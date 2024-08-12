@@ -1,4 +1,4 @@
-import {Button, drawBlock, Label, RenderParameters, VBox} from "./test.ts";
+import {Button, Checkbox, drawBlock, HBox, Label, RenderParameters, VBox} from "./test.ts";
 
 console.log("this is the beginning")
 
@@ -17,9 +17,10 @@ const c:RenderParameters = {
     debug:false
 }
 c.ctx.font = '20px sans-serif'
-const vblock = VBox(c,[
+const vblock = HBox(c,[
     Label(c,"label"),
     Button(c,"Button"),
+    Checkbox(c,"Checkbox",true),
 ])
 
 ctx.save()

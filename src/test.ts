@@ -1,12 +1,5 @@
-import {Bounds, Insets} from "josh_js_util"
+import {Bounds, Insets, Point} from "josh_js_util"
 
-export type ButtonParameters = {
-    text?:string
-    leftIcon?:string,
-    rightIcon:string,
-    selected:boolean,
-    hover:boolean,
-}
 export type RenderParameters = {
     ctx:CanvasRenderingContext2D
     fontSize: string
@@ -22,12 +15,15 @@ export type Border = {
 export type VBlock = {
     text?:string,
     bounds:Bounds,
-    children?:VBlock[]
-    baseline:number,
-    border?:Border,
-    background?:string
-    padding?: Insets,
     margin?: Insets,
+    border?:Border,
+    padding?: Insets,
+
+    icon?: "square-empty"
+    children?:VBlock[]
+
+    baseline:number,
+    background?:string
     color?:string
 }
 
@@ -47,6 +43,22 @@ export function Button(c:RenderParameters, text:string):VBlock {
     }}
 }
 
+
+export function Checkbox(c: RenderParameters, text: string, b: boolean) {
+    return HBox(c, [
+        CheckIcon(c),
+        Label(c,'text')
+    ])
+}
+
+
+export function CheckIcon(c:RenderParameters):VBlock {
+    return {
+        bounds: new Bounds(0,0,16,16),
+        baseline: 8,
+        icon:"square-empty",
+    }
+}
 export function Label(c:RenderParameters, text:string):VBlock {
     const m = c.ctx.measureText(text)
     let bounds = new Bounds(0,0,m.width,m.fontBoundingBoxAscent+m.fontBoundingBoxDescent)
@@ -54,7 +66,6 @@ export function Label(c:RenderParameters, text:string):VBlock {
     bounds = addInsets(bounds,padding)
     return {text: text, bounds: bounds, children:[], baseline: m.fontBoundingBoxAscent, padding:padding} as VBlock
 }
-
 export function VBox(_c: RenderParameters, vBlocks: VBlock[]):VBlock {
     let bounds = new Bounds(0,0,0,0)
     const border:Border = {
@@ -79,6 +90,32 @@ export function VBox(_c: RenderParameters, vBlocks: VBlock[]):VBlock {
         border:border,
     }
 }
+export function HBox(c:RenderParameters, children:VBlock[]):VBlock {
+    let bounds = new Bounds(0,0,0,0)
+    const border:Border = {
+        width:1,
+        color:'red',
+    }
+    bounds.w += border.width*2
+    bounds.h += border.width*2
+    let pt = new Point(bounds.x,bounds.y).add(new Point(2,2))
+    for(let ch of children) {
+        ch.bounds.x = pt.x
+        ch.bounds.y = pt.y
+        pt.x += ch.bounds.w
+        bounds.w += ch.bounds.w
+        bounds.h = Math.max(bounds.h, ch.bounds.h)
+    }
+    bounds = bounds.grow(1)
+    return {
+        text:undefined,
+        bounds:bounds,
+        children:children,
+        baseline: 0,
+        border:border,
+    }
+
+}
 
 export function drawBlock(c: RenderParameters, block: VBlock) {
     c.ctx.save()
@@ -102,6 +139,13 @@ export function drawBlock(c: RenderParameters, block: VBlock) {
     }
     if (block.text) {
         c.ctx.fillText(block.text, 0, block.baseline)
+    }
+    if(block.icon) {
+        if(block.icon === 'square-empty') {
+            c.ctx.strokeStyle = 'black'
+            c.ctx.lineWidth = 1
+            c.ctx.strokeRect(0,0,16,16)
+        }
     }
     if(block.children) {
         for(let ch of block.children) {
