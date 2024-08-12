@@ -55,7 +55,7 @@ export function Label(c:RenderParameters, text:string):VBlock {
     return {text: text, bounds: bounds, children:[], baseline: m.fontBoundingBoxAscent, padding:padding} as VBlock
 }
 
-export function VBox(c: RenderParameters, vBlocks: VBlock[]):VBlock {
+export function VBox(_c: RenderParameters, vBlocks: VBlock[]):VBlock {
     let bounds = new Bounds(0,0,0,0)
     const border:Border = {
         width:1,

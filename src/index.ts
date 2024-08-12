@@ -4,8 +4,8 @@ console.log("this is the beginning")
 
 const canvas = document.createElement('canvas')
 
-canvas.width = '500'
-canvas.height = '300'
+canvas.width = 500
+canvas.height = 300
 
 document.body.appendChild(canvas)
 
