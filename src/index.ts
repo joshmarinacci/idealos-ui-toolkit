@@ -8,7 +8,7 @@ import {
     NumberInput, RadioButton,
     RenderParameters,
     SearchInput,
-    Separator,
+    Separator, ShrinkBox,
     TextInput, VBox
 } from "./test.ts";
 import {Icons} from "./icons.ts";
@@ -30,6 +30,12 @@ const c:RenderParameters = {
 c.ctx.font = '20px sans-serif'
 
 
+function Tag(c: RenderParameters, param2: { text: string }) {
+    return ShrinkBox(c,[Label(c,param2.text)],{
+        background:"aqua"
+    })
+}
+
 const content = VBox(c, [
     HBox(c,[
         Label(c,'buttons'),
@@ -37,7 +43,7 @@ const content = VBox(c, [
         IconButton(c,{text:'Doc',icon:Icons.Document}),
         Icon(c,{icon:Icons.Document}),
         Checkbox(c,"Checkbox",true),
-        // Tag(c, {text:'tag'}),
+        Tag(c, {text:'tag'}),
     ]),
     HBox(c, [
         Label(c,'toolbar'),

@@ -61,14 +61,17 @@ function addInsets(bounds: Bounds, padding: Insets): Bounds {
 type ShrinkBoxParamters = {
     margin?:Insets,
     border?:Border,
-    padding?:Insets
+    padding?:Insets,
+    background?:string
 }
 export function ShrinkBox(c:RenderParameters, children:VBlock[], opts?:ShrinkBoxParamters):VBlock {
     let margin = new Insets(0,0,0,0)
     let padding = new Insets(0,0,0,0)
+    let border = undefined
     if(opts) {
         if(opts.margin) margin = opts.margin
         if(opts.padding) padding = opts.padding
+        if(opts.border) border = opts.border
     }
 
 
@@ -87,16 +90,15 @@ export function ShrinkBox(c:RenderParameters, children:VBlock[], opts?:ShrinkBox
     bounds.h += inner.h
     bounds.w += inner.w
 
+
     return {
         baseline: 0,
         bounds:bounds,
         padding:padding,
         margin:margin,
         children:children,
-        border:{
-            width: 1,
-            color:'purple'
-        }
+        border:border,
+        background:opts?.background
     }
 }
 
