@@ -5,7 +5,7 @@ import {
     Icon,
     IconButton,
     Label,
-    NumberInput,
+    NumberInput, RadioButton,
     RenderParameters,
     SearchInput,
     Separator,
@@ -15,7 +15,7 @@ import {Icons} from "./icons.ts";
 
 const canvas = document.createElement('canvas')
 
-canvas.width = 700
+canvas.width = 800
 canvas.height = 300
 
 document.body.appendChild(canvas)
@@ -32,19 +32,17 @@ c.ctx.font = '20px sans-serif'
 
 const content = VBox(c, [
     HBox(c,[
-        Label(c,'simple components'),
-        Button(c,"Button"),
-        // ToggleButton(c,{text:"Toggle",selected:true}),
+        Label(c,'buttons'),
+        Button(c,{text:"Button",selected:true}),
         IconButton(c,{text:'Doc',icon:Icons.Document}),
-        // IconButton(c,{icon:Icons.Document, ghost:true}),
-        // Icon(c,{icon:Icons.Document}),
+        Icon(c,{icon:Icons.Document}),
+        Checkbox(c,"Checkbox",true),
         // Tag(c, {text:'tag'}),
-        // Checkbox(c,"Checkbox",true),
     ]),
     HBox(c, [
         Label(c,'toolbar'),
         HBox(c, [
-            Button(c,"Button"),
+            Button(c, {text:"Button",selected:false}),
             IconButton(c,{text:'IconButton',icon:Icons.Document}),
             IconButton(c,{icon:Icons.Document}),
             Separator(c),
@@ -53,11 +51,12 @@ const content = VBox(c, [
     ]),
     HBox(c, [
         Label(c,'inputs'),
-        Button(c,"Button"),
+        Button(c, {text:"Button",selected:true}),
         TextInput(c,{placeholder:'text'}),
         NumberInput(c,{placeholder:'0'}),
         SearchInput(c,{placeholder:'search'}),
         Checkbox(c, 'check box', true),
+        RadioButton(c, 'radio box', false),
     ])
 ])
 // const content = IconButton(c,{ icon: Icons.Document, text:"Download"})
@@ -71,7 +70,7 @@ async function doit() {
     await font.load()
     console.log("font is loaded")
     ctx.save()
-    ctx.translate(100, 100);
+    // ctx.translate(100, 100);
     // console.log("sleeping")
     // await sleep(3)
     console.log('drawing')

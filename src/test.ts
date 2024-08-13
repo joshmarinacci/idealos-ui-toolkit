@@ -1,4 +1,4 @@
-import {Bounds, Insets, Point} from "josh_js_util"
+import {Bounds, Insets, Point, Size} from "josh_js_util"
 import {Icons} from "./icons.ts";
 
 export type RenderParameters = {
@@ -58,42 +58,76 @@ function addInsets(bounds: Bounds, padding: Insets): Bounds {
     return new Bounds(bounds.x, bounds.y, bounds.w + padding.left + padding.right, bounds.h + padding.top + padding.bottom)
 }
 
-export function Button(c: RenderParameters, text: string, bg?: string): VBlock {
-    const m = c.ctx.measureText(text)
-    let bounds = new Bounds(0, 0, m.width, m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)
-    const padding = new Insets(5, 5, 5, 5)
-    bounds = addInsets(bounds, padding)
-    bounds = addInsets(bounds, StyleVars.margin)
-    return {
-        text,
-        bounds, children: [],
-        baseline: m.fontBoundingBoxAscent,
-        background: bg ? bg : StyleVars.selectedBackground,
-        color: "black",
-        padding: padding,
-        border: {
-            width: 1,
-            color: 'black',
-        },
-        margin: StyleVars.margin
+type ShrinkBoxParamters = {
+    margin?:Insets,
+    border?:Border,
+    padding?:Insets
+}
+export function ShrinkBox(c:RenderParameters, children:VBlock[], opts?:ShrinkBoxParamters):VBlock {
+    let margin = new Insets(0,0,0,0)
+    let padding = new Insets(0,0,0,0)
+    if(opts) {
+        if(opts.margin) margin = opts.margin
+        if(opts.padding) padding = opts.padding
     }
+
+
+    let bounds = new Bounds(0,0,0,0)
+    bounds = addInsets(bounds,margin)
+    bounds = addInsets(bounds,padding)
+
+    let inner = new Bounds(0,0,0,0)
+    for(let ch of children) {
+        if(ch.bounds.h > inner.h) inner.h = ch.bounds.h
+        ch.bounds.x += margin.left
+        ch.bounds.y += margin.top
+        ch.bounds.x = inner.w
+        inner.w += ch.bounds.w
+    }
+    bounds.h += inner.h
+    bounds.w += inner.w
+
+    return {
+        baseline: 0,
+        bounds:bounds,
+        padding:padding,
+        margin:margin,
+        children:children,
+        border:{
+            width: 1,
+            color:'purple'
+        }
+    }
+}
+
+type ButtonOpts = {
+    text:string,
+    selected:boolean
+}
+export function Button(c: RenderParameters, opts: ButtonOpts): VBlock {
+    return ShrinkBox(c,[Label(c,opts.text)],{
+        // margin: StyleVars.margin,
+        border: {
+            width:StyleVars.borderWidth,
+            color: StyleVars.borderColor,
+        },
+        // padding:StyleVars.padding,
+    })
 }
 
 
 export function Checkbox(c: RenderParameters, text: string, b: boolean) {
-    return HBox(c, [
-        CheckIcon(c),
+    return ShrinkBox(c, [
+        Icon(c,{icon:b?Icons.CheckboxChecked:Icons.CheckboxUnchecked}),
         Label(c, text)
     ])
 }
 
-
-export function CheckIcon(c: RenderParameters): VBlock {
-    return {
-        bounds: new Bounds(0, 0, 16, 16),
-        baseline: 10,
-        icon: Icons.CheckboxUnchecked
-    }
+export function RadioButton(c: RenderParameters, text: string, b: boolean) {
+    return ShrinkBox(c, [
+        Icon(c,{icon:b?Icons.RadioButtonChecked:Icons.RadioButtonUnchecked}),
+        Label(c, text)
+    ])
 }
 
 export function Label(c: RenderParameters, text: string): VBlock {
@@ -130,10 +164,21 @@ type TextInputParameters = {
     placeholder: string
 }
 
+export function FixedBox(c: RenderParameters,
+                         child:VBlock,
+                         opts:{size:Size, border:Border}): VBlock {
+    return {
+        baseline:0,
+        bounds: new Bounds(0,0,opts.size.w,opts.size.h),
+        children:[child],
+        border: opts.border,
+    }
+}
 export function TextInput(c: RenderParameters, opts: TextInputParameters): VBlock {
-    return HBox(c, [
+    return FixedBox(c,
         Label(c, opts.placeholder)
-    ],{
+    ,{
+        size:new Size(100,32),
         border: {
             width: StyleVars.borderWidth,
             color: StyleVars.borderColor,
@@ -152,10 +197,7 @@ export function SearchInput(c: RenderParameters, opts: TextInputParameters) {
 export function IconButton(c: RenderParameters, opts: { icon: Icons; text?: string }): VBlock {
     const ch = [Icon(c, {icon: opts.icon})]
     if (opts.text) ch.push(Label(c, opts.text))
-    return HBox(c, ch, {
-        margin: StyleVars.margin,
-        padding: StyleVars.padding,
-        background: StyleVars.selectedControlBackground,
+    return ShrinkBox(c, ch, {
         border: {
             color: StyleVars.borderColor,
             width: 1
@@ -163,7 +205,7 @@ export function IconButton(c: RenderParameters, opts: { icon: Icons; text?: stri
     })
 }
 
-export function Icon(c: RenderParameters, opts: IconParameters): VBlock {
+export function Icon(_c: RenderParameters, opts: IconParameters): VBlock {
     return {
         bounds: new Bounds(0, 0, 32, 32),
         baseline: 17,
@@ -174,9 +216,10 @@ export function Icon(c: RenderParameters, opts: IconParameters): VBlock {
     }
 }
 
-export function Separator(c: RenderParameters): VBlock {
+export function Separator(_c: RenderParameters): VBlock {
     return {
-        bounds: new Bounds(0, 0, 10, 30),
+        bounds: new Bounds(0, 0, 20, 30),
+        margin: new Insets(5,5,5,5),
         background: "red",
         baseline: 0
     }
@@ -184,12 +227,6 @@ export function Separator(c: RenderParameters): VBlock {
 
 export function VBox(_c: RenderParameters, vBlocks: VBlock[]): VBlock {
     let bounds = new Bounds(0, 0, 0, 0)
-    // const border: Border = {
-    //     width: 0,
-    //     color: 'transparent',
-    // }
-    // bounds.w += border.width * 2
-    // bounds.h += border.width * 2
     for (let ch of vBlocks) {
         if (ch.bounds.w > bounds.w) {
             bounds.w = ch.bounds.w
@@ -213,7 +250,7 @@ type BoxParameters = {
     background?:string
 }
 
-export function HBox(c: RenderParameters, children: VBlock[], opts?: BoxParameters): VBlock {
+export function HBox(_c: RenderParameters, children: VBlock[], opts?: BoxParameters): VBlock {
     let bounds = new Bounds(0, 0, 0, 0)
     if (opts && opts.border) {
         bounds.w += opts.border.width * 2

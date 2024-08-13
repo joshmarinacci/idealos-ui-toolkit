@@ -16,6 +16,8 @@ export enum Icons {
     Star = 'star',
     CheckboxChecked = 'check_box',
     CheckboxUnchecked = 'check_box_outline_blank',
+    RadioButtonChecked = 'radio_button_checked',
+    RadioButtonUnchecked = 'radio_button_unchecked',
     Document = 'description',
     Page = 'note',
     Color = 'palette',
