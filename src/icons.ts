@@ -39,4 +39,6 @@ export enum Icons {
     Info = 'info',
     Forum = 'forum',
     ShoppingCart = 'shopping_cart',
+    ToggleOn = 'toggle_on',
+    ToggleOff= 'toggle_off',
 }

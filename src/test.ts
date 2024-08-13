@@ -64,7 +64,7 @@ type ShrinkBoxParamters = {
     padding?:Insets,
     background?:string
 }
-export function ShrinkBox(c:RenderParameters, children:VBlock[], opts?:ShrinkBoxParamters):VBlock {
+export function ShrinkBox(_c:RenderParameters, children:VBlock[], opts?:ShrinkBoxParamters):VBlock {
     let margin = new Insets(0,0,0,0)
     let padding = new Insets(0,0,0,0)
     let border = undefined
@@ -149,12 +149,10 @@ export function Label(c: RenderParameters, text: string): VBlock {
 }
 
 export function ToggleButton(c: RenderParameters, opts: { text: string; selected: boolean }): VBlock {
-    if (opts.selected) {
-        return Button(c, opts.text)
-    } else {
-        return Button(c, opts.text)
-    }
-
+    return ShrinkBox(c, [
+        Icon(c,{icon:opts.selected?Icons.ToggleOn:Icons.ToggleOff}),
+        Label(c, opts.text)
+    ])
 }
 
 
@@ -166,7 +164,7 @@ type TextInputParameters = {
     placeholder: string
 }
 
-export function FixedBox(c: RenderParameters,
+export function FixedBox(_c: RenderParameters,
                          child:VBlock,
                          opts:{size:Size, border:Border}): VBlock {
     return {

@@ -9,7 +9,7 @@ import {
     RenderParameters,
     SearchInput,
     Separator, ShrinkBox,
-    TextInput, VBox
+    TextInput, ToggleButton, VBox
 } from "./test.ts";
 import {Icons} from "./icons.ts";
 
@@ -56,13 +56,16 @@ const content = VBox(c, [
         ]),
     ]),
     HBox(c, [
-        Label(c,'inputs'),
         Button(c, {text:"Button",selected:true}),
+        Checkbox(c, 'check box', true),
+        RadioButton(c, 'radio box', false),
+        ToggleButton(c, {text:'enabled',selected:true})
+    ]),
+    HBox(c, [
+        Label(c,'inputs'),
         TextInput(c,{placeholder:'text'}),
         NumberInput(c,{placeholder:'0'}),
         SearchInput(c,{placeholder:'search'}),
-        Checkbox(c, 'check box', true),
-        RadioButton(c, 'radio box', false),
     ])
 ])
 // const content = IconButton(c,{ icon: Icons.Document, text:"Download"})
