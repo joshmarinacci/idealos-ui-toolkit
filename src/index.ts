@@ -34,12 +34,12 @@ const c:RenderParameters = {
     fontSize:'26px',
     debug:false
 }
-c.ctx.font = '20px sans-serif'
+c.ctx.font = '16px sans-serif'
 
 
 const vconent = VBox(c, [
     HBox(c,[
-        Label(c,'buttons'),
+        Label(c,{text:'buttons'}),
         Button(c,{text:"Button",selected:true}),
         Icon(c,{icon:Icons.Document}),
         IconButton(c,{text:'Doc',icon:Icons.Document}),
@@ -47,7 +47,7 @@ const vconent = VBox(c, [
         Tag(c, {text:'tag'}),
     ]),
     HBox(c, [
-        Label(c,'toolbar'),
+        Label(c,{text:'toolbar'}),
         HBox(c, [
             Button(c, {text:"Button",selected:false}),
             IconButton(c,{text:'IconButton',icon:Icons.Document}),
@@ -57,14 +57,14 @@ const vconent = VBox(c, [
         ]),
     ]),
     HBox(c, [
-        Label(c, 'buttons'),
+        Label(c, {text:'buttons'}),
         Button(c, {text:"Button",selected:true}),
         Checkbox(c, 'check box', true),
         RadioButton(c, 'radio box', false),
         ToggleButton(c, {text:'enabled',selected:true})
     ]),
     HBox(c, [
-        Label(c,'inputs'),
+        Label(c,{text:'inputs'}),
         TextInput(c,{placeholder:'text'}),
         NumberInput(c,{placeholder:'0'}),
         SearchInput(c,{placeholder:'search'}),
@@ -85,6 +85,7 @@ function findTarget(pos: Point, block: VBlock):VBlock|undefined {
     if(block.bounds.contains(pos)) {
         if(block.children) {
             for (let ch of block.children) {
+                if(ch.shadow) continue
                 let p2 = pos.subtract(block.bounds.top_left())
                 let found = findTarget(p2, ch)
                 if(found) return found
@@ -95,6 +96,7 @@ function findTarget(pos: Point, block: VBlock):VBlock|undefined {
 }
 
 canvas.addEventListener('click',(e) => {
+    // @ts-ignore
     let rect = e.target.getBoundingClientRect()
     let pos = new Point(e.clientX, e.clientY);
     pos = pos.subtract(new Point(rect.x,rect.y))

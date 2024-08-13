@@ -53,6 +53,7 @@ export type VBlock = {
     baseline: number,
     background?: string
     color?: string
+    shadow?:boolean
 }
 
 function addInsets(bounds: Bounds, padding: Insets): Bounds {
@@ -109,7 +110,7 @@ type ButtonOpts = {
     selected:boolean
 }
 export function Button(c: RenderParameters, opts: ButtonOpts): VBlock {
-    return ShrinkBox(c,[Label(c,opts.text)],{
+    return ShrinkBox(c,[Label(c,{text:opts.text, shadow:true})],{
         // margin: StyleVars.margin,
         border: {
             width:StyleVars.borderWidth,
@@ -127,39 +128,47 @@ const DebugBorder:Border = {
 }
 export function Checkbox(c: RenderParameters, text: string, b: boolean) {
     return ShrinkBox(c, [
-        Icon(c,{icon:b?Icons.CheckboxChecked:Icons.CheckboxUnchecked}),
-        Label(c, text)
+        Icon(c,{
+            icon:b?Icons.CheckboxChecked:Icons.CheckboxUnchecked,
+            shadow:true,
+        }),
+        Label(c, {text, shadow:true})
     ])
 }
 
 export function RadioButton(c: RenderParameters, text: string, b: boolean) {
     return ShrinkBox(c, [
         Icon(c,{icon:b?Icons.RadioButtonChecked:Icons.RadioButtonUnchecked}),
-        Label(c, text)
+        Label(c, {text})
     ])
 }
 
-export function Label(c: RenderParameters, text: string): VBlock {
-    const m = c.ctx.measureText(text)
+type LabelOpts = {
+    text:string
+    shadow?:boolean
+}
+export function Label(c: RenderParameters, opts:LabelOpts): VBlock {
+    const m = c.ctx.measureText(opts.text)
     let bounds = new Bounds(0, 0, m.width, m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)
     // console.log('metrics',text,m)
     bounds = addInsets(bounds, StyleVars.padding)
     bounds = addInsets(bounds, StyleVars.margin)
     return {
         name:'Label',
-        text: text,
+        text: opts.text,
         bounds: bounds,
         children: [],
         baseline: m.fontBoundingBoxAscent,
         padding: StyleVars.padding,
         margin: StyleVars.margin,
+        shadow: opts.shadow
     }
 }
 
 export function ToggleButton(c: RenderParameters, opts: { text: string; selected: boolean }): VBlock {
     return ShrinkBox(c, [
         Icon(c,{icon:opts.selected?Icons.ToggleOn:Icons.ToggleOff}),
-        Label(c, opts.text)
+        Label(c, {text:opts.text})
     ])
 }
 
@@ -167,6 +176,7 @@ export function ToggleButton(c: RenderParameters, opts: { text: string; selected
 type IconParameters = {
     icon: Icons
     color?: string
+    shadow?:boolean
 }
 type TextInputParameters = {
     placeholder: string
@@ -184,7 +194,7 @@ export function FixedBox(_c: RenderParameters,
 }
 export function TextInput(c: RenderParameters, opts: TextInputParameters): VBlock {
     return FixedBox(c,
-        Label(c, opts.placeholder)
+        Label(c, {text:opts.placeholder})
     ,{
         size:new Size(100,32),
         border: {
@@ -203,8 +213,8 @@ export function SearchInput(c: RenderParameters, opts: TextInputParameters) {
 }
 
 export function IconButton(c: RenderParameters, opts: { icon: Icons; text?: string }): VBlock {
-    const ch = [Icon(c, {icon: opts.icon})]
-    if (opts.text) ch.push(Label(c, opts.text))
+    const ch = [Icon(c, {icon: opts.icon, shadow:true})]
+    if (opts.text) ch.push(Label(c, {text:opts.text, shadow:true}))
     return ShrinkBox(c, ch, {
         border: {
             color: StyleVars.borderColor,
@@ -222,6 +232,7 @@ export function Icon(_c: RenderParameters, opts: IconParameters): VBlock {
         padding: StyleVars.padding,
         margin: StyleVars.margin,
         color: opts.color,
+        shadow: opts.shadow
         // border: DebugBorder
     }
 }
@@ -307,33 +318,35 @@ export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts
         c.ctx.strokeRect(block.bounds.x, block.bounds.y, block.bounds.w, block.bounds.h)
     }
     c.ctx.translate(block.bounds.x, block.bounds.y)
+    let offset = new Point(0,0)
     if (block.margin) {
-        c.ctx.translate(block.margin.left, block.margin.top)
+        offset.x += block.margin.left
+        offset.y += block.margin.top
     }
     if (block.background) {
         c.ctx.fillStyle = block.background
-        c.ctx.fillRect(0, 0, block.bounds.w, block.bounds.h)
+        c.ctx.fillRect(offset.x, offset.y, block.bounds.w-offset.x, block.bounds.h-offset.y)
     }
     if (block.border) {
         c.ctx.strokeStyle = block.border.color
         c.ctx.lineWidth = block.border.width
-        c.ctx.strokeRect(0, 0, block.bounds.w, block.bounds.h)
-        c.ctx.translate(block.border.width, block.border.width)
+        c.ctx.strokeRect(offset.x, offset.y, block.bounds.w-offset.x, block.bounds.h-offset.y)
     }
     if (block.padding) {
-        c.ctx.translate(block.padding.left, block.padding.top)
+        offset.x += block.padding.left
+        offset.y += block.padding.top
     }
     c.ctx.fillStyle = 'black'
     if (block.color) {
         c.ctx.fillStyle = block.color
     }
     if (block.text) {
-        c.ctx.fillText(block.text, 0, block.baseline)
+        c.ctx.fillText(block.text, offset.x, offset.y+block.baseline)
     }
     if (block.icon) {
         c.ctx.font = '24px material-icons'
         c.ctx.fillStyle = (block.color ? block.color : 'black')
-        c.ctx.fillText(block.icon, 0, block.baseline)
+        c.ctx.fillText(block.icon, offset.x, offset.y+block.baseline)
     }
     // draw the baseline
     // c.ctx.strokeStyle = 'purple'
@@ -356,8 +369,8 @@ export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts
     }
 }
 
-export function Tag(c: RenderParameters, param2: { text: string }) {
-    return ShrinkBox(c, [Label(c, param2.text)], {
+export function Tag(c: RenderParameters, opts: { text: string }) {
+    return ShrinkBox(c, [Label(c, {text:opts.text})], {
         background: "aqua"
     })
 }
