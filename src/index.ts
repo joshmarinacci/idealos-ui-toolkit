@@ -1,17 +1,24 @@
 import {
-    Button, Checkbox,
+    Button,
+    Checkbox,
     drawBlock,
     HBox,
     Icon,
     IconButton,
     Label,
-    NumberInput, RadioButton,
+    NumberInput,
+    RadioButton,
     RenderParameters,
     SearchInput,
-    Separator, ShrinkBox,
-    TextInput, ToggleButton, VBox
+    Separator,
+    Tag,
+    TextInput,
+    ToggleButton,
+    VBlock,
+    VBox
 } from "./test.ts";
 import {Icons} from "./icons.ts";
+import {Point} from "josh_js_util";
 
 const canvas = document.createElement('canvas')
 
@@ -25,23 +32,17 @@ const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 const c:RenderParameters = {
     ctx:ctx,
     fontSize:'26px',
-    debug:true
+    debug:false
 }
 c.ctx.font = '20px sans-serif'
 
 
-function Tag(c: RenderParameters, param2: { text: string }) {
-    return ShrinkBox(c,[Label(c,param2.text)],{
-        background:"aqua"
-    })
-}
-
-const content = VBox(c, [
+const vconent = VBox(c, [
     HBox(c,[
         Label(c,'buttons'),
         Button(c,{text:"Button",selected:true}),
-        IconButton(c,{text:'Doc',icon:Icons.Document}),
         Icon(c,{icon:Icons.Document}),
+        IconButton(c,{text:'Doc',icon:Icons.Document}),
         Checkbox(c,"Checkbox",true),
         Tag(c, {text:'tag'}),
     ]),
@@ -56,6 +57,7 @@ const content = VBox(c, [
         ]),
     ]),
     HBox(c, [
+        Label(c, 'buttons'),
         Button(c, {text:"Button",selected:true}),
         Checkbox(c, 'check box', true),
         RadioButton(c, 'radio box', false),
@@ -68,28 +70,42 @@ const content = VBox(c, [
         SearchInput(c,{placeholder:'search'}),
     ])
 ])
-// const content = IconButton(c,{ icon: Icons.Document, text:"Download"})
-
-// const content = Icon(c, {icon:Icons.Document, color:'red'})
 async function doit() {
     const font = new FontFace('material-icons',
     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
-    // 'url(https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200)')
     document.fonts.add(font)
     await font.load()
-    console.log("font is loaded")
     ctx.save()
-    // ctx.translate(100, 100);
-    // console.log("sleeping")
-    // await sleep(3)
-    console.log('drawing')
-    drawBlock(c, content)
+    drawBlock(c, vconent,{})
     ctx.restore()
 
-    // ctx.fillStyle = 'green';
-    // ctx.font = '20px material-icons';
-    // ctx.fillText('airplanemode_active', 20, 40);
-
 }
+
+function findTarget(pos: Point, block: VBlock):VBlock|undefined {
+    if(block.bounds.contains(pos)) {
+        if(block.children) {
+            for (let ch of block.children) {
+                let p2 = pos.subtract(block.bounds.top_left())
+                let found = findTarget(p2, ch)
+                if(found) return found
+            }
+        }
+        return block
+    }
+}
+
+canvas.addEventListener('click',(e) => {
+    let rect = e.target.getBoundingClientRect()
+    let pos = new Point(e.clientX, e.clientY);
+    pos = pos.subtract(new Point(rect.x,rect.y))
+    console.log("clicked at",pos)
+    let found = findTarget(pos,vconent)
+    console.log("found is",found)
+    c.ctx.fillStyle = 'white'
+    c.ctx.fillRect(0,0,canvas.width,canvas.height)
+    drawBlock(c,vconent,{
+        highlight:found
+    })
+})
 
 doit().then(()=>console.log("is done"))

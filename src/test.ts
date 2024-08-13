@@ -40,6 +40,7 @@ export type Border = {
 
 
 export type VBlock = {
+    name?:string,
     text?: string,
     bounds: Bounds,
     margin?: Insets,
@@ -92,6 +93,7 @@ export function ShrinkBox(_c:RenderParameters, children:VBlock[], opts?:ShrinkBo
 
 
     return {
+        name:'ShrinkBox',
         baseline: 0,
         bounds:bounds,
         padding:padding,
@@ -117,7 +119,12 @@ export function Button(c: RenderParameters, opts: ButtonOpts): VBlock {
     })
 }
 
+const NullInsets:Insets = new Insets(0,0,0,0)
 
+const DebugBorder:Border = {
+    width: 3,
+    color: 'red'
+}
 export function Checkbox(c: RenderParameters, text: string, b: boolean) {
     return ShrinkBox(c, [
         Icon(c,{icon:b?Icons.CheckboxChecked:Icons.CheckboxUnchecked}),
@@ -139,6 +146,7 @@ export function Label(c: RenderParameters, text: string): VBlock {
     bounds = addInsets(bounds, StyleVars.padding)
     bounds = addInsets(bounds, StyleVars.margin)
     return {
+        name:'Label',
         text: text,
         bounds: bounds,
         children: [],
@@ -207,17 +215,20 @@ export function IconButton(c: RenderParameters, opts: { icon: Icons; text?: stri
 
 export function Icon(_c: RenderParameters, opts: IconParameters): VBlock {
     return {
-        bounds: new Bounds(0, 0, 32, 32),
-        baseline: 17,
+        name:'Icon',
+        bounds: new Bounds(0, 0, 48, 48),
+        baseline: 20,
         icon: opts.icon,
         padding: StyleVars.padding,
-        margin: StyleVars.padding,
-        color: opts.color
+        margin: StyleVars.margin,
+        color: opts.color,
+        // border: DebugBorder
     }
 }
 
 export function Separator(_c: RenderParameters): VBlock {
     return {
+        name:'Separator',
         bounds: new Bounds(0, 0, 20, 30),
         margin: new Insets(5,5,5,5),
         background: "red",
@@ -236,7 +247,7 @@ export function VBox(_c: RenderParameters, vBlocks: VBlock[]): VBlock {
     }
     bounds = bounds.grow(1)
     return {
-        // text: undefined,
+        name:'VBox',
         bounds: bounds,
         children: vBlocks,
         baseline: 0,
@@ -274,6 +285,7 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts?: BoxParamet
     }
     bounds = bounds.grow(1)
     return {
+        name:'HBox',
         bounds: bounds,
         children: children,
         baseline: bounds.h,
@@ -284,13 +296,16 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts?: BoxParamet
 
 }
 
-export function drawBlock(c: RenderParameters, block: VBlock) {
+export type DrawBlockOpts = {
+    highlight?:VBlock
+}
+export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts) {
     c.ctx.save()
-    // if (c.debug) {
-    //     c.ctx.lineWidth = 0.5
-    //     c.ctx.strokeStyle = 'purple'
-    //     c.ctx.strokeRect(block.bounds.x, block.bounds.y, block.bounds.w, block.bounds.h)
-    // }
+    if (c.debug) {
+        c.ctx.lineWidth = 0.5
+        c.ctx.strokeStyle = 'purple'
+        c.ctx.strokeRect(block.bounds.x, block.bounds.y, block.bounds.w, block.bounds.h)
+    }
     c.ctx.translate(block.bounds.x, block.bounds.y)
     if (block.margin) {
         c.ctx.translate(block.margin.left, block.margin.top)
@@ -329,9 +344,20 @@ export function drawBlock(c: RenderParameters, block: VBlock) {
 
     if (block.children) {
         for (let ch of block.children) {
-            drawBlock(c, ch)
+            drawBlock(c, ch, opts)
         }
     }
     c.ctx.restore()
+    if(opts) {
+        if(opts.highlight === block) {
+            c.ctx.fillStyle = 'rgba(255,0,0,0.1)'
+            c.ctx.fillRect(block.bounds.x, block.bounds.y, block.bounds.w, block.bounds.h)
+        }
+    }
 }
 
+export function Tag(c: RenderParameters, param2: { text: string }) {
+    return ShrinkBox(c, [Label(c, param2.text)], {
+        background: "aqua"
+    })
+}
