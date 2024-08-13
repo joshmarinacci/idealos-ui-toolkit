@@ -61,7 +61,7 @@ const vconent = VBox(c, [
         Button(c, {text:"Button",selected:true}),
         Checkbox(c, 'check box', true),
         RadioButton(c, 'radio box', false),
-        ToggleButton(c, {text:'enabled',selected:true})
+        ToggleButton(c, {text:'toggle',selected:true})
     ]),
     HBox(c, [
         Label(c,{text:'inputs'}),
