@@ -1,6 +1,5 @@
 import {
-    Button,
-    Checkbox,
+    Button, Checkbox,
     drawBlock,
     HBox,
     Icon,
@@ -10,9 +9,7 @@ import {
     RenderParameters,
     SearchInput,
     Separator,
-    TextInput,
-    ToggleButton,
-    VBox
+    TextInput, VBox
 } from "./test.ts";
 import {Icons} from "./icons.ts";
 
@@ -37,12 +34,12 @@ const content = VBox(c, [
     HBox(c,[
         Label(c,'simple components'),
         Button(c,"Button"),
-        ToggleButton(c,{text:"Toggle",selected:true}),
+        // ToggleButton(c,{text:"Toggle",selected:true}),
         IconButton(c,{text:'Doc',icon:Icons.Document}),
         // IconButton(c,{icon:Icons.Document, ghost:true}),
-        Icon(c,{icon:Icons.Document}),
+        // Icon(c,{icon:Icons.Document}),
         // Tag(c, {text:'tag'}),
-        Checkbox(c,"Checkbox",true),
+        // Checkbox(c,"Checkbox",true),
     ]),
     HBox(c, [
         Label(c,'toolbar'),
@@ -63,8 +60,28 @@ const content = VBox(c, [
         Checkbox(c, 'check box', true),
     ])
 ])
+// const content = IconButton(c,{ icon: Icons.Document, text:"Download"})
 
-ctx.save()
-ctx.translate(100,100);
-drawBlock(c,content)
-ctx.restore()
+// const content = Icon(c, {icon:Icons.Document, color:'red'})
+async function doit() {
+    const font = new FontFace('material-icons',
+    'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+    // 'url(https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200)')
+    document.fonts.add(font)
+    await font.load()
+    console.log("font is loaded")
+    ctx.save()
+    ctx.translate(100, 100);
+    // console.log("sleeping")
+    // await sleep(3)
+    console.log('drawing')
+    drawBlock(c, content)
+    ctx.restore()
+
+    // ctx.fillStyle = 'green';
+    // ctx.font = '20px material-icons';
+    // ctx.fillText('airplanemode_active', 20, 40);
+
+}
+
+doit().then(()=>console.log("is done"))

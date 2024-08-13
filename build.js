@@ -27,7 +27,7 @@ async function go() {
         platform: "browser",
         format: "esm",
         outfile: "build/bundle.js",
-        target:['es2020']
+        target:['es2024']
         // external: ["pngjs", "opentype.js", "jpeg-js"],
     });
 }
