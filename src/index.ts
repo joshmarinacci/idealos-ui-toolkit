@@ -103,6 +103,12 @@ canvas.addEventListener('click',(e) => {
     console.log("clicked at",pos)
     let found = findTarget(pos,vconent)
     console.log("found is",found)
+    if(found) {
+        console.log(found.name)
+        console.log('bounds',found.bounds)
+        console.log('margin',found.margin)
+        console.log('padding',found.padding)
+    }
     c.ctx.fillStyle = 'white'
     c.ctx.fillRect(0,0,canvas.width,canvas.height)
     drawBlock(c,vconent,{

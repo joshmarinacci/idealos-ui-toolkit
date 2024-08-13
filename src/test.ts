@@ -15,7 +15,7 @@ const StyleVars = {
     fontSize: '16px',
     fontFamily: 'sans-serif',
     margin: new Insets(4, 4, 4, 4),
-    padding: new Insets(8, 8, 8, 8),
+    padding: new Insets(7, 8, 7, 8),
     background: `hsl(${hue},5%,100%)`,
     selectedBackground: `hsl(${hue},90%,57%)`,
     borderRadius: '4px',
@@ -92,7 +92,7 @@ function addInsets(bounds: Bounds, padding: Insets): Bounds {
 }
 
 export function Icon(_c: RenderParameters, opts: IconParameters): VBlock {
-    let bounds = new Bounds(0,0,24,24)
+    let bounds = new Bounds(0,0,24,17)
     let padding = opts.padding || StyleVars.padding
     let margin = opts.margin || StyleVars.margin
     bounds = addInsets(bounds,padding)
@@ -252,13 +252,13 @@ type IconButtonOptions = {
     hideBorder?:boolean
 }
 export function IconButton(c: RenderParameters, opts: IconButtonOptions): VBlock {
-    const ch = [Icon(c, {
+    const children = [Icon(c, {
         icon: opts.icon,
         shadow:true,
         padding:NullInsets,
         margin:NullInsets
     })]
-    if (opts.text) ch.push(Label(c, {
+    if (opts.text) children.push(Label(c, {
         text:opts.text,
         shadow:true,
         padding:NullInsets,
@@ -271,7 +271,7 @@ export function IconButton(c: RenderParameters, opts: IconButtonOptions): VBlock
     if(opts.hideBorder){
         border = undefined
     }
-    return ShrinkBox(c, ch, {
+    return ShrinkBox(c, children, {
         margin: StyleVars.margin,
         border: border,
         padding:StyleVars.padding,
