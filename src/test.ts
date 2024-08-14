@@ -4,7 +4,8 @@ import {Icons} from "./icons.ts";
 export type RenderParameters = {
     ctx: CanvasRenderingContext2D
     fontSize: string
-    debug: boolean
+    debug: boolean,
+    redraw: () => void
 }
 
 
@@ -54,6 +55,7 @@ export type VBlock = {
     background?: string
     color?: string
     shadow?:boolean
+    handleEvent?:() => void;
 }
 const NullInsets:Insets = new Insets(0,0,0,0)
 
@@ -66,8 +68,10 @@ type LabelOpts = {
     text:string
     shadow?:boolean
     padding?:Insets,
-    margin?:Insets
+    margin?:Insets,
+    handleEvent?:() => void
 }
+
 export function Label(c: RenderParameters, opts:LabelOpts): VBlock {
     const m = c.ctx.measureText(opts.text)
     let bounds = new Bounds(0, 0, m.width, m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)
@@ -83,7 +87,8 @@ export function Label(c: RenderParameters, opts:LabelOpts): VBlock {
         baseline: Math.floor(m.fontBoundingBoxAscent),
         padding: opts.padding || StyleVars.padding,
         margin: opts.margin || StyleVars.margin,
-        shadow: opts.shadow
+        shadow: opts.shadow,
+        handleEvent: opts.handleEvent,
     }
 }
 
@@ -115,6 +120,7 @@ type ShrinkBoxParamters = {
     border?:Border,
     padding?:Insets,
     background?:string
+    handleEvent?:() => void
 }
 export function ShrinkBox(_c:RenderParameters, children:VBlock[], opts?:ShrinkBoxParamters):VBlock {
     let margin = new Insets(0,0,0,0)
@@ -150,7 +156,8 @@ export function ShrinkBox(_c:RenderParameters, children:VBlock[], opts?:ShrinkBo
         margin:margin,
         children:children,
         border:border,
-        background:opts?.background
+        background:opts?.background,
+        handleEvent:opts?.handleEvent,
     }
 }
 
@@ -160,7 +167,9 @@ type ButtonOpts = {
 }
 export function Button(c: RenderParameters, opts: ButtonOpts): VBlock {
     return ShrinkBox(c,[
-        Label(c,{text:opts.text, shadow:true,
+        Label(c,{
+            text:opts.text,
+            shadow:true,
             padding:NullInsets,
             margin:NullInsets,
         })],{
@@ -170,14 +179,24 @@ export function Button(c: RenderParameters, opts: ButtonOpts): VBlock {
             color: StyleVars.borderColor,
         },
         padding:StyleVars.padding,
+        handleEvent:() => {
+            console.log("button got an event")
+        }
     })
 }
 
-export function Checkbox(c: RenderParameters, text: string, b: boolean) {
-    return IconButton(c,{
-        icon:b?Icons.CheckboxChecked:Icons.CheckboxUnchecked,
-        text: text,
+type CheckboxOpts = {
+    handleEvent?:() => void
+    selected:boolean,
+    text:string
+}
+
+export function Checkbox(c: RenderParameters, opts:CheckboxOpts) {
+     return IconButton(c,{
+        icon:opts.selected?Icons.CheckboxChecked:Icons.CheckboxUnchecked,
+        text: opts.text,
         hideBorder:true,
+        handleEvent:opts.handleEvent,
     })
 }
 
@@ -250,6 +269,7 @@ type IconButtonOptions = {
     icon:Icons,
     text?:string,
     hideBorder?:boolean
+    handleEvent?:()=>void,
 }
 export function IconButton(c: RenderParameters, opts: IconButtonOptions): VBlock {
     const children = [Icon(c, {
@@ -275,6 +295,7 @@ export function IconButton(c: RenderParameters, opts: IconButtonOptions): VBlock
         margin: StyleVars.margin,
         border: border,
         padding:StyleVars.padding,
+        handleEvent:opts.handleEvent,
     })
 }
 

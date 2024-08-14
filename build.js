@@ -1,4 +1,4 @@
-import { build } from "esbuild";
+import {build, context} from "esbuild"
 // import pkg from "npm-dts";
 // const { Generator } = pkg;
 
@@ -20,16 +20,27 @@ async function go() {
     //     outfile: "build/index.cjs",
     // });
     //
-    await build({
-        // ...sharedConfig,
+    // await build({
+    //     entryPoints: ['src/index.ts'],
+    //     bundle: true,
+    //     platform: "browser",
+    //     format: "esm",
+    //     outfile: "build/bundle.js",
+    //     target:['es2024']
+    // });
+
+    let ctx = await context({
         entryPoints: ['src/index.ts'],
-        bundle: true,
+        bundle:true,
         platform: "browser",
         format: "esm",
         outfile: "build/bundle.js",
         target:['es2024']
-        // external: ["pngjs", "opentype.js", "jpeg-js"],
-    });
+    })
+
+    await ctx.watch()
+
+
 }
 
 go()
