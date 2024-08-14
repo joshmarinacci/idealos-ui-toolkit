@@ -65,6 +65,7 @@ export type VBlock = {
     shadow?: boolean
     handleEvent?: EventHandler;
     clip?: boolean
+    doLayout?:(space:Size) => void
 }
 
 const NullInsets: Insets = new Insets(0, 0, 0, 0)
@@ -256,7 +257,7 @@ export function FixedBox(_c: RenderParameters,
                          child: VBlock,
                          opts: { size: Size,
                                 border?: Border
-                             background: string,
+                             background?: string,
 }): VBlock {
     return {
         baseline: 0,
@@ -269,8 +270,7 @@ export function FixedBox(_c: RenderParameters,
 
 export function TextInput(c: RenderParameters, opts: TextInputParameters): VBlock {
     return FixedBox(c,
-        Label(c, {text: opts.placeholder})
-        , {
+        Label(c, {text: opts.placeholder}), {
             size: new Size(100, 32),
             border: {
                 width: StyleVars.borderWidth,
@@ -360,6 +360,7 @@ type BoxParameters = {
     mainAxisAlign?: AxisAlign
     crossAxisAlign?: AxisAlign
     flex?:number
+    name?:string
 }
 type BoxProperties = {
     content: Bounds
@@ -368,17 +369,20 @@ type BoxProperties = {
     crossAxisAlign: AxisAlign
 }
 
-function calculateBoxProperties(opts:BoxParameters):BoxProperties {
+function calculateBoxProperties(opts?:BoxParameters):BoxProperties {
     let content = new Bounds(0, 0, 0, 0)
-    if (opts?.preferredSize) content = Bounds.fromPointSize(new Point(0, 0), opts.preferredSize)
     let selfLayout: SelfLayout = 'shrink'
-    if (opts.selfLayout) selfLayout = opts.selfLayout
     let main_align: AxisAlign = "start"
-    if (opts && opts.mainAxisAlign) main_align = opts.mainAxisAlign
     let cross_align: AxisAlign = "start"
-    if (opts && opts.crossAxisAlign) cross_align = opts.crossAxisAlign
+    let preferredSize = undefined
+    if(opts) {
+        if (opts.preferredSize) content = Bounds.fromPointSize(new Point(0, 0), opts.preferredSize)
+        if (opts.selfLayout) selfLayout = opts.selfLayout
+        if (opts.mainAxisAlign) main_align = opts.mainAxisAlign
+        if (opts.crossAxisAlign) cross_align = opts.crossAxisAlign
+    }
 
-    if(selfLayout === 'grow' && !opts.preferredSize) {
+    if(selfLayout === 'grow' && preferredSize) {
         console.warn("Box grow set without a preferred size")
     }
     return {
@@ -389,7 +393,7 @@ function calculateBoxProperties(opts:BoxParameters):BoxProperties {
     }
 }
 
-export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParameters): VBlock {
+export function VBox(_c: RenderParameters, children: VBlock[], opts?: BoxParameters): VBlock {
     const p = calculateBoxProperties(opts)
 
     let kid_main_length = 0
@@ -419,6 +423,15 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
                 if (ch.flex && ch.flex > 0) {
                     ch.bounds.h += leftover / flex_count
                 }
+            }
+        }
+        // console.log(`vbox, kid max ${kid_cross_length} leftover ${leftover}
+        // vbox size: ${p.content}
+        // `)
+        // do sub-layout if needed
+        for(let ch of children) {
+            if(ch.doLayout) {
+                ch.doLayout(p.content.size())
             }
         }
 
@@ -473,7 +486,7 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
 
 
     return {
-        name: 'VBox',
+        name: opts?.name || 'VBox',
         bounds: p.content,
         children: children,
         baseline: 20,
@@ -483,8 +496,30 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
     }
 }
 
+/*
+new algorithm
 
-export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParameters): VBlock {
+Component just returns block, not laid out
+block has function to return minimum size
+block has function to do layout given available space
+parent component does:
+    gets min size of children
+    does internal calcs to figure out positions
+    set layout size of children
+
+
+all layout taken out of the hands of components
+instead vblock becomes a class which implements flexbox
+
+tests:
+    FixedBox sets self to specific size but sets child to its minimum size
+    HBox and VBox can stretch the children
+        on main axis using child's flex value
+        on cross axis using parent's "stretch" value
+    HBox and VBox can also take a preferred size value
+ */
+
+export function HBox(_c: RenderParameters, children: VBlock[], opts?: BoxParameters): VBlock {
     const p = calculateBoxProperties(opts)
 
     // count flex kids, and total kid width
@@ -580,8 +615,8 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
         bounds.w += opts.margin.left + opts.margin.right
         bounds.h += opts.margin.top + opts.margin.bottom
     }
-    return {
-        name: 'HBox',
+    let box =  {
+        name: opts?.name || 'HBox',
         bounds: p.content,
         children: children,
         baseline: 20,
@@ -589,7 +624,13 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
         padding: opts?.padding,
         margin: opts?.margin,
         flex: opts?.flex,
+        doLayout:(space:Size) => {
+            console.log("hbox doing layout with available space",space,box)
+            box.bounds.w = space.w
+            box.bounds.h = space.h
+        }
     }
+    return box
 
 }
 
