@@ -369,6 +369,58 @@ type BoxProperties = {
     crossAxisAlign: AxisAlign
 }
 
+
+export function TabbedPane(c:RenderParameters,children:VBlock[], opts:BoxParameters, opts2:{
+    selected:string
+    onSelected:ListViewSelectionCallback
+}):VBlock {
+    const p = calculateBoxProperties(opts)
+    let tabs = children.map(ch => ch.children[0])
+    let selected_tab = children.find((tab) => {
+        return (tab.children[0].children[0].text === opts2.selected)
+    })
+    if(selected_tab) {
+        selected_tab.children[0].background = StyleVars.selectedControlBackground
+    }
+    tabs.forEach(tab => {
+        tab.handleEvent = () => opts2.onSelected(tab.children[0].text)
+    })
+
+    let tabsBox = HBox(c,tabs,{
+        border:{
+            width: 1,
+            color: StyleVars.borderColor,
+        },
+        padding: NullInsets,
+        margin: NullInsets
+    })
+    tabsBox.bounds.w = p.content.w
+    let nchildren = []
+    if(selected_tab) {
+        nchildren = [tabsBox, selected_tab]
+    } else {
+        nchildren = [tabsBox]
+    }
+    return {
+        name:"TabbedPane",
+        bounds: p.content,
+        baseline: 20,
+        children:nchildren,
+        border: opts.border,
+        clip:true,
+    }
+
+}
+export function Tab(c:RenderParameters, children:VBlock[]) {
+    return VBox(c,children,{name:'Tab'})
+}
+export function TabTitle(c:RenderParameters,opts: { text: string }) {
+    return Button(c, {text: opts.text})
+}
+export function TabContent(c: RenderParameters, children: VBlock[]) {
+    return VBox(c,children)
+}
+
 function calculateBoxProperties(opts?:BoxParameters):BoxProperties {
     let content = new Bounds(0, 0, 0, 0)
     let selfLayout: SelfLayout = 'shrink'
@@ -692,8 +744,8 @@ export function drawBlock(c: RenderParameters, block: VBlock, opts: DrawBlockOpt
             c.ctx.rect(0, 0, block.bounds.w, block.bounds.h)
             c.ctx.closePath()
             c.ctx.clip()
-            c.ctx.strokeStyle = 'yellow'
-            c.ctx.stroke()
+            // c.ctx.strokeStyle = 'yellow'
+            // c.ctx.stroke()
         }
         for (let ch of block.children) {
             drawBlock(c, ch, opts)
@@ -728,7 +780,7 @@ export function ListView(c: RenderParameters, opts: {
     selected: string,
     onSelected: ListViewSelectionCallback
 }): VBlock {
-    let bounds = new Bounds(0, 0, 200, 110)
+    let bounds = new Bounds(0, 0, 200, 200)
     let children = opts.data.map(item => {
         return ListItem(c, {
             item: item,
@@ -748,7 +800,10 @@ export function ListView(c: RenderParameters, opts: {
     return {
         name: "ListView",
         bounds: bounds,
-        border: DebugBorder,
+        border: {
+            width:1,
+            color: StyleVars.borderColor
+        },
         children: children,
         baseline: 0,
         clip: true,
