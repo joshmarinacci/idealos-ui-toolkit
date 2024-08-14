@@ -63,6 +63,7 @@ export type VBlock = {
     color?: string
     shadow?:boolean
     handleEvent?:EventHandler;
+    clip?:boolean
 }
 
 const NullInsets:Insets = new Insets(0,0,0,0)
@@ -444,8 +445,20 @@ export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts
     }
 
     if (block.children) {
+        if(block.clip) {
+            c.ctx.save()
+            c.ctx.beginPath()
+            c.ctx.rect(0, 0, block.bounds.w, block.bounds.h)
+            c.ctx.closePath()
+            c.ctx.clip()
+            c.ctx.strokeStyle = 'yellow'
+            c.ctx.stroke()
+        }
         for (let ch of block.children) {
             drawBlock(c, ch, opts)
+        }
+        if(block.clip) {
+            c.ctx.restore()
         }
     }
     c.ctx.restore()
@@ -468,7 +481,7 @@ function ListItem(c:RenderParameters, opts: {
 }
 export type ListViewSelectionCallback = (item:string) => void
 export function ListView(c: RenderParameters, opts: { data: string[], selected:string, onSelected:ListViewSelectionCallback }): VBlock {
-    let bounds = new Bounds(0, 0, 200, 200)
+    let bounds = new Bounds(0, 0, 200, 110)
     let children = opts.data.map(item => {
         return ListItem(c,{
             item:item,
@@ -491,5 +504,6 @@ export function ListView(c: RenderParameters, opts: { data: string[], selected:s
         border: DebugBorder,
         children: children,
         baseline:0,
+        clip:true,
     }
 }
