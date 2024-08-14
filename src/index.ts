@@ -1,6 +1,6 @@
 import {
     Button,
-    Checkbox,
+    Checkbox, DebugBorder,
     drawBlock,
     HBox,
     Icon,
@@ -13,12 +13,12 @@ import {
     VBlock,
     VBox
 } from "./components.ts";
-import {Point} from "josh_js_util";
+import {Point, Size} from "josh_js_util";
 import {Icons} from "./icons.ts";
 
 const canvas = document.createElement('canvas')
 
-canvas.width = 800
+canvas.width = 600
 canvas.height = 300
 
 document.body.appendChild(canvas)
@@ -30,7 +30,7 @@ const c:RenderParameters = {
     fontSize: '16px',
     debug: {
         outline: false,
-        baseline: false
+        baseline: false,
     },
     redraw: function (): void {
         throw new Error("Function not implemented.");
@@ -52,25 +52,68 @@ let state = {
 }
 
 function makeTree(c:RenderParameters) {
-    return VBox(c, [
-        HBox(c, [
-            Label(c, {text: 'buttons'}),
-            Button(c, {text: "Button", selected: true}),
-            Icon(c, {icon: Icons.Document}),
-            IconButton(c, {text: 'Doc', icon: Icons.Document}),
-            Checkbox(c, {
-                text: "Checkbox", selected: state.checked, handleEvent: () => {
-                    state.checked = !state.checked
-                    c.redraw()
-                }
-            }),
-            RadioButton(c, 'radio box', false),
-            ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
-                    state.toggled = !state.toggled
-                    c.redraw()
-                }})
-            // Tag(c, {text:'tag'}),
-        ]),
+    // return VBox(c, [
+    //     Button(c,{text:'A', flex:0}),
+    //     Button(c,{text:'B', flex:0}),
+    //     Button(c,{text:'C'})
+    // ],{
+    //     border:DebugBorder,
+    //     selfLayout:'grow',
+    //     preferredSize: new Size(200,200),
+    //     mainAxisAlign:'middle',
+    //     crossAxisAlign: 'end',
+    // })
+    // return HBox(c,[
+    //     Button(c,{text:'A', flex:0}),
+    //     Button(c,{text:'B', flex:0}),
+    //     Button(c,{text:'C'})
+    // ],{
+    //     // border:DebugBorder,
+    //     selfLayout:'shrink',
+    //     mainAxisAlign:"middle",
+    //     preferredSize: new Size(300,100),
+    //     crossAxisAlign:"middle",
+    // })
+
+
+    return VBox(c,[
+        Button(c,{text:"hello"}),
+        HBox(c,[
+            Button(c,{text:"Hello"}),
+            Button(c,{text:"There"}),
+        ],{
+            border:DebugBorder,
+            flex:1.0,
+            selfLayout:'grow',
+        }),
+        Button(c,{text:"mister"}),
+    ],{
+        border:DebugBorder,
+        selfLayout:'grow',
+        preferredSize: new Size(400,150),
+        // crossAxisAlign:'middle',
+        // mainAxisAlign:'start',
+    })
+
+    // return VBox(c, [
+        // HBox(c, [
+        //     Label(c, {text: 'buttons'}),
+        //     Button(c, {text: "Button", selected: true}),
+        //     Icon(c, {icon: Icons.Document}),
+        //     IconButton(c, {text: 'Doc', icon: Icons.Document}),
+        //     Checkbox(c, {
+        //         text: "Checkbox", selected: state.checked, handleEvent: () => {
+        //             state.checked = !state.checked
+        //             c.redraw()
+        //         }
+        //     }),
+        //     RadioButton(c, 'radio box', false),
+        //     ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
+        //             state.toggled = !state.toggled
+        //             c.redraw()
+        //         }})
+        //     // Tag(c, {text:'tag'}),
+        // ]),
         // HBox(c, [
         //     Label(c,{text:'toolbar'}),
         //     HBox(c, [
@@ -93,15 +136,15 @@ function makeTree(c:RenderParameters) {
         //     SearchInput(c,{placeholder:'search'}),
         // ])
 
-        ListView(c, {
-            data: data,
-            selected: state.listSelected,
-            onSelected: (item) => {
-                state.listSelected = item
-                c.redraw()
-            }
-        })
-    ])
+        // ListView(c, {
+        //     data: data,
+        //     selected: state.listSelected,
+        //     onSelected: (item) => {
+        //         state.listSelected = item
+        //         c.redraw()
+        //     }
+        // })
+    // ])
 }
 let vconent = makeTree(c)
 function redraw() {
