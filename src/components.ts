@@ -4,7 +4,10 @@ import {Icons} from "./icons.ts";
 export type RenderParameters = {
     ctx: CanvasRenderingContext2D
     fontSize: string
-    debug: boolean,
+    debug: {
+        outline:boolean,
+        baseline:boolean
+    }
     redraw: () => void
 }
 
@@ -18,7 +21,7 @@ const StyleVars = {
     margin: new Insets(4, 4, 4, 4),
     padding: new Insets(7, 8, 7, 8),
     background: `hsl(${hue},5%,100%)`,
-    selectedBackground: `hsl(${hue},90%,57%)`,
+    // selectedBackground: `hsl(${hue},90%,57%)`,
     borderRadius: '4px',
     borderWidth: 1,
     panelBackgroundColor: `hsl(${hue}, 5%, 100%)`,
@@ -39,6 +42,10 @@ export type Border = {
     color: string
 }
 
+export type CEvent = {
+    type:"click"|"move"
+}
+export type EventHandler = (event: CEvent) => void
 
 export type VBlock = {
     name?:string,
@@ -55,8 +62,9 @@ export type VBlock = {
     background?: string
     color?: string
     shadow?:boolean
-    handleEvent?:() => void;
+    handleEvent?:EventHandler;
 }
+
 const NullInsets:Insets = new Insets(0,0,0,0)
 
 const DebugBorder:Border = {
@@ -69,7 +77,7 @@ type LabelOpts = {
     shadow?:boolean
     padding?:Insets,
     margin?:Insets,
-    handleEvent?:() => void
+    handleEvent?:EventHandler
 }
 
 export function Label(c: RenderParameters, opts:LabelOpts): VBlock {
@@ -120,7 +128,7 @@ type ShrinkBoxParamters = {
     border?:Border,
     padding?:Insets,
     background?:string
-    handleEvent?:() => void
+    handleEvent?:EventHandler
 }
 export function ShrinkBox(_c:RenderParameters, children:VBlock[], opts?:ShrinkBoxParamters):VBlock {
     let margin = new Insets(0,0,0,0)
@@ -179,14 +187,14 @@ export function Button(c: RenderParameters, opts: ButtonOpts): VBlock {
             color: StyleVars.borderColor,
         },
         padding:StyleVars.padding,
-        handleEvent:() => {
+        handleEvent:(_event) => {
             console.log("button got an event")
         }
     })
 }
 
 type CheckboxOpts = {
-    handleEvent?:() => void
+    handleEvent?:EventHandler
     selected:boolean,
     text:string
 }
@@ -209,11 +217,17 @@ export function RadioButton(c: RenderParameters, text: string, b: boolean) {
 }
 
 
-export function ToggleButton(c: RenderParameters, opts: { text: string; selected: boolean }): VBlock {
+export type ToggleButtonOptions = {
+    text:string
+    selected:boolean
+    handleEvent?:EventHandler
+}
+export function ToggleButton(c: RenderParameters, opts: ToggleButtonOptions): VBlock {
     return IconButton(c,{
         text:opts.text,
         icon:opts.selected?Icons.ToggleOn:Icons.ToggleOff,
         hideBorder:true,
+        handleEvent:opts.handleEvent,
     })
 }
 
@@ -269,7 +283,7 @@ type IconButtonOptions = {
     icon:Icons,
     text?:string,
     hideBorder?:boolean
-    handleEvent?:()=>void,
+    handleEvent?:EventHandler
 }
 export function IconButton(c: RenderParameters, opts: IconButtonOptions): VBlock {
     const children = [Icon(c, {
@@ -384,7 +398,7 @@ export type DrawBlockOpts = {
 }
 export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts) {
     c.ctx.save()
-    if (c.debug) {
+    if (c.debug.outline) {
         c.ctx.lineWidth = 0.5
         c.ctx.strokeStyle = 'purple'
         c.ctx.strokeRect(block.bounds.x, block.bounds.y, block.bounds.w, block.bounds.h)
@@ -421,11 +435,13 @@ export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts
         c.ctx.fillText(block.icon, offset.x, offset.y+block.baseline)
     }
     // draw the baseline
-    // c.ctx.strokeStyle = 'purple'
-    // c.ctx.lineWidth = 1
-    // c.ctx.strokeRect(0,block.baseline,block.bounds.w, 1)
-    // console.log(`baseline ${block.text} ${block.icon}`,block.baseline)
-    // console.log('metrics',block.bounds,'margin',block.margin, 'border',block.border, 'padding',block.padding)
+    if(c.debug.baseline) {
+        c.ctx.strokeStyle = 'purple'
+        c.ctx.lineWidth = 1
+        c.ctx.strokeRect(0,block.baseline,block.bounds.w, 1)
+        // console.log(`baseline ${block.text} ${block.icon}`,block.baseline)
+        // console.log('metrics',block.bounds,'margin',block.margin, 'border',block.border, 'padding',block.padding)
+    }
 
     if (block.children) {
         for (let ch of block.children) {
@@ -441,3 +457,39 @@ export function drawBlock(c: RenderParameters, block: VBlock, opts:DrawBlockOpts
     }
 }
 
+function ListItem(c:RenderParameters, opts: {
+    item:string,
+    handleEvent:EventHandler,
+    background:string
+}):VBlock {
+    return ShrinkBox(c, [
+        Label(c,{text:opts.item}),
+    ],{handleEvent:opts.handleEvent, background:opts.background})
+}
+export type ListViewSelectionCallback = (item:string) => void
+export function ListView(c: RenderParameters, opts: { data: string[], selected:string, onSelected:ListViewSelectionCallback }): VBlock {
+    let bounds = new Bounds(0, 0, 200, 200)
+    let children = opts.data.map(item => {
+        return ListItem(c,{
+            item:item,
+            handleEvent:(_event) => opts.onSelected(item),
+            background:item===opts.selected?StyleVars.selectedControlBackground:StyleVars.controlBackgroundColor
+        })
+    })
+    let pt = new Point(0,0)
+    let gap = 5
+    for(let ch of children) {
+        ch.bounds.x = pt.x
+        ch.bounds.y = pt.y
+        ch.bounds.w = bounds.w - 3
+        pt.y += ch.bounds.h
+        pt.y += gap
+    }
+    return {
+        name: "ListView",
+        bounds: bounds,
+        border: DebugBorder,
+        children: children,
+        baseline:0,
+    }
+}

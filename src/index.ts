@@ -6,19 +6,15 @@ import {
     Icon,
     IconButton,
     Label,
-    NumberInput,
+    ListView,
     RadioButton,
     RenderParameters,
-    SearchInput,
-    Separator,
-    Tag,
-    TextInput,
     ToggleButton,
     VBlock,
     VBox
-} from "./test.ts";
-import {Icons} from "./icons.ts";
+} from "./components.ts";
 import {Point} from "josh_js_util";
+import {Icons} from "./icons.ts";
 
 const canvas = document.createElement('canvas')
 
@@ -30,57 +26,82 @@ document.body.appendChild(canvas)
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 
 const c:RenderParameters = {
-    ctx:ctx,
-    fontSize:'26px',
-    debug:false,
-    // redraw: () => {
-    //     console.log("redrawing")
-    //     drawBlock(c,vcontent,{})
-    // }
+    ctx: ctx,
+    fontSize: '16px',
+    debug: {
+        outline: false,
+        baseline: false
+    },
+    redraw: function (): void {
+        throw new Error("Function not implemented.");
+    }
 }
 c.ctx.font = '16px sans-serif'
 
+let data:string[] = [
+    "alice",
+    "bob",
+    "claire",
+    // "dan",
+    // "eve"
+]
 let state = {
-    checked:true
+    checked:true,
+    toggled:true,
+    listSelected: "alice"
 }
+
 function makeTree(c:RenderParameters) {
-    const vconent = VBox(c, [
-        HBox(c,[
-            Label(c,{text:'buttons'}),
-            Button(c,{text:"Button",selected:true}),
-            Icon(c,{icon:Icons.Document}),
-            IconButton(c,{text:'Doc',icon:Icons.Document}),
-            Checkbox(c,{text:"Checkbox",selected:state.checked, handleEvent:()=>{
+    return VBox(c, [
+        HBox(c, [
+            Label(c, {text: 'buttons'}),
+            Button(c, {text: "Button", selected: true}),
+            Icon(c, {icon: Icons.Document}),
+            IconButton(c, {text: 'Doc', icon: Icons.Document}),
+            Checkbox(c, {
+                text: "Checkbox", selected: state.checked, handleEvent: () => {
                     state.checked = !state.checked
                     c.redraw()
-                }}),
-            Tag(c, {text:'tag'}),
-        ]),
-        HBox(c, [
-            Label(c,{text:'toolbar'}),
-            HBox(c, [
-                Button(c, {text:"Button",selected:false}),
-                IconButton(c,{text:'IconButton',icon:Icons.Document}),
-                IconButton(c,{icon:Icons.Document}),
-                Separator(c),
-                IconButton(c,{icon:Icons.Document}),
-            ]),
-        ]),
-        HBox(c, [
-            Label(c, {text:'buttons'}),
-            Button(c, {text:"Button",selected:true}),
-            Checkbox(c, {text:'check box', selected:true}),
+                }
+            }),
             RadioButton(c, 'radio box', false),
-            ToggleButton(c, {text:'toggle',selected:true})
+            ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
+                    state.toggled = !state.toggled
+                    c.redraw()
+                }})
+            // Tag(c, {text:'tag'}),
         ]),
-        HBox(c, [
-            Label(c,{text:'inputs'}),
-            TextInput(c,{placeholder:'text'}),
-            NumberInput(c,{placeholder:'0'}),
-            SearchInput(c,{placeholder:'search'}),
-        ])
+        // HBox(c, [
+        //     Label(c,{text:'toolbar'}),
+        //     HBox(c, [
+        //         Button(c, {text:"Button",selected:false}),
+        //         IconButton(c,{text:'IconButton',icon:Icons.Document}),
+        //         IconButton(c,{icon:Icons.Document}),
+        //         Separator(c),
+        //         IconButton(c,{icon:Icons.Document}),
+        //     ]),
+        // ]),
+        // HBox(c, [
+        //     Label(c, {text:'buttons'}),
+        //     Button(c, {text:"Button",selected:true}),
+        //     Checkbox(c, {text:'check box', selected:true}),
+        // ]),
+        // HBox(c, [
+        //     Label(c,{text:'inputs'}),
+        //     TextInput(c,{placeholder:'text'}),
+        //     NumberInput(c,{placeholder:'0'}),
+        //     SearchInput(c,{placeholder:'search'}),
+        // ])
+
+        ListView(c, {
+            data: data,
+            selected: state.listSelected,
+            onSelected: (item) => {
+                state.listSelected = item
+                c.redraw()
+            }
+        })
     ])
-    return vconent
 }
 let vconent = makeTree(c)
 function redraw() {
@@ -130,7 +151,7 @@ canvas.addEventListener('click',(e) => {
         // console.log('margin',found.margin)
         // console.log('padding',found.padding)
         // console.log("found event",found.handleEvent)
-        if(found.handleEvent) found.handleEvent()
+        if(found.handleEvent) found.handleEvent({type:"click"})
     }
     c.ctx.fillStyle = 'white'
     c.ctx.fillRect(0,0,canvas.width,canvas.height)
