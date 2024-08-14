@@ -84,15 +84,16 @@ function makeTree(c:RenderParameters) {
         ],{
             border:DebugBorder,
             flex:1.0,
-            selfLayout:'grow',
+            selfLayout:'shrink',
+            crossAxisAlign:'middle',
         }),
         Button(c,{text:"mister"}),
     ],{
         border:DebugBorder,
         selfLayout:'grow',
-        preferredSize: new Size(400,150),
-        // crossAxisAlign:'middle',
-        // mainAxisAlign:'start',
+        preferredSize: new Size(400,200),
+        crossAxisAlign:'middle',
+        mainAxisAlign:'start',
     })
 
     // return VBox(c, [

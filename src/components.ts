@@ -358,12 +358,18 @@ type BoxParameters = {
     flex?:number
 }
 
-export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParameters): VBlock {
+type BoxProperties = {
+    content: Bounds
+    selfLayout: SelfLayout
+    mainAxisAlign: AxisAlign
+    crossAxisAlign: AxisAlign
+}
+
+function calculateBoxProperties(opts:BoxParameters):BoxProperties {
     let content = new Bounds(0, 0, 0, 0)
     if (opts?.preferredSize) content = Bounds.fromPointSize(new Point(0, 0), opts.preferredSize)
     let selfLayout: SelfLayout = 'shrink'
-    if (opts?.selfLayout) selfLayout = opts.selfLayout
-
+    if (opts.selfLayout) selfLayout = opts.selfLayout
     let main_align: AxisAlign = "start"
     if (opts && opts.mainAxisAlign) main_align = opts.mainAxisAlign
     let cross_align: AxisAlign = "start"
@@ -372,8 +378,17 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
     if(selfLayout === 'grow' && !opts.preferredSize) {
         console.warn("Box grow set without a preferred size")
     }
+    return {
+        content: content,
+        selfLayout: selfLayout,
+        mainAxisAlign:main_align,
+        crossAxisAlign:cross_align,
+    }
+}
 
-    // count flex kids, and total kid length
+export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParameters): VBlock {
+    const p = calculateBoxProperties(opts)
+
     let kid_main_length = 0
     let flex_count = 0
     let kid_cross_length = 0
@@ -383,25 +398,18 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
         if (ch.flex && ch.flex > 0) flex_count += 1
     }
 
-    // console.log(`Vbox, kids total height= ${kid_main_length}
-    // flex count = ${flex_count}
-    // cross width = ${kid_cross_length}
-    // `)
-
-
-
-    if (selfLayout === 'shrink') {
+    if (p.selfLayout === 'shrink') {
         let pt = new Point(0, 0);
         for (let ch of children) {
             ch.bounds.x = pt.x
             ch.bounds.y = pt.y
             pt.y += ch.bounds.h
         }
-        content.h = pt.y
-        content.w = kid_cross_length
+        p.content.h = pt.y
+        p.content.w = kid_cross_length
     }
-    if (selfLayout === 'grow') {
-        let leftover = content.h - kid_main_length
+    if (p.selfLayout === 'grow') {
+        let leftover = p.content.h - kid_main_length
         // if any flex kids, distribute the leftover width
         if (flex_count > 0) {
             for (let ch of children) {
@@ -418,7 +426,7 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
         }
 
         // then do normal layout
-        if (main_align === 'start') {
+        if (p.mainAxisAlign === 'start') {
             let pt = new Point(0, 0);
             for (let ch of children) {
                 ch.bounds.x = pt.x
@@ -426,16 +434,16 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
                 pt.y += ch.bounds.h
             }
         }
-        if (main_align === 'end') {
-            let pt = new Point(0,content.h - kid_main_length);
+        if (p.mainAxisAlign === 'end') {
+            let pt = new Point(0,p.content.h - kid_main_length);
             for (let ch of children) {
                 ch.bounds.x = pt.x
                 ch.bounds.y = pt.y
                 pt.y += ch.bounds.h
             }
         }
-        if (main_align === 'middle') {
-            let pt = new Point(0,(content.h - kid_main_length) / 2);
+        if (p.mainAxisAlign === 'middle') {
+            let pt = new Point(0,(p.content.h - kid_main_length) / 2);
             for (let ch of children) {
                 ch.bounds.x = pt.x
                 ch.bounds.y = pt.y
@@ -443,19 +451,19 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
             }
         }
 
-        if (cross_align === 'start') {
+        if (p.crossAxisAlign === 'start') {
             for (let ch of children) {
                 ch.bounds.x = 0
             }
         }
-        if (cross_align === 'middle') {
+        if (p.crossAxisAlign === 'middle') {
             for (let ch of children) {
-                ch.bounds.x = content.w / 2 - ch.bounds.w / 2
+                ch.bounds.x = p.content.w / 2 - ch.bounds.w / 2
             }
         }
-        if (cross_align === 'end') {
+        if (p.crossAxisAlign === 'end') {
             for (let ch of children) {
-                ch.bounds.x = content.w - ch.bounds.w
+                ch.bounds.x = p.content.w - ch.bounds.w
             }
         }
     }
@@ -463,7 +471,7 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
 
     return {
         name: 'VBox',
-        bounds: content,
+        bounds: p.content,
         children: children,
         baseline: 20,
         border: opts?.border,
@@ -474,19 +482,7 @@ export function VBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
 
 
 export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParameters): VBlock {
-    let content = new Bounds(0, 0, 0, 0)
-    if (opts?.preferredSize) content = Bounds.fromPointSize(new Point(0, 0), opts.preferredSize)
-    let selfLayout: SelfLayout = 'shrink'
-    if (opts?.selfLayout) selfLayout = opts.selfLayout
-
-    let main_align: AxisAlign = "start"
-    if (opts && opts.mainAxisAlign) main_align = opts.mainAxisAlign
-    let cross_align: AxisAlign = "start"
-    if (opts && opts.crossAxisAlign) cross_align = opts.crossAxisAlign
-
-    if(selfLayout === 'grow' && !opts.preferredSize) {
-        console.warn("Box grow set without a preferred size")
-    }
+    const p = calculateBoxProperties(opts)
 
     // count flex kids, and total kid width
     let kids_width = 0
@@ -498,18 +494,18 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
         if (ch.flex && ch.flex > 0) flex_count += 1
     }
 
-    if (selfLayout === 'shrink') {
+    if (p.selfLayout === 'shrink') {
         let pt = new Point(0, 0);
         for (let ch of children) {
             ch.bounds.x = pt.x
             ch.bounds.y = pt.y
             pt.x += ch.bounds.w
         }
-        content.w = pt.x
-        content.h = kids_height
+        p.content.w = pt.x
+        p.content.h = kids_height
     }
-    if (selfLayout === 'grow') {
-        let leftover = content.w - kids_width
+    if (p.selfLayout === 'grow') {
+        let leftover = p.content.w - kids_width
         // if any flex kids, distribute the leftover width
         if (flex_count > 0) {
             for (let ch of children) {
@@ -526,7 +522,7 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
         }
 
         // then do normal layout
-        if (main_align === 'start') {
+        if (p.mainAxisAlign === 'start') {
             let pt = new Point(0, 0);
             for (let ch of children) {
                 ch.bounds.x = pt.x
@@ -534,16 +530,16 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
                 pt.x += ch.bounds.w
             }
         }
-        if (main_align === 'end') {
-            let pt = new Point(content.w - kids_width, 0);
+        if (p.mainAxisAlign === 'end') {
+            let pt = new Point(p.content.w - kids_width, 0);
             for (let ch of children) {
                 ch.bounds.x = pt.x
                 ch.bounds.y = pt.y
                 pt.x += ch.bounds.w
             }
         }
-        if (main_align === 'middle') {
-            let pt = new Point((content.w - kids_width) / 2, 0);
+        if (p.mainAxisAlign === 'middle') {
+            let pt = new Point((p.content.w - kids_width) / 2, 0);
             for (let ch of children) {
                 ch.bounds.x = pt.x
                 ch.bounds.y = pt.y
@@ -551,19 +547,19 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
             }
         }
 
-        if (cross_align === 'start') {
+        if (p.crossAxisAlign === 'start') {
             for (let ch of children) {
                 ch.bounds.y = 0
             }
         }
-        if (cross_align === 'middle') {
+        if (p.crossAxisAlign === 'middle') {
             for (let ch of children) {
-                ch.bounds.y = content.h / 2 - ch.bounds.h / 2
+                ch.bounds.y = p.content.h / 2 - ch.bounds.h / 2
             }
         }
-        if (cross_align === 'end') {
+        if (p.crossAxisAlign === 'end') {
             for (let ch of children) {
-                ch.bounds.y = content.h - ch.bounds.h
+                ch.bounds.y = p.content.h - ch.bounds.h
             }
         }
     }
@@ -583,7 +579,7 @@ export function HBox(_c: RenderParameters, children: VBlock[], opts: BoxParamete
     }
     return {
         name: 'HBox',
-        bounds: content,
+        bounds: p.content,
         children: children,
         baseline: 20,
         border: opts?.border,
