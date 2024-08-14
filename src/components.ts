@@ -254,12 +254,16 @@ type TextInputParameters = {
 
 export function FixedBox(_c: RenderParameters,
                          child: VBlock,
-                         opts: { size: Size, border: Border }): VBlock {
+                         opts: { size: Size,
+                                border?: Border
+                             background: string,
+}): VBlock {
     return {
         baseline: 0,
         bounds: new Bounds(0, 0, opts.size.w, opts.size.h),
         children: [child],
         border: opts.border,
+        background: opts.background,
     }
 }
 
@@ -357,7 +361,6 @@ type BoxParameters = {
     crossAxisAlign?: AxisAlign
     flex?:number
 }
-
 type BoxProperties = {
     content: Bounds
     selfLayout: SelfLayout
@@ -708,5 +711,14 @@ export function ListView(c: RenderParameters, opts: {
         children: children,
         baseline: 0,
         clip: true,
+    }
+}
+
+export function Spacer(c: RenderParameters): VBlock {
+    return {
+        bounds: new Bounds(0, 0, 0, 0),
+        name: 'Spacer',
+        baseline: 0,
+        flex: 1.0
     }
 }

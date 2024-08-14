@@ -1,20 +1,5 @@
-import {
-    Button,
-    Checkbox, DebugBorder,
-    drawBlock,
-    HBox,
-    Icon,
-    IconButton,
-    Label,
-    ListView,
-    RadioButton,
-    RenderParameters,
-    ToggleButton,
-    VBlock,
-    VBox
-} from "./components.ts";
+import {Button, DebugBorder, drawBlock, FixedBox, HBox, Label, RenderParameters, Spacer, VBlock, VBox} from "./components.ts";
 import {Point, Size} from "josh_js_util";
-import {Icons} from "./icons.ts";
 
 const canvas = document.createElement('canvas')
 
@@ -52,48 +37,44 @@ let state = {
 }
 
 function makeTree(c:RenderParameters) {
-    // return VBox(c, [
-    //     Button(c,{text:'A', flex:0}),
-    //     Button(c,{text:'B', flex:0}),
-    //     Button(c,{text:'C'})
-    // ],{
-    //     border:DebugBorder,
-    //     selfLayout:'grow',
-    //     preferredSize: new Size(200,200),
-    //     mainAxisAlign:'middle',
-    //     crossAxisAlign: 'end',
-    // })
-    // return HBox(c,[
-    //     Button(c,{text:'A', flex:0}),
-    //     Button(c,{text:'B', flex:0}),
-    //     Button(c,{text:'C'})
-    // ],{
-    //     // border:DebugBorder,
-    //     selfLayout:'shrink',
-    //     mainAxisAlign:"middle",
-    //     preferredSize: new Size(300,100),
-    //     crossAxisAlign:"middle",
-    // })
-
-
     return VBox(c,[
-        Button(c,{text:"hello"}),
         HBox(c,[
-            Button(c,{text:"Hello"}),
+            Button(c,{text:"Play"}),
+            Spacer(c),
             Button(c,{text:"There"}),
         ],{
             border:DebugBorder,
-            flex:1.0,
-            selfLayout:'shrink',
-            crossAxisAlign:'middle',
+            selfLayout:'grow',
         }),
-        Button(c,{text:"mister"}),
+        HBox(c,[
+            FixedBox(c, Label(c,{text:"left"}), {
+                size: new Size(100,50),
+                background:'aqua'
+            }),
+            Button(c, {
+                text:"middle",
+                flex:1.0,
+            }),
+            FixedBox(c, Label(c,{text:"left"}), {
+                size: new Size(100,50),
+                background:'aqua'
+            }),
+        ],{
+            border:DebugBorder,
+            flex:1.0,
+            selfLayout:'grow',
+            // preferredSize: new Size(300,100),
+        }),
+        HBox(c,[
+            Button(c,{text:"status bar"}),
+        ],{
+            border:DebugBorder,
+            selfLayout:'grow',
+        }),
     ],{
         border:DebugBorder,
         selfLayout:'grow',
         preferredSize: new Size(400,200),
-        crossAxisAlign:'middle',
-        mainAxisAlign:'start',
     })
 
     // return VBox(c, [
