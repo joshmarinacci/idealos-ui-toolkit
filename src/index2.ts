@@ -21,10 +21,10 @@ const rc: RenderContext = {
 
 function makeTree():GElement {
     return new MHBoxElement({
-        mainAxisSelfLayout:'grow',
+        mainAxisSelfLayout:'shrink',
         crossAxisSelfLayout:'shrink',
         mainAxisLayout:'start',
-        crossAxisLayout:'end',
+        crossAxisLayout:'center',
         background:Style.panelBackgroundColor,
         padding: Style.panelPadding,
         margin: Style.panelMargin,
@@ -32,7 +32,7 @@ function makeTree():GElement {
         borderColor:Style.panelBorderColor,
         children:[
             Square(50,"red"),
-            // new HExpander(),
+            new HExpander(),
             new TextElement({
                 text:"Every text",
                 padding: withInsets(5),
@@ -42,14 +42,14 @@ function makeTree():GElement {
                 borderWidth: ZERO_INSETS,
                 backgroundColor:'transparent',
             }),
-            // Square(50,"green"),
+            Square(50,"green"),
         ],
     })
 }
 
 
 const elementRoot = makeTree()
-const renderRoot = elementRoot.layout(rc, {space:rc.size})
+const renderRoot = elementRoot.layout(rc, {space:rc.size, layout:'grow'})
 rc.ctx.save()
 rc.ctx.scale(rc.scale, rc.scale)
 // rc.ctx.translate(10,10)

@@ -3,6 +3,7 @@ import {Insets, Point, Size} from "josh_js_util";
 
 export type LayoutConstraints = {
     space:Size
+    layout:AxisSelfLayout
 }
 
 export interface GElement {

@@ -133,8 +133,11 @@ export class MHBoxElement implements GElement {
             this.log("growing my width")
             contentBounds.w = cons.space.w
             fullBounds.w = cons.space.w
-            contentBounds.h = cons.space.h
-            fullBounds.h = cons.space.h
+
+            if(this.settings.crossAxisSelfLayout === 'grow') {
+                contentBounds.h = cons.space.h
+                fullBounds.h = cons.space.h
+            }
 
             // account for insets
             contentBounds = this.subtractInsets(contentBounds)
@@ -144,7 +147,8 @@ export class MHBoxElement implements GElement {
             let non_expander_total_width = 0
             non_expanders.map(ch => {
                 let node = ch.layout(rc,{
-                    space:contentBounds.size()
+                    space:contentBounds.size(),
+                    layout:this.settings.mainAxisSelfLayout,
                 })
                 non_expander_total_width += node.settings.size.w
                 map.set(ch,node)
@@ -156,7 +160,8 @@ export class MHBoxElement implements GElement {
             // layout the expander children
             expanders.map(ch => {
                 let node = ch.layout(rc,{
-                    space:new Size(leftover_per_child, contentBounds.h)
+                    space:new Size(leftover_per_child, contentBounds.h),
+                    layout:this.settings.mainAxisSelfLayout,
                 })
                 leftover -= leftover_per_child
                 // non_expander_total_width += node.settings.size.w
@@ -171,6 +176,10 @@ export class MHBoxElement implements GElement {
                 max_child_height = Math.max(node.settings.size.h, max_child_height)
             })
 
+            if(this.settings.crossAxisSelfLayout === 'shrink') {
+                contentBounds.h = max_child_height
+            }
+
             // position all children
             let x = contentBounds.x
             if(this.settings.mainAxisLayout === 'start') {
@@ -183,22 +192,17 @@ export class MHBoxElement implements GElement {
                 x = contentBounds.x + leftover
             }
             let y = contentBounds.y
-            this.log("layout children at",x,y)
+            this.log("layout children at",x,y,contentBounds)
+            this.layout_nodes_cross_axis(chs,map,contentBounds)
             chs.forEach(ch => {
                 let node = map.get(ch) as GRenderNode
                 node.settings.pos.x = x
-                if(this.settings.crossAxisLayout === 'start') {
-                    node.settings.pos.y = y
-                }
-                if(this.settings.crossAxisLayout === 'center') {
-                    node.settings.pos.y = y + contentBounds.h/2 - node.settings.size.h/2
-                }
-                if(this.settings.crossAxisLayout === 'end') {
-                    node.settings.pos.y = y + contentBounds.h - node.settings.size.h
-                }
                 x += node.settings.size.w
             })
             let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
+            fullBounds = this.addInsets(contentBounds)
+            this.log(`content bounds ${contentBounds}`)
+            this.log(`full bounds ${fullBounds}`)
             return new GRenderNode({
                 background: this.settings.background,
                 baseline: 0,
@@ -226,8 +230,9 @@ export class MHBoxElement implements GElement {
             this.log("started content bounds",contentBounds)
             // layout all children.
             chs.forEach(ch => {
-                let node = ch.layout(rc,{
-                    space:contentBounds.size()
+                const node = ch.layout(rc,{
+                    space:contentBounds.size(),
+                    layout:this.settings.mainAxisSelfLayout,
                 })
                 map.set(ch,node)
             })
@@ -247,26 +252,13 @@ export class MHBoxElement implements GElement {
             this.log(`full bounds ${fullBounds}`)
 
             // position all children
+            this.layout_nodes_cross_axis(chs,map,contentBounds)
             let x = contentBounds.x
             chs.forEach(ch => {
                 let node = map.get(ch) as GRenderNode
                 node.settings.pos.x = x
                 x += node.settings.size.w
-                node.settings.pos.y = contentBounds.y
-                if(this.settings.crossAxisLayout === 'start') {
-                    node.settings.pos.y = contentBounds.y
-                }
-                if(this.settings.crossAxisLayout === 'center') {
-                    node.settings.pos.y = contentBounds.y + (contentBounds.h - node.settings.size.h)/2
-                }
-                if(this.settings.crossAxisLayout === 'end') {
-                    node.settings.pos.y = contentBounds.y + contentBounds.h - node.settings.size.h
-                }
             })
-
-            // fullBounds.w = contentBounds.w + this.settings.margin.left
-            // fullBounds.w = child_total_width
-            // fullBounds.h = max_child_height
 
             let children = chs.map(ch => map.get(ch) as GRenderNode)
             return new GRenderNode({
@@ -287,89 +279,7 @@ export class MHBoxElement implements GElement {
             })
 
         }
-
-        // // layout non expander children
-        // const non_expander_children = chs.map(ch => {
-        //     let node = ch.layout(rc,{space:cons.space})
-        //     map.set(ch,node)
-        //     return node
-        // })
-        // let min_width = 0
-        // let max_height = 0
-        // for (let ch of non_expander_children) {
-        //     min_width += ch.settings.size.w
-        //     max_height = Math.max(max_height, ch.settings.size.h)
-        // }
-        // if (this.settings.mainAxisSelfLayout === 'grow') {
-        //     contentBounds.w = cons.space.w
-        // } else {
-        //     contentBounds.w = min_width
-        // }
-        // if(this.settings.crossAxisSelfLayout === 'grow') {
-        //     contentBounds.h = cons.space.h
-        // } else {
-        //     contentBounds.h = 100
-        // }
-
-        // this.log('content bounds', contentBounds)
-        // let leftover = contentBounds.w - min_width
-        // this.log("leftover is",leftover)
-        // let expander_count = expanders.length
-        // this.log("expander count",expander_count)
-        // chs.map(ch => {
-        //     let ndoe = ch.layout(rc,{space:cons.space})
-        //     map.set(ch,ndoe)
-        //     return ndoe
-        // })
-        // let h = (this.settings.crossAxisSelfLayout === 'grow') ? space.h : y
-        // this.log("after insets",contentBounds)
-        // let x = contentBounds.x
-        // if (this.settings.mainAxisLayout === 'start') {
-        //     x = contentBounds.x
-        // }
-        // if (this.settings.mainAxisLayout === 'center') {
-        //     x = (contentBounds.w - min_width) / 2
-        // }
-        // if (this.settings.mainAxisLayout === 'end') {
-        //     x = contentBounds.w - min_width
-        // }
-        // // this.log("hbox padding", contentBounds)
-        //
-        // // do final position of children
-        // let y = contentBounds.y
-        // let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
-        // for (let ch of children) {
-        //     // console.log('ch',ch.settings.id,'size',ch.settings.size)
-        //     ch.settings.pos.x = x
-        //     ch.settings.pos.y = contentBounds.y
-        //     x += ch.settings.size.w
-        //     y = Math.max(ch.settings.size.h, y)
-        // }
-        // // let w = (this.settings.mainAxisSelfLayout === 'grow')?space.w:x
-        // // let h = (this.settings.crossAxisSelfLayout === 'grow') ? space.h : y
-        // // let size = new Size(contentBounds.w, h)
-        // // size = sizeWithPadding(size,this.settings.padding)
-        // let size = contentBounds.size()
-        // size = sizeWithPadding(size,this.settings.margin)
-        // size = sizeWithPadding(size,this.settings.borderWidth)
-        // size = sizeWithPadding(size,this.settings.padding)
-        // this.log("final size",size)
-        // return new GRenderNode({
-        //     background: this.settings.background,
-        //     baseline: 0,
-        //     font: Style.font,
-        //     pos: new Point(0, 0),
-        //     size: size,
-        //     text: "",
-        //     id: "mhbox",
-        //     children: children,
-        //     padding: this.settings.padding,
-        //     contentOffset: contentBounds.position(),
-        //     borderColor:'black',
-        //     margin: this.settings.margin,
-        //     textColor:'black',
-        //     borderWidth: this.settings.borderWidth
-        // })
+        throw new Error(`unknown self layout type ${this.settings.mainAxisSelfLayout}`)
     }
 
     private log(...output:any[]   ) {
@@ -390,10 +300,32 @@ export class MHBoxElement implements GElement {
         contentBounds = bdsAddInsets(contentBounds,this.settings.padding)
         return contentBounds
     }
+
+    private layout_nodes_cross_axis(chs: GElement[], map: Map<GElement, GRenderNode>, contentBounds: Bounds) {
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            if(this.settings.crossAxisLayout === 'start') {
+                node.settings.pos.y = contentBounds.y
+            }
+            if(this.settings.crossAxisLayout === 'center') {
+                node.settings.pos.y = contentBounds.y + (contentBounds.h - node.settings.size.h)/2
+            }
+            if(this.settings.crossAxisLayout === 'end') {
+                node.settings.pos.y = contentBounds.y + contentBounds.h - node.settings.size.h
+            }
+        })
+    }
 }
 
 export class HExpander implements GElement {
     layout(_rc: RenderContext, cons:LayoutConstraints): GRenderNode {
+        let size = new Size(20,20)
+        if(cons.layout === 'grow') {
+            size = new Size(cons.space.w,20)
+        }
+        if(cons.layout === 'shrink') {
+            size = new Size(20,20)
+        }
         return new GRenderNode({
             baseline: 0,
             borderColor: "",
@@ -404,7 +336,7 @@ export class HExpander implements GElement {
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: ZERO_POINT,
-            size: new Size(cons.space.w,10),
+            size: size,
             text: "",
             textColor: "",
             background: 'cyan',
