@@ -58,7 +58,7 @@ export const Style = {
     panelMargin: withInsets(0),
     panelBorderColor: '#333',
     panelBorderWidth: withInsets(0),
-    panelPadding: withInsets(5),
+    panelPadding: withInsets(0),
     panelBackgroundColor: '#222',
     panelBorderRadius: 4,
 

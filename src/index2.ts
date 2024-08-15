@@ -34,6 +34,8 @@ ToggleGroup HBox(with mutually exclusive options)
 ColorWell
 
 make HBox cross axis stretch to give all buttons the same height
+make VBox size actually as big as the available area
+make some options to Hbox and VBox be optional. good defaults.
 
  */
 import {makeCanvas} from "./util.ts";

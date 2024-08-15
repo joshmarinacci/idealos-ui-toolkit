@@ -8,15 +8,16 @@ export function IconButton(param: { icon: Icons; text: string, ghost:boolean }) 
         background: param.ghost ? TRANSPARENT : Style.buttonBackground,
         borderColor: Style.buttonBorderColor,
         borderWidth: param.ghost ? ZERO_INSETS : Style.buttonBorderWidth,
+        borderRadius: Style.buttonBorderRadius,
         children: [
             new Icon({icon: param.icon}),
             new TextElement({
                 padding: ZERO_INSETS,
                 font: Style.font,
                 margin: ZERO_INSETS,
-                borderColor: 'transparent',
+                borderColor: TRANSPARENT,
                 borderWidth: ZERO_INSETS,
-                backgroundColor: param.ghost ? TRANSPARENT : Style.buttonBackground,
+                backgroundColor: TRANSPARENT,
                 text: param.text,
                 textColor: Style.buttonTextColor,
             }),

@@ -283,6 +283,7 @@ export class MVBoxElement implements GElement {
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         this.log("space = ", cons)
 
+        let bounds = new Bounds(0,0,cons.space.w, cons.space.h)
         // layout children
         let children = this.settings.children.map(ch => {
             return ch.layout(rc, cons)
@@ -309,7 +310,7 @@ export class MVBoxElement implements GElement {
             margin: this.settings.margin,
             padding: this.settings.padding,
             pos: new Point(0,0),
-            size: new Size(50,200),
+            size: bounds.size(),
             text: "",
             textColor: ""
 
