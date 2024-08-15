@@ -38,9 +38,10 @@ import {makeCanvas} from "./util.ts";
 import {Size} from "josh_js_util";
 import {doDraw, RenderContext} from "./gfx.ts";
 import {GElement, Style} from "./base.ts";
-import {Icon, MHBoxElement, MLabel} from "./comps2.ts";
+import {HSeparator, Icon, MLabel} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
+import {MHBoxElement, MVBoxElement} from "./layout.ts";
 
 const canvas = makeCanvas(new Size(600, 300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -58,40 +59,86 @@ const rc: RenderContext = {
 
 
 function makeTree(): GElement {
-    return new MHBoxElement({
-        mainAxisSelfLayout: 'grow',
-        crossAxisSelfLayout: 'shrink',
-        mainAxisLayout: 'start',
-        crossAxisLayout: 'center',
+    return new MVBoxElement({
         background: Style.panelBackgroundColor,
-        padding: Style.panelPadding,
-        margin: Style.panelMargin,
-        borderWidth: Style.panelBorderWidth,
         borderColor: Style.panelBorderColor,
+        borderWidth: Style.panelBorderWidth,
+        crossAxisLayout: "center",
+        crossAxisSelfLayout: "grow",
+        mainAxisLayout: "center",
+        mainAxisSelfLayout: "grow",
+        margin: Style.panelMargin,
+        padding: Style.panelPadding,
         children: [
-            // Square(50,"red"),
-            // new HExpander(),
-            // MHLabel("Every Text"),
-            // MHButton({text: "hello"}),
-            // new Icon(Icons.Document),
-            // Square(50,"green"),
-            MLabel({text: 'buttons'}),
-            Button({text: "Button"}),
-            new Icon({icon: Icons.Document}),
-            IconButton({text: 'Doc', icon: Icons.Document, ghost:false}),
-            CheckBox({
-                text: "Checkbox",
-                // selected: state.checked, handleEvent: () => {
-                //     state.checked = !state.checked
-                //     c.redraw()
-                // }
+            new MHBoxElement({
+                mainAxisSelfLayout: 'grow',
+                crossAxisSelfLayout: 'shrink',
+                mainAxisLayout: 'start',
+                crossAxisLayout: 'center',
+                background: Style.panelBackgroundColor,
+                padding: Style.panelPadding,
+                margin: Style.panelMargin,
+                borderWidth: Style.panelBorderWidth,
+                borderColor: Style.panelBorderColor,
+                children: [
+                    // Square(50,"red"),
+                    // new HExpander(),
+                    // MHLabel("Every Text"),
+                    // MHButton({text: "hello"}),
+                    // new Icon(Icons.Document),
+                    // Square(50,"green"),
+                    MLabel({text: 'buttons'}),
+                    Button({text: "Button"}),
+                    new Icon({icon: Icons.Document}),
+                    IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
+                    CheckBox({
+                        text: "Checkbox",
+                        // selected: state.checked, handleEvent: () => {
+                        //     state.checked = !state.checked
+                        //     c.redraw()
+                        // }
+                    }),
+                    RadioButton({text: 'radio box'}),
+                    // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
+                    //         state.toggled = !state.toggled
+                    //         c.redraw()
+                    //     }})
+                ],
             }),
-            RadioButton({text:'radio box'}),
-            // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
-            //         state.toggled = !state.toggled
-            //         c.redraw()
-            //     }})
-        ],
+            new MHBoxElement({
+                mainAxisSelfLayout: 'grow',
+                crossAxisSelfLayout: 'shrink',
+                mainAxisLayout: 'start',
+                crossAxisLayout: 'center',
+                background: Style.panelBackgroundColor,
+                padding: Style.panelPadding,
+                margin: Style.panelMargin,
+                borderWidth: Style.panelBorderWidth,
+                borderColor: Style.panelBorderColor,
+                children: [
+                    Button({text: 'Button'}),
+                    MLabel({text: 'toolbar'}),
+                    new MHBoxElement({
+                        background: "",
+                        borderColor: "",
+                        borderWidth: Style.panelBorderWidth,
+                        crossAxisLayout: "center",
+                        crossAxisSelfLayout: "shrink",
+                        mainAxisLayout: "start",
+                        mainAxisSelfLayout: "shrink",
+                        margin: Style.panelMargin,
+                        padding: Style.panelPadding,
+                        children: [
+                            Button({text: "Button"}),
+                            IconButton({text: 'IconButton', icon: Icons.Document, ghost: false}),
+                            IconButton({icon: Icons.Document, text: "", ghost: false}),
+                            new HSeparator(),
+                            IconButton({icon: Icons.Document, text: "", ghost: false}),
+                        ]
+                    }),
+                ]
+            })
+        ]
     })
 }
 

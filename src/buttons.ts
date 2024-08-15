@@ -1,6 +1,7 @@
 import {Icons} from "./icons.ts";
-import {Icon, MHBoxElement, TextElement} from "./comps2.ts";
+import {Icon, TextElement} from "./comps2.ts";
 import {GElement, Style, TRANSPARENT, ZERO_INSETS} from "./base.ts";
+import {MHBoxElement} from "./layout.ts";
 
 export function IconButton(param: { icon: Icons; text: string, ghost:boolean }) {
     return new MHBoxElement({
