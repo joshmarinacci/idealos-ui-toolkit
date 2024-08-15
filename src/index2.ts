@@ -2,16 +2,23 @@
 
 next steps
 
-Text is text without any insets
+// Text is text without any insets
 // Label is text with padding and margins
 // Button is text with border and padding and margins
-    states: enabled, hover, primary, secondary, destructive
+//     states: enabled, hover, primary, secondary, destructive
 // Icon is reference to icon font with fixed size and no insets
 // IconButton is HBox shrinking with two children
 // CheckBox is IconButton with check icon and no border
 // RadioButton is IconButton with radio icon and no border
+// Tag is Text with fancy colored border and background
+
+make HBox cross axis stretch to give all buttons the same height
+make some options to Hbox and VBox be optional. good defaults.
 ToggleButton is Button with selected state
     selected = true | false
+TabbedPane is VBox(main:grow, cross:grow, HBox(main:grow, cross:shrink,titles),currentContent)
+
+
 DropdownButton
     takes a menu list as its dropdown child
     enabled = true | false
@@ -19,8 +26,6 @@ DropdownButton
 MenuList = VBox(main:shrink, cross:shrink, children:[menu items])
 MenuItem = IconButton with no border + hover effect
 
-Tag is Text with fancy colored border and background
-TabbedPane is VBox(main:grow, cross:grow, HBox(main:grow, cross:shrink,titles),currentContent)
 
 ListView is custom VBox with NodeRenderer and clip and scrolling
 HSpacer is h growing
@@ -33,9 +38,6 @@ SearchBox = HBox(SearchIcon,TextInput)
 ToggleGroup HBox(with mutually exclusive options)
 ColorWell
 
-make HBox cross axis stretch to give all buttons the same height
-make VBox size actually as big as the available area
-make some options to Hbox and VBox be optional. good defaults.
 
  */
 import {makeCanvas} from "./util.ts";
