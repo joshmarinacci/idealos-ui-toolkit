@@ -33,6 +33,7 @@ SearchBox = HBox(SearchIcon,TextInput)
 ToggleGroup HBox(with mutually exclusive options)
 ColorWell
 
+make HBox cross axis stretch to give all buttons the same height
 
  */
 import {makeCanvas} from "./util.ts";
@@ -88,8 +89,7 @@ function makeTree(): GElement {
                     // MHButton({text: "hello"}),
                     // new Icon(Icons.Document),
                     // Square(50,"green"),
-                    Label({text: 'buttons'}),
-                    Tag({text:'tag'}),
+                    Label({text: 'simple components'}),
                     Button({text: "Button"}),
                     new Icon({icon: Icons.Document}),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
@@ -101,6 +101,7 @@ function makeTree(): GElement {
                         // }
                     }),
                     RadioButton({text: 'radio box'}),
+                    Tag({text:'tag'}),
                     // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
                     //         state.toggled = !state.toggled
                     //         c.redraw()
@@ -118,7 +119,6 @@ function makeTree(): GElement {
                 borderWidth: Style.panelBorderWidth,
                 borderColor: Style.panelBorderColor,
                 children: [
-                    Button({text: 'Button'}),
                     Label({text: 'toolbar'}),
                     new MHBoxElement({
                         background: "",

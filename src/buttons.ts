@@ -6,7 +6,7 @@ import {MHBoxElement} from "./layout.ts";
 export function IconButton(param: { icon: Icons; text: string, ghost:boolean }) {
     return new MHBoxElement({
         background: param.ghost ? TRANSPARENT : Style.buttonBackground,
-        borderColor: Style.panelBorderColor,
+        borderColor: Style.buttonBorderColor,
         borderWidth: param.ghost ? ZERO_INSETS : Style.buttonBorderWidth,
         children: [
             new Icon({icon: param.icon}),
@@ -17,7 +17,8 @@ export function IconButton(param: { icon: Icons; text: string, ghost:boolean }) 
                 borderColor: 'transparent',
                 borderWidth: ZERO_INSETS,
                 backgroundColor: param.ghost ? TRANSPARENT : Style.buttonBackground,
-                text: param.text
+                text: param.text,
+                textColor: Style.buttonTextColor,
             }),
         ],
         crossAxisLayout: "center",
@@ -35,8 +36,9 @@ export const RadioButton = (p: { text: string }) => IconButton({text: p.text, ic
 export function Button(param: { text: string }): GElement {
     return new MHBoxElement({
         background: Style.buttonBackground,
-        borderColor: "",
+        borderColor: Style.buttonBorderColor,
         borderWidth: Style.buttonBorderWidth,
+        borderRadius: Style.buttonBorderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
             font: Style.font,
@@ -44,7 +46,8 @@ export function Button(param: { text: string }): GElement {
             borderColor: 'transparent',
             borderWidth: ZERO_INSETS,
             backgroundColor: Style.buttonBackground,
-            text: param.text
+            text: param.text,
+            textColor: Style.buttonTextColor,
         })],
         crossAxisLayout: 'center',
         crossAxisSelfLayout: 'shrink',
@@ -52,6 +55,5 @@ export function Button(param: { text: string }): GElement {
         mainAxisSelfLayout: 'shrink',
         margin: Style.buttonMargin,
         padding: Style.buttonPadding,
-
     })
 }

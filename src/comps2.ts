@@ -1,7 +1,8 @@
-import {ElementSettings, GElement, GRenderNode, LayoutConstraints, Style, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {ElementSettings, GElement, GRenderNode, LayoutConstraints, Style, TRANSPARENT, ZERO_INSETS, ZERO_POINT} from "./base.ts";
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
 import {Point, Size} from "josh_js_util";
 import {Icons} from "./icons.ts";
+import {MHBoxElement} from "./layout.ts";
 
 export class TextElement implements GElement {
     settings: ElementSettings;
@@ -32,7 +33,7 @@ export class TextElement implements GElement {
             padding: this.settings.padding,
             margin: this.settings.margin,
             borderWidth: this.settings.borderWidth,
-            textColor:Style.textColor,
+            textColor: this.settings.textColor,
             borderColor: this.settings.borderColor,
         })
     }
@@ -93,7 +94,7 @@ export class Icon implements GElement {
             pos: new Point(0,0),
             size: new Size(24,24),
             text: this.icon,
-            textColor: ""
+            textColor: Style.textColor,
         })
     }
 }
@@ -101,6 +102,7 @@ export class Icon implements GElement {
 export function Label(opts: { text: string }) {
     return new TextElement({
         text: opts.text,
+        textColor: Style.textColor,
         padding: withInsets(5),
         font: Style.font,
         margin: withInsets(5),
@@ -111,14 +113,27 @@ export function Label(opts: { text: string }) {
 }
 
 export function Tag(opts: { text: string }) {
-    return new TextElement({
-        text: opts.text,
-        padding: withInsets(5),
-        font: Style.font,
-        margin: withInsets(5),
-        borderColor: 'cyan',
-        borderWidth: withInsets(5),
-        backgroundColor: 'cyan',
+    return new MHBoxElement({
+        background: 'blue',
+        borderColor: Style.buttonBorderColor,
+        borderWidth: Style.buttonBorderWidth,
+        borderRadius: Style.tagBorderRadius,
+        children: [new TextElement({
+            padding: ZERO_INSETS,
+            font: Style.font,
+            margin: ZERO_INSETS,
+            borderColor: 'transparent',
+            borderWidth: ZERO_INSETS,
+            backgroundColor: TRANSPARENT,
+            text: opts.text,
+            textColor: Style.buttonTextColor,
+        })],
+        crossAxisLayout: 'center',
+        crossAxisSelfLayout: 'shrink',
+        mainAxisLayout: 'center',
+        mainAxisSelfLayout: 'shrink',
+        margin: Style.buttonMargin,
+        padding: Style.buttonPadding,
     })
 }
 

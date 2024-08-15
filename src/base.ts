@@ -18,6 +18,7 @@ export type ElementSettings = {
     borderColor: string
     backgroundColor: string
     font: string
+    textColor: string
 }
 
 export type RenderNodeSettings = {
@@ -35,6 +36,7 @@ export type RenderNodeSettings = {
     margin: Insets
     borderWidth: Insets
     borderColor: string
+    borderRadius?: number
 }
 export class GRenderNode {
     settings: RenderNodeSettings;
@@ -50,17 +52,26 @@ export const Style = {
     fontSize: '16px',
     font: '16px sans-serif',
 
-    textColor: 'red',
+    textColor: '#fff',
+    borderRadius: 0,
 
-    panelMargin: withInsets(5),
+    panelMargin: withInsets(0),
     panelBorderColor: '#333',
-    panelBorderWidth: withInsets(5),
+    panelBorderWidth: withInsets(0),
     panelPadding: withInsets(5),
-    panelBackgroundColor: '#bbb',
-    buttonBackground: "#fff",
-    buttonBorderWidth: new Insets(1,1,1,1),
-    buttonMargin: withInsets(5),
-    buttonPadding: withInsets(5)
+    panelBackgroundColor: '#222',
+    panelBorderRadius: 4,
+
+    buttonBackground: "#333",
+    buttonTextColor: '#fff',
+
+    buttonMargin: withInsets(4),
+    buttonBorderColor: '#666',
+    buttonBorderWidth: withInsets(1),
+    buttonPadding: withInsets(7),
+    buttonBorderRadius: 4,
+
+    tagBorderRadius: 16
 
 
 }

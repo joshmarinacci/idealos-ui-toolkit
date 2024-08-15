@@ -1,5 +1,5 @@
 import {AxisLayout, AxisSelfLayout, GElement, GRenderNode, LayoutConstraints, Style, ZERO_INSETS, ZERO_POINT} from "./base.ts";
-import {RenderContext, withInsets} from "./gfx.ts";
+import {RenderContext } from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 
 type BoxParameters = {
@@ -12,7 +12,8 @@ type BoxParameters = {
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
-    borderColor: string
+    borderColor: string,
+    borderRadius?: number,
 }
 
 function bdsSubInsets(bds: Bounds, insets: Insets) {
@@ -136,10 +137,11 @@ export class MHBoxElement implements GElement {
                 children: children,
                 padding: this.settings.padding,
                 contentOffset: contentBounds.position(),
-                borderColor: 'black',
+                borderColor: this.settings.borderColor,
                 margin: this.settings.margin,
                 textColor: 'black',
-                borderWidth: this.settings.borderWidth
+                borderWidth: this.settings.borderWidth,
+                borderRadius: this.settings.borderRadius,
             })
         }
         if (this.settings.mainAxisSelfLayout == 'shrink') {
@@ -194,10 +196,11 @@ export class MHBoxElement implements GElement {
                 children: children,
                 padding: this.settings.padding,
                 contentOffset: contentBounds.position(),
-                borderColor: 'black',
+                borderColor: this.settings.borderColor,
                 margin: this.settings.margin,
                 textColor: 'black',
-                borderWidth: this.settings.borderWidth
+                borderWidth: this.settings.borderWidth,
+                borderRadius: this.settings.borderRadius,
             })
 
         }
@@ -294,18 +297,19 @@ export class MVBoxElement implements GElement {
 
 
         return new GRenderNode({
-            background: Style.panelBackgroundColor,
+            background: this.settings.background,
             baseline: 0,
-            borderColor: Style.panelBorderColor,
-            borderWidth: withInsets(5),
+            borderColor: this.settings.borderColor,
+            borderWidth: this.settings.borderWidth,
+            borderRadius: this.settings.borderRadius,
             children: children,
             contentOffset: new Point(0,0),
             font: "",
             id: "VBox",
-            margin: withInsets(5),
-            padding: withInsets(5),
+            margin: this.settings.margin,
+            padding: this.settings.padding,
             pos: new Point(0,0),
-            size: new Size(50,50),
+            size: new Size(50,200),
             text: "",
             textColor: ""
 
