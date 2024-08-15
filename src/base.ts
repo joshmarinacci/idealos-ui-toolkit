@@ -11,12 +11,15 @@ export type ElementSettings = {
     margin: Insets
     borderWidth: Insets
     borderColor: string
+    backgroundColor: string
     font: string
 }
 
 export type RenderNodeSettings = {
     text: string;
-    background: string | undefined,
+    textColor: string
+    contentOffset: Point,
+    background: string,
     font: string;
     size: Size;
     pos: Point;
@@ -24,6 +27,9 @@ export type RenderNodeSettings = {
     id:string,
     children:GRenderNode[],
     padding: Insets
+    margin: Insets
+    borderWidth: Insets
+    borderColor: string
 }
 export class GRenderNode {
     settings: RenderNodeSettings;

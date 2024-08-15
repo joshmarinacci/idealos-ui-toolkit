@@ -1,8 +1,8 @@
 import {makeCanvas} from "./util.ts";
-import {Insets, Size} from "josh_js_util";
-import {doDraw, RenderContext} from "./gfx.ts";
+import { Size} from "josh_js_util";
+import {doDraw, RenderContext, withInsets} from "./gfx.ts";
 import {GElement} from "./base.ts";
-import {MHBoxElement, MText, Square} from "./comps2.ts";
+import {MHBoxElement, Square, Style, TextElement, ZERO_INSETS} from "./comps2.ts";
 
 const canvas = makeCanvas(new Size(600,300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -15,7 +15,7 @@ const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     implement stretching for child by wrapping in Expander()
     // make hbox fill space or not
     debug render margin box
-    debug render padding box
+    // debug render padding box
     render border box
     make background only be inside of the border box
 
@@ -26,7 +26,7 @@ const rc:RenderContext = {
     ctx: ctx,
     scale:sc,
     debug:{
-        metrics: true
+        metrics: false
     },
     size: new Size(canvas.width/sc, canvas.height/sc)
 }
@@ -35,17 +35,26 @@ const rc:RenderContext = {
 function makeTree():GElement {
     return new MHBoxElement({
         mainAxisSelfLayout:'grow',
-        crossAxisSelfLayout:'shrink',
+        crossAxisSelfLayout:'grow',
         mainAxisLayout:'center',
-        background:"magenta",
+        background:Style.panelBackgroundColor,
+        padding: Style.panelPadding,
+        margin: Style.panelMargin,
+        borderWidth: Style.panelBorderWidth,
+        borderColor:Style.panelBorderColor,
         children:[
             Square(50,"red"),
-            MText({
-                text:"some text",
-                padding: new Insets(5,5,5,5)
+            new TextElement({
+                text:"Every text",
+                padding: withInsets(5),
+                font: Style.font,
+                margin: withInsets(5),
+                borderColor: 'transparent',
+                borderWidth: ZERO_INSETS,
+                backgroundColor:'transparent',
             }),
             Square(50,"green"),
-        ]
+        ],
     })
 }
 
