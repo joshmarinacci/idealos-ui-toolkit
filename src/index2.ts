@@ -13,6 +13,7 @@ Text is text without any insets
 ToggleButton is Button with selected state
     selected = true | false
 DropdownButton
+    takes a menu list as its dropdown child
     enabled = true | false
     open = true | false
 MenuList = VBox(main:shrink, cross:shrink, children:[menu items])
@@ -38,7 +39,7 @@ import {makeCanvas} from "./util.ts";
 import {Size} from "josh_js_util";
 import {doDraw, RenderContext} from "./gfx.ts";
 import {GElement, Style} from "./base.ts";
-import {HSeparator, Icon, MLabel} from "./comps2.ts";
+import {HSeparator, Icon, Label, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
@@ -87,7 +88,8 @@ function makeTree(): GElement {
                     // MHButton({text: "hello"}),
                     // new Icon(Icons.Document),
                     // Square(50,"green"),
-                    MLabel({text: 'buttons'}),
+                    Label({text: 'buttons'}),
+                    Tag({text:'tag'}),
                     Button({text: "Button"}),
                     new Icon({icon: Icons.Document}),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
@@ -117,7 +119,7 @@ function makeTree(): GElement {
                 borderColor: Style.panelBorderColor,
                 children: [
                     Button({text: 'Button'}),
-                    MLabel({text: 'toolbar'}),
+                    Label({text: 'toolbar'}),
                     new MHBoxElement({
                         background: "",
                         borderColor: "",

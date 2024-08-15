@@ -17,6 +17,8 @@ export class TextElement implements GElement {
             Math.floor(metrics.width),
             Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
         size = sizeWithPadding(size,this.settings.padding)
+        size = sizeWithPadding(size,this.settings.margin)
+        size = sizeWithPadding(size,this.settings.borderWidth)
         return new GRenderNode({
             id: "text element",
             text: this.settings.text,
@@ -29,9 +31,9 @@ export class TextElement implements GElement {
             children: [],
             padding: this.settings.padding,
             margin: this.settings.margin,
-            borderWidth: ZERO_INSETS,
+            borderWidth: this.settings.borderWidth,
             textColor:Style.textColor,
-            borderColor:'gray'
+            borderColor: this.settings.borderColor,
         })
     }
 }
@@ -96,7 +98,7 @@ export class Icon implements GElement {
     }
 }
 
-export function MLabel(opts: { text: string }) {
+export function Label(opts: { text: string }) {
     return new TextElement({
         text: opts.text,
         padding: withInsets(5),
@@ -105,6 +107,18 @@ export function MLabel(opts: { text: string }) {
         borderColor: 'transparent',
         borderWidth: ZERO_INSETS,
         backgroundColor: 'transparent',
+    })
+}
+
+export function Tag(opts: { text: string }) {
+    return new TextElement({
+        text: opts.text,
+        padding: withInsets(5),
+        font: Style.font,
+        margin: withInsets(5),
+        borderColor: 'cyan',
+        borderWidth: withInsets(5),
+        backgroundColor: 'cyan',
     })
 }
 
