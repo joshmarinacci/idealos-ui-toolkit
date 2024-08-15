@@ -1,4 +1,4 @@
-import {RenderContext} from "./gfx.ts";
+import {RenderContext, withInsets} from "./gfx.ts";
 import {Insets, Point, Size} from "josh_js_util";
 
 export type LayoutConstraints = {
@@ -45,3 +45,18 @@ export class GRenderNode {
 
 export type AxisSelfLayout = "grow" | "shrink"
 export type AxisLayout = 'start' | 'center' | 'end'
+export const Style = {
+    fontSize: '16px',
+    font: '16px plain sans-serif',
+
+    textColor: 'red',
+
+    panelMargin: withInsets(5),
+    panelBorderColor: '#333',
+    panelBorderWidth: withInsets(5),
+    panelPadding: withInsets(5),
+    panelBackgroundColor: '#bbb',
+
+}
+export const ZERO_INSETS = new Insets(0, 0, 0, 0);
+export const ZERO_POINT = new Point(0, 0)
