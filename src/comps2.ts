@@ -11,6 +11,7 @@ import {
 } from "./base.ts";
 import {RenderContext, sizeWithPadding} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
+import {Icons} from "./icons.ts";
 
 export class TextElement implements GElement {
     settings: ElementSettings;
@@ -366,4 +367,30 @@ export function MHButton(param: { text: string }): GElement {
         padding: Style.buttonPadding,
 
     })
+}
+
+export class Icon implements GElement {
+    private icon: Icons;
+    constructor(icon:Icons) {
+        this.icon = icon
+    }
+
+    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        return new GRenderNode({
+            background: "",
+            baseline: 24,
+            borderColor: "",
+            borderWidth: ZERO_INSETS,
+            children: [],
+            contentOffset: new Point(0,0),
+            font: "24px material-icons",
+            id: `icon: ${this.icon}`,
+            margin: ZERO_INSETS,
+            padding: ZERO_INSETS,
+            pos: new Point(0,0),
+            size: new Size(24,24),
+            text: this.icon,
+            textColor: ""
+        })
+    }
 }

@@ -45,7 +45,8 @@ import {makeCanvas} from "./util.ts";
 import {Size} from "josh_js_util";
 import {doDraw, RenderContext, withInsets} from "./gfx.ts";
 import {GElement, Style, ZERO_INSETS} from "./base.ts";
-import {MHBoxElement, MHButton, TextElement} from "./comps2.ts";
+import {Icon, MHBoxElement, MHButton, TextElement} from "./comps2.ts";
+import {Icons} from "./icons.ts";
 
 const canvas = makeCanvas(new Size(600, 300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -85,19 +86,28 @@ function makeTree():GElement {
                 borderWidth: ZERO_INSETS,
                 backgroundColor:'transparent',
             }),
-            MHButton({text:"hello"})
+            MHButton({text:"hello"}),
+            new Icon(Icons.Document),
             // Square(50,"green"),
         ],
     })
 }
 
 
-const elementRoot = makeTree()
-const renderRoot = elementRoot.layout(rc, {space:rc.size, layout:'grow'})
-rc.ctx.save()
-rc.ctx.scale(rc.scale, rc.scale)
+async function doit() {
+    const font = new FontFace('material-icons',
+        'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+    document.fonts.add(font)
+    await font.load()
+    const elementRoot = makeTree()
+    const renderRoot = elementRoot.layout(rc, {space:rc.size, layout:'grow'})
+    rc.ctx.save()
+    rc.ctx.scale(rc.scale, rc.scale)
 // rc.ctx.translate(10,10)
-rc.ctx.fillStyle = '#f0f0f0'
-rc.ctx.fillRect(0,0,rc.size.w,rc.size.h);
-doDraw(renderRoot,rc)
-rc.ctx.restore()
+    rc.ctx.fillStyle = '#f0f0f0'
+    rc.ctx.fillRect(0,0,rc.size.w,rc.size.h);
+    doDraw(renderRoot,rc)
+    rc.ctx.restore()
+}
+doit().then(()=>console.log("is done"))
+
