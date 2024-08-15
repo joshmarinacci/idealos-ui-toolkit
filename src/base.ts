@@ -1,8 +1,12 @@
 import {RenderContext} from "./gfx.ts";
 import {Insets, Point, Size} from "josh_js_util";
 
+export type LayoutConstraints = {
+    space:Size
+}
+
 export interface GElement {
-    layout(rc: RenderContext, space: Size): GRenderNode
+    layout(rc: RenderContext, cons:LayoutConstraints): GRenderNode
 }
 
 export type ElementSettings = {

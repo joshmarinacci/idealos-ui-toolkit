@@ -1,10 +1,10 @@
 import {makeCanvas} from "./util.ts";
-import { Size} from "josh_js_util";
+import {Size} from "josh_js_util";
 import {doDraw, RenderContext, withInsets} from "./gfx.ts";
 import {GElement} from "./base.ts";
-import {MHBoxElement, Square, Style, TextElement, ZERO_INSETS} from "./comps2.ts";
+import {Expander, MHBoxElement, Square, Style, TextElement, ZERO_INSETS} from "./comps2.ts";
 
-const canvas = makeCanvas(new Size(600,300))
+const canvas = makeCanvas(new Size(600, 300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 
 
@@ -21,14 +21,14 @@ const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 
  */
 let sc = 2 * window.devicePixelRatio
-const rc:RenderContext = {
-    canvas:canvas,
+const rc: RenderContext = {
+    canvas: canvas,
     ctx: ctx,
-    scale:sc,
-    debug:{
+    scale: sc,
+    debug: {
         metrics: false
     },
-    size: new Size(canvas.width/sc, canvas.height/sc)
+    size: new Size(canvas.width / sc, canvas.height / sc)
 }
 
 
@@ -36,7 +36,7 @@ function makeTree():GElement {
     return new MHBoxElement({
         mainAxisSelfLayout:'grow',
         crossAxisSelfLayout:'grow',
-        mainAxisLayout:'center',
+        mainAxisLayout:'start',
         background:Style.panelBackgroundColor,
         padding: Style.panelPadding,
         margin: Style.panelMargin,
@@ -44,6 +44,7 @@ function makeTree():GElement {
         borderColor:Style.panelBorderColor,
         children:[
             Square(50,"red"),
+            new Expander(),
             new TextElement({
                 text:"Every text",
                 padding: withInsets(5),
@@ -60,7 +61,7 @@ function makeTree():GElement {
 
 
 const elementRoot = makeTree()
-const renderRoot = elementRoot.layout(rc, rc.size)
+const renderRoot = elementRoot.layout(rc, {space:rc.size})
 rc.ctx.save()
 rc.ctx.scale(rc.scale, rc.scale)
 // rc.ctx.translate(10,10)

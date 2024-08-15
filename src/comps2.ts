@@ -1,4 +1,4 @@
-import {AxisLayout, AxisSelfLayout, ElementSettings, GElement, GRenderNode} from "./base.ts";
+import {AxisLayout, AxisSelfLayout, ElementSettings, GElement, GRenderNode, LayoutConstraints} from "./base.ts";
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 
@@ -23,10 +23,12 @@ export class TextElement implements GElement {
         this.settings = settings
     }
 
-    layout(rc: RenderContext, _space: Size): GRenderNode {
+    layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         rc.ctx.font = this.settings.font
         let metrics = rc.ctx.measureText(this.settings.text)
-        let size = new Size(metrics.width, metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent)
+        let size = new Size(
+            Math.floor(metrics.width),
+            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
         size = sizeWithPadding(size,this.settings.padding)
         return new GRenderNode({
             id: "text element",
@@ -71,7 +73,7 @@ class SquareElement implements GElement {
         this.fill = fill
     }
 
-    layout(_rc: RenderContext, _space: Size): GRenderNode {
+    layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         return new GRenderNode({
             id: 'square',
             text: "",
@@ -124,29 +126,48 @@ export class MHBoxElement implements GElement {
         this.settings = param
     }
 
-    layout(rc: RenderContext, space: Size): GRenderNode {
-        this.log(`space ${space}`)
+    layout(rc: RenderContext, cons:LayoutConstraints): GRenderNode {
+        this.log(`space ${cons}`)
         let chs = this.settings.children
-        const children = chs.map(ch => {
-            return ch.layout(rc, space)
+        let map = new Map<GElement,GRenderNode>()
+        let expanders = chs.filter(ch => ch instanceof Expander)
+        let non_expanders = chs.filter(ch => !(ch instanceof Expander))
+        this.log(`exp ${expanders.length} non = ${non_expanders.length}`)
+
+        // layout non expander children
+        const non_expander_children = chs.map(ch => {
+            let node = ch.layout(rc,{space:cons.space})
+            map.set(ch,node)
+            return node
         })
         let min_width = 0
         let max_height = 0
-        for (let ch of children) {
+        for (let ch of non_expander_children) {
             min_width += ch.settings.size.w
             max_height = Math.max(max_height, ch.settings.size.h)
         }
         let contentBounds = new Bounds(0,0,0,0)
         if (this.settings.mainAxisSelfLayout === 'grow') {
-            contentBounds.w = space.w
+            contentBounds.w = cons.space.w
         } else {
             contentBounds.w = min_width
         }
         if(this.settings.crossAxisSelfLayout === 'grow') {
-            contentBounds.h = space.h
+            contentBounds.h = cons.space.h
         } else {
             contentBounds.h = 100
         }
+
+        this.log('content bounds', contentBounds)
+        // let leftover = contentBounds.w - min_width
+        // this.log("leftover is",leftover)
+        // let expander_count = expanders.length
+        // this.log("expander count",expander_count)
+        chs.map(ch => {
+            let ndoe = ch.layout(rc,{space:cons.space})
+            map.set(ch,ndoe)
+            return ndoe
+        })
         // let h = (this.settings.crossAxisSelfLayout === 'grow') ? space.h : y
         this.log("started content bounds",contentBounds)
         // subtract padding
@@ -168,6 +189,7 @@ export class MHBoxElement implements GElement {
 
         // do final position of children
         let y = contentBounds.y
+        let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
         for (let ch of children) {
             // console.log('ch',ch.settings.id,'size',ch.settings.size)
             ch.settings.pos.x = x
@@ -207,3 +229,23 @@ export class MHBoxElement implements GElement {
     }
 }
 
+export class Expander implements GElement {
+    layout(_rc: RenderContext, _cons:LayoutConstraints): GRenderNode {
+        return new GRenderNode({
+            baseline: 0,
+            borderColor: "",
+            borderWidth: ZERO_INSETS,
+            children: [],
+            font: "",
+            id: "",
+            margin: ZERO_INSETS,
+            padding: ZERO_INSETS,
+            pos: ZERO_POINT,
+            size: new Size(20,20),
+            text: "",
+            textColor: "",
+            background: 'cyan',
+            contentOffset: new Point(0, 0)
+        })
+    }
+}
