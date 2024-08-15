@@ -66,3 +66,4 @@ export const Style = {
 }
 export const ZERO_INSETS = new Insets(0, 0, 0, 0);
 export const ZERO_POINT = new Point(0, 0)
+export const TRANSPARENT = 'transparent';

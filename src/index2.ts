@@ -2,21 +2,14 @@
 
 next steps
 
-add back Icons and the various buttons that use icons
-add back ListView. uses a renderer to create child elements. clips
-create simple VBox that just lays out children vertically. assume grows in both dimensions.
-add event handling back. event goes to render node, which then goes
-    to a listener on that node which is the developer's code
-different styles for components vs panels
-
 Text is text without any insets
-Label is text with padding and margins
-Button is text with border and padding and margins
+// Label is text with padding and margins
+// Button is text with border and padding and margins
     states: enabled, hover, primary, secondary, destructive
-Icon is reference to icon font with fixed size and no insets
-IconButton is HBox shrinking with two children
-CheckBox is IconButton with check icon and no border
-RadioButton is IconButton with radio icon and no border
+// Icon is reference to icon font with fixed size and no insets
+// IconButton is HBox shrinking with two children
+// CheckBox is IconButton with check icon and no border
+// RadioButton is IconButton with radio icon and no border
 ToggleButton is Button with selected state
     selected = true | false
 DropdownButton
@@ -43,10 +36,11 @@ ColorWell
  */
 import {makeCanvas} from "./util.ts";
 import {Size} from "josh_js_util";
-import {doDraw, RenderContext, withInsets} from "./gfx.ts";
-import {GElement, Style, ZERO_INSETS} from "./base.ts";
-import {Icon, MHBoxElement, MHButton, TextElement} from "./comps2.ts";
+import {doDraw, RenderContext} from "./gfx.ts";
+import {GElement, Style} from "./base.ts";
+import {Icon, MHBoxElement, MLabel} from "./comps2.ts";
 import {Icons} from "./icons.ts";
+import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 
 const canvas = makeCanvas(new Size(600, 300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -63,32 +57,40 @@ const rc: RenderContext = {
 }
 
 
-function makeTree():GElement {
+function makeTree(): GElement {
     return new MHBoxElement({
-        mainAxisSelfLayout:'grow',
-        crossAxisSelfLayout:'shrink',
-        mainAxisLayout:'start',
-        crossAxisLayout:'center',
-        background:Style.panelBackgroundColor,
+        mainAxisSelfLayout: 'grow',
+        crossAxisSelfLayout: 'shrink',
+        mainAxisLayout: 'start',
+        crossAxisLayout: 'center',
+        background: Style.panelBackgroundColor,
         padding: Style.panelPadding,
         margin: Style.panelMargin,
         borderWidth: Style.panelBorderWidth,
-        borderColor:Style.panelBorderColor,
-        children:[
+        borderColor: Style.panelBorderColor,
+        children: [
             // Square(50,"red"),
             // new HExpander(),
-            new TextElement({
-                text:"Every text",
-                padding: withInsets(5),
-                font: Style.font,
-                margin: withInsets(5),
-                borderColor: 'transparent',
-                borderWidth: ZERO_INSETS,
-                backgroundColor:'transparent',
-            }),
-            MHButton({text:"hello"}),
-            new Icon(Icons.Document),
+            // MHLabel("Every Text"),
+            // MHButton({text: "hello"}),
+            // new Icon(Icons.Document),
             // Square(50,"green"),
+            MLabel({text: 'buttons'}),
+            Button({text: "Button"}),
+            new Icon({icon: Icons.Document}),
+            IconButton({text: 'Doc', icon: Icons.Document, ghost:false}),
+            CheckBox({
+                text: "Checkbox",
+                // selected: state.checked, handleEvent: () => {
+                //     state.checked = !state.checked
+                //     c.redraw()
+                // }
+            }),
+            RadioButton({text:'radio box'}),
+            // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
+            //         state.toggled = !state.toggled
+            //         c.redraw()
+            //     }})
         ],
     })
 }
@@ -100,14 +102,15 @@ async function doit() {
     document.fonts.add(font)
     await font.load()
     const elementRoot = makeTree()
-    const renderRoot = elementRoot.layout(rc, {space:rc.size, layout:'grow'})
+    const renderRoot = elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
     rc.ctx.save()
     rc.ctx.scale(rc.scale, rc.scale)
 // rc.ctx.translate(10,10)
     rc.ctx.fillStyle = '#f0f0f0'
-    rc.ctx.fillRect(0,0,rc.size.w,rc.size.h);
-    doDraw(renderRoot,rc)
+    rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
+    doDraw(renderRoot, rc)
     rc.ctx.restore()
 }
-doit().then(()=>console.log("is done"))
+
+doit().then(() => console.log("is done"))
 

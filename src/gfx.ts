@@ -40,7 +40,7 @@ export function strokeBounds(rc: RenderContext, size: Bounds, color: string) {
 }
 
 export function doDraw(n: GRenderNode, rc: RenderContext): void {
-    console.log("drawing", n.settings.id, n.settings.pos, n.settings.contentOffset)
+    // console.log("drawing", n.settings.id, n.settings.pos, n.settings.contentOffset)
     rc.ctx.save()
     rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
 
