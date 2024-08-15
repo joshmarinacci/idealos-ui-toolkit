@@ -30,7 +30,7 @@ async function go() {
     // });
 
     let ctx = await context({
-        entryPoints: ['src/index.ts'],
+        entryPoints: ['src/index2.ts'],
         bundle:true,
         platform: "browser",
         format: "esm",

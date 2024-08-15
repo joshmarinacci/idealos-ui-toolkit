@@ -1,27 +1,30 @@
 import {
-    Button, Checkbox,
-    DebugBorder,
+    Button,
+    Checkbox,
     drawBlock,
-    FixedBox,
-    HBox, Icon, IconButton,
+    HBox,
+    Icon,
+    IconButton,
     Label,
-    ListView, NumberInput, RadioButton,
+    ListView,
+    NumberInput,
+    RadioButton,
     RenderParameters,
-    SearchInput, Separator,
-    Spacer, Tab, TabbedPane, TabContent, TabTitle, TextInput, ToggleButton,
-    VBlock,
-    VBox
+    SearchInput,
+    Separator,
+    Tab,
+    TabbedPane,
+    TabContent,
+    TabTitle,
+    TextInput,
+    ToggleButton,
+    VBlock
 } from "./components.ts";
 import {Point, Size} from "josh_js_util";
 import {Icons} from "./icons.ts";
+import {makeCanvas} from "./util.ts";
 
-const canvas = document.createElement('canvas')
-
-canvas.width = 600
-canvas.height = 300
-
-document.body.appendChild(canvas)
-
+const canvas = makeCanvas(new Size(600,300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 
 const c:RenderParameters = {
