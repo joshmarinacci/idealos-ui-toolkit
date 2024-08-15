@@ -48,7 +48,7 @@ export type AxisSelfLayout = "grow" | "shrink"
 export type AxisLayout = 'start' | 'center' | 'end'
 export const Style = {
     fontSize: '16px',
-    font: '16px plain sans-serif',
+    font: '16px sans-serif',
 
     textColor: 'red',
 
@@ -57,6 +57,11 @@ export const Style = {
     panelBorderWidth: withInsets(5),
     panelPadding: withInsets(5),
     panelBackgroundColor: '#bbb',
+    buttonBackground: "#fff",
+    buttonBorderWidth: new Insets(1,1,1,1),
+    buttonMargin: withInsets(5),
+    buttonPadding: withInsets(5)
+
 
 }
 export const ZERO_INSETS = new Insets(0, 0, 0, 0);

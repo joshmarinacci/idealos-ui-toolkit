@@ -45,7 +45,6 @@ export class TextElement implements GElement {
     }
 }
 
-
 class SquareElement implements GElement {
     private size: number;
     private fill: string;
@@ -328,8 +327,8 @@ export class HExpander implements GElement {
         }
         return new GRenderNode({
             baseline: 0,
-            borderColor: "",
-            borderWidth: ZERO_INSETS,
+            borderColor: "cyan",
+            borderWidth: new Insets(1,1,1,1),
             children: [],
             font: "",
             id: "",
@@ -339,8 +338,32 @@ export class HExpander implements GElement {
             size: size,
             text: "",
             textColor: "",
-            background: 'cyan',
+            background: Style.panelBackgroundColor,
             contentOffset: new Point(0, 0)
         })
     }
+}
+
+export function MHButton(param: { text: string }): GElement {
+    return new MHBoxElement({
+        background: Style.buttonBackground,
+        borderColor: "",
+        borderWidth: Style.buttonBorderWidth,
+        children: [new TextElement({
+            padding: ZERO_INSETS,
+            font: Style.font,
+            margin: ZERO_INSETS,
+            borderColor: 'transparent',
+            borderWidth: ZERO_INSETS,
+            backgroundColor: Style.buttonBackground,
+            text: param.text
+        })],
+        crossAxisLayout: 'center',
+        crossAxisSelfLayout: 'shrink',
+        mainAxisLayout: 'center',
+        mainAxisSelfLayout: 'shrink',
+        margin: Style.buttonMargin,
+        padding: Style.buttonPadding,
+
+    })
 }
