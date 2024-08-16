@@ -19,6 +19,7 @@ export type ElementSettings = {
     backgroundColor: string
     font: string
     textColor: string
+    shadow: boolean
 }
 
 export type RenderNodeSettings = {
@@ -37,6 +38,7 @@ export type RenderNodeSettings = {
     borderWidth: Insets
     borderColor: string
     borderRadius?: number
+    shadow?:boolean
 }
 export class GRenderNode {
     settings: RenderNodeSettings;

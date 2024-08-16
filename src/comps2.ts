@@ -36,6 +36,7 @@ export class TextElement implements GElement {
             borderWidth: this.settings.borderWidth,
             textColor: this.settings.textColor,
             borderColor: this.settings.borderColor,
+            shadow: this.settings.shadow,
         })
     }
 }
@@ -76,8 +77,10 @@ export function Square(number: number, red: string): GElement {
 
 export class Icon implements GElement {
     private icon: Icons;
-    constructor(opts:{icon:Icons}) {
+    private shadow: boolean;
+    constructor(opts:{icon:Icons, shadow?:boolean}) {
         this.icon = opts.icon
+        this.shadow = opts.shadow || false
     }
 
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
@@ -96,6 +99,7 @@ export class Icon implements GElement {
             size: new Size(24,24),
             text: this.icon,
             textColor: Style.textColor,
+            shadow: this.shadow
         })
     }
 }
@@ -110,6 +114,7 @@ export function Label(opts: { text: string }) {
         borderColor: 'transparent',
         borderWidth: ZERO_INSETS,
         backgroundColor: 'transparent',
+        shadow: false
     })
 }
 
@@ -128,6 +133,7 @@ export function Tag(opts: { text: string }) {
             backgroundColor: TRANSPARENT,
             text: opts.text,
             textColor: Style.buttonTextColor,
+            shadow: true,
         })],
         crossAxisLayout: 'center',
         crossAxisSelfLayout: 'shrink',

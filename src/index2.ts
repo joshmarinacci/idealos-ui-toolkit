@@ -11,13 +11,11 @@ next steps
 // CheckBox is IconButton with check icon and no border
 // RadioButton is IconButton with radio icon and no border
 // Tag is Text with fancy colored border and background
-
-make HBox cross axis stretch to give all buttons the same height
-make some options to Hbox and VBox be optional. good defaults.
-ToggleButton is Button with selected state
-    selected = true | false
-TabbedPane is VBox(main:grow, cross:grow, HBox(main:grow, cross:shrink,titles),currentContent)
-
+// make HBox cross axis stretch to give all buttons the same height
+// make some options to Hbox and VBox be optional. good defaults.
+// ToggleButton is Button with selected state
+//    selected = true | false
+// TabbedPane is VBox(main:grow, cross:grow, HBox(main:grow, cross:shrink,titles),currentContent)
 
 DropdownButton
     takes a menu list as its dropdown child
@@ -25,7 +23,6 @@ DropdownButton
     open = true | false
 MenuList = VBox(main:shrink, cross:shrink, children:[menu items])
 MenuItem = IconButton with no border + hover effect
-
 
 ListView is custom VBox with NodeRenderer and clip and scrolling
 HSpacer is h growing
@@ -39,44 +36,27 @@ ToggleGroup HBox(with mutually exclusive options)
 ColorWell
 
 
+input:
+  mouse down, move, up
+  pick repeatedly when not down
+  when down, keep sending event to same target until up again
+
  */
 import {makeCanvas} from "./util.ts";
-import {Size} from "josh_js_util";
+import {Bounds, Point, Size} from "josh_js_util";
 import {doDraw, RenderContext} from "./gfx.ts";
-import {GElement} from "./base.ts";
-import {HSeparator, Icon, Label, Tag} from "./comps2.ts";
+import {GElement, GRenderNode} from "./base.ts";
+import {HSeparator, Label, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 
-const canvas = makeCanvas(new Size(600, 300))
-const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-
-let sc = 1 * window.devicePixelRatio
-const rc: RenderContext = {
-    canvas: canvas,
-    ctx: ctx,
-    scale: sc,
-    debug: {
-        metrics: false
-    },
-    size: new Size(canvas.width / sc, canvas.height / sc)
-}
-
 
 function makeTree(): GElement {
     const compsDemo = new MVBoxElement({
-        crossAxisLayout: "center",
-        crossAxisSelfLayout: "grow",
-        mainAxisLayout: "center",
-        mainAxisSelfLayout: "grow",
         children: [
             new MHBoxElement({
-                mainAxisSelfLayout: 'grow',
-                crossAxisSelfLayout: 'shrink',
-                mainAxisLayout: 'start',
-                crossAxisLayout: 'center',
                 children: [
                     // Square(50,"red"),
                     // new HExpander(),
@@ -105,17 +85,11 @@ function makeTree(): GElement {
                 ],
             }),
             new MHBoxElement({
-                mainAxisSelfLayout: 'grow',
-                crossAxisSelfLayout: 'shrink',
-                mainAxisLayout: 'start',
                 crossAxisLayout: 'center',
                 children: [
                     Label({text: 'toolbar'}),
                     new MHBoxElement({
                         crossAxisLayout: "center",
-                        crossAxisSelfLayout: "shrink",
-                        mainAxisLayout: "start",
-                        mainAxisSelfLayout: "shrink",
                         children: [
                             Button({text: "Button"}),
                             IconButton({text: 'IconButton', icon: Icons.Document, ghost: false}),
@@ -148,21 +122,101 @@ function makeTree(): GElement {
 }
 
 
-async function doit() {
-    const font = new FontFace('material-icons',
-        'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
-    document.fonts.add(font)
-    await font.load()
-    const elementRoot = makeTree()
-    const renderRoot = elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
-    rc.ctx.save()
-    rc.ctx.scale(rc.scale, rc.scale)
-// rc.ctx.translate(10,10)
-    rc.ctx.fillStyle = '#f0f0f0'
-    rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
-    doDraw(renderRoot, rc)
-    rc.ctx.restore()
+class Scene {
+    private elementRoot: GElement;
+    renderRoot: GRenderNode;
+    canvas: HTMLCanvasElement;
+    private last :GRenderNode | undefined
+
+    async init() {
+        const font = new FontFace('material-icons',
+            'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+        document.fonts.add(font)
+        await font.load()
+
+        this.canvas = makeCanvas(new Size(600, 300))
+        this.last = undefined
+        this.canvas.addEventListener('mousemove',(e) => {
+            // @ts-ignore
+            let rect = e.target.getBoundingClientRect()
+            let pos = new Point(e.clientX, e.clientY);
+            pos = pos.subtract(new Point(rect.x,rect.y))
+            this.handleMouseMove(pos)
+        })
+
+
+
+    }
+    makeRc() {
+        const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
+
+        let sc = 1 * window.devicePixelRatio
+        const rc: RenderContext = {
+            canvas: this.canvas,
+            ctx: ctx,
+            scale: sc,
+            debug: {
+                metrics: false
+            },
+            size: new Size(this.canvas.width / sc, this.canvas.height / sc)
+        }
+        return rc
+    }
+    layout() {
+        let rc = this.makeRc()
+        this.elementRoot = makeTree()
+        this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
+    }
+    redraw() {
+        let rc = this.makeRc()
+        rc.ctx.save()
+        rc.ctx.scale(rc.scale, rc.scale)
+        // rc.ctx.translate(10,10)
+        rc.ctx.fillStyle = '#f0f0f0'
+        rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
+        doDraw(this.renderRoot, rc)
+        rc.ctx.restore()
+    }
+
+    private findTarget(pos: Point, node: GRenderNode):GRenderNode|undefined {
+        const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
+        if(bounds.contains(pos)) {
+            if(node.settings.children) {
+                for (let ch of node.settings.children) {
+                    // console.log("ch under mouse is",ch)
+                    if(ch.settings.shadow) continue
+                    let p2 = pos.subtract(bounds.top_left())
+                    let found = this.findTarget(p2, ch)
+                    if(found) return found
+                }
+            }
+            return node
+        }
+    }
+
+    handleMouseMove(pos: Point) {
+        let found = this.findTarget(pos,scene.renderRoot)
+        // console.log("mouse at",pos,found?found.settings.id:"nothing")
+        if(found) {
+            if(found !== this.last) {
+                if(this.last) {
+                    this.last.settings.background = 'white'
+                }
+                found.settings.background = 'blue'
+                scene.redraw()
+                this.last = found
+            }
+        }
+    }
 }
 
-doit().then(() => console.log("is done"))
+const scene = new Scene()
+scene.init().then(() => {
+    scene.layout()
+    scene.redraw()
+})
+
+
+
+
 
