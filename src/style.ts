@@ -28,6 +28,8 @@
 // }
 // dark style
 import {withInsets} from "./gfx.ts";
+import {Insets} from "josh_js_util";
+import {TRANSPARENT, ZERO_INSETS} from "./base.ts";
 
 export const Style = {
     fontSize: '16px',
@@ -57,4 +59,14 @@ export const Style = {
     selectedBackgroundColor: 'orange',
 
 
+}
+export type BorderStyle = {
+    borderColor: string
+    borderWidth: Insets
+    borderRadius: number|undefined
+}
+export const NULL_BORDER_STYLE: BorderStyle = {
+    borderColor: TRANSPARENT,
+    borderWidth: ZERO_INSETS,
+    borderRadius: 0
 }
