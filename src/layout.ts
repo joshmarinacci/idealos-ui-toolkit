@@ -8,12 +8,26 @@ type BoxParameters = {
     mainAxisLayout: AxisLayout,
     crossAxisLayout: AxisLayout,
     children: GElement[],
+    background?: string,
+    padding?: Insets
+    margin?: Insets,
+    borderWidth?: Insets,
+    borderColor?: string,
+    borderRadius?: number,
+}
+
+type BoxRequirements = {
+    mainAxisSelfLayout: AxisSelfLayout,
+    crossAxisSelfLayout: AxisSelfLayout,
+    mainAxisLayout: AxisLayout,
+    crossAxisLayout: AxisLayout,
+    children: GElement[],
     background: string,
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
     borderColor: string,
-    borderRadius?: number,
+    borderRadius: number,
 }
 
 function bdsSubInsets(bds: Bounds, insets: Insets) {
@@ -34,11 +48,28 @@ function bdsAddInsets(bds: Bounds, insets: Insets) {
     )
 }
 
+function withFallback<T>(value: T | undefined, fallback: T): T {
+    return value || fallback
+}
+
 export class MHBoxElement implements GElement {
-    private settings: BoxParameters;
+    private settings: BoxRequirements;
 
     constructor(param: BoxParameters) {
-        this.settings = param
+        this.settings = {
+            borderRadius: 0,
+            crossAxisLayout: param.crossAxisLayout,
+            crossAxisSelfLayout: param.crossAxisSelfLayout,
+            mainAxisLayout: param.mainAxisLayout,
+            mainAxisSelfLayout: param.mainAxisSelfLayout,
+            children: param.children,
+
+            background: withFallback(param.background,Style.panelBackgroundColor),
+            margin: withFallback(param.margin,Style.panelMargin),
+            padding: withFallback(param.padding,Style.panelPadding),
+            borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
+            borderColor: withFallback(param.borderColor,Style.panelBorderColor)
+        }
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
@@ -271,10 +302,23 @@ export class HExpander implements GElement {
 }
 
 export class MVBoxElement implements GElement {
-    private settings: BoxParameters;
+    private settings: BoxRequirements;
 
     constructor(param: BoxParameters) {
-        this.settings = param
+        this.settings = {
+            borderRadius: 0,
+            crossAxisLayout: param.crossAxisLayout,
+            crossAxisSelfLayout: param.crossAxisSelfLayout,
+            mainAxisLayout: param.mainAxisLayout,
+            mainAxisSelfLayout: param.mainAxisSelfLayout,
+            children: param.children,
+
+            background: withFallback(param.background,Style.panelBackgroundColor),
+            margin: withFallback(param.margin,Style.panelMargin),
+            padding: withFallback(param.padding,Style.panelPadding),
+            borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
+            borderColor: withFallback(param.borderColor,Style.panelBorderColor)
+        }
     }
     private log(...output: any[]) {
         console.log("VBox", ...output)

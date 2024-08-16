@@ -43,7 +43,7 @@ ColorWell
 import {makeCanvas} from "./util.ts";
 import {Size} from "josh_js_util";
 import {doDraw, RenderContext} from "./gfx.ts";
-import {GElement, Style} from "./base.ts";
+import {GElement} from "./base.ts";
 import {HSeparator, Icon, Label, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
@@ -66,26 +66,16 @@ const rc: RenderContext = {
 
 function makeTree(): GElement {
     return new MVBoxElement({
-        background: Style.panelBackgroundColor,
-        borderColor: Style.panelBorderColor,
-        borderWidth: Style.panelBorderWidth,
         crossAxisLayout: "center",
         crossAxisSelfLayout: "grow",
         mainAxisLayout: "center",
         mainAxisSelfLayout: "grow",
-        margin: Style.panelMargin,
-        padding: Style.panelPadding,
         children: [
             new MHBoxElement({
                 mainAxisSelfLayout: 'grow',
                 crossAxisSelfLayout: 'shrink',
                 mainAxisLayout: 'start',
                 crossAxisLayout: 'center',
-                background: Style.panelBackgroundColor,
-                padding: Style.panelPadding,
-                margin: Style.panelMargin,
-                borderWidth: Style.panelBorderWidth,
-                borderColor: Style.panelBorderColor,
                 children: [
                     // Square(50,"red"),
                     // new HExpander(),
@@ -117,23 +107,13 @@ function makeTree(): GElement {
                 crossAxisSelfLayout: 'shrink',
                 mainAxisLayout: 'start',
                 crossAxisLayout: 'center',
-                background: Style.panelBackgroundColor,
-                padding: Style.panelPadding,
-                margin: Style.panelMargin,
-                borderWidth: Style.panelBorderWidth,
-                borderColor: Style.panelBorderColor,
                 children: [
                     Label({text: 'toolbar'}),
                     new MHBoxElement({
-                        background: "",
-                        borderColor: "",
-                        borderWidth: Style.panelBorderWidth,
                         crossAxisLayout: "center",
                         crossAxisSelfLayout: "shrink",
                         mainAxisLayout: "start",
                         mainAxisSelfLayout: "shrink",
-                        margin: Style.panelMargin,
-                        padding: Style.panelPadding,
                         children: [
                             Button({text: "Button"}),
                             IconButton({text: 'IconButton', icon: Icons.Document, ghost: false}),
