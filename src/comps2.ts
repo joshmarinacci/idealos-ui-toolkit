@@ -104,17 +104,17 @@ export class Icon implements GElement {
     }
 }
 
-export function Label(opts: { text: string }) {
+export function Label(opts: { text: string, shadow?:boolean }) {
     return new TextElement({
         text: opts.text,
         textColor: Style.textColor,
         padding: withInsets(5),
         font: Style.font,
         margin: withInsets(5),
-        borderColor: 'transparent',
+        borderColor: TRANSPARENT,
         borderWidth: ZERO_INSETS,
-        backgroundColor: 'transparent',
-        shadow: false
+        backgroundColor: TRANSPARENT,
+        shadow: opts.shadow?opts.shadow:false
     })
 }
 

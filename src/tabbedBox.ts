@@ -5,12 +5,13 @@ import {Style} from "./style.ts";
 import {Insets} from "josh_js_util";
 import {CEvent, ZERO_INSETS} from "./base.ts";
 
-export function TabbedBox(opts: {
+export type TabbedBoxOptions = {
     titles: string[],
     children: MVBoxElement[],
     selectedTab:number
     onSelectedChanged(i: number, e:CEvent): void;
-}) {
+}
+export function TabbedBox(opts: TabbedBoxOptions) {
     return new MVBoxElement({
         mainAxisSelfLayout: "grow",
         mainAxisLayout: "center",

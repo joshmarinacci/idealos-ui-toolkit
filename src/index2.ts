@@ -60,13 +60,44 @@ import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
+import {Schema} from "rtds-core";
+import {ListView} from "./listView.ts";
+
+const S = new Schema()
+const Names = S.list(S.string()).cloneWith([
+    "John",
+    "Jacob",
+    "Jingleheimer",
+    "Schmitd",
+])
+const NamesLong = S.list(S.string()).cloneWith([
+    "John",
+    "Jacob",
+    "Jingleheimer",
+    "Schmitd",
+    "John",
+    "Jacob",
+    "Jingleheimer",
+    "Schmitd",
+    "John",
+    "Jacob",
+    "Jingleheimer",
+    "Schmitd",
+    "John",
+    "Jacob",
+    "Jingleheimer",
+    "Schmitd",
+])
 
 const state = {
     toggle:false,
     checked:true,
     radioed: false,
-    selectedTab: 0
+    selectedTab: 0,
+    selectedListItem: 0
 }
+
+
 function makeTree(): GElement {
     const compsDemo = new MVBoxElement({
         children: [
@@ -129,20 +160,37 @@ function makeTree(): GElement {
         ]
     })
 
-    const secondDemo = new MVBoxElement({
+    const listviewDemo = new MVBoxElement({
+        background:'magenta',
+        id:"list view demo",
         children:[
-            Button({text: "second demo"}),
+            ListView({
+                data:["john","Jacob",'jingleheimer'],
+                selected:state.selectedListItem,
+                onSelectedChanged:((i: number, e: CEvent)=> {
+                    state.selectedListItem = i
+                    e.redraw()
+                })
+            }),
+            ListView({
+                data:["john","Jacob",'jingleheimer'],
+                selected:state.selectedListItem,
+                onSelectedChanged:((i: number, e: CEvent)=> {
+                    state.selectedListItem = i
+                    e.redraw()
+                })
+            })
         ]
     })
 
     return TabbedBox({
         titles:[
             'Components',
-            'Second',
+            'List View',
         ],
         children:[
             compsDemo,
-            secondDemo,
+            listviewDemo,
         ],
         selectedTab:state.selectedTab,
         onSelectedChanged(i: number, e:CEvent) {

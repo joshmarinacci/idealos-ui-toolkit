@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.js",
+    "serve": "npx http-server .",
     "clean": "rm -rf build",
     "tsc": "tsc"
   },
@@ -12,8 +13,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "esbuild": "^0.23.0",
     "josh_js_util": "^0.1.25",
-    "typescript": "^5.5.4",
-    "esbuild": "^0.23.0"
+    "rtds-core": "^0.0.19",
+    "typescript": "^5.5.4"
   }
 }

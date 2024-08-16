@@ -5,9 +5,9 @@ import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
 
 export class Scene {
-    private elementRoot: GElement;
-    renderRoot: GRenderNode;
-    canvas: HTMLCanvasElement;
+    private elementRoot!: GElement;
+    renderRoot!: GRenderNode;
+    canvas!: HTMLCanvasElement;
     private last: GRenderNode | undefined
     private lastBorderStyle: BorderStyle
     private debugBorder: BorderStyle
@@ -121,12 +121,15 @@ export class Scene {
 
     handleMouseDown(pos: Point) {
         let found = this.findTarget(pos, this.renderRoot)
-        if (found && found.settings.handleEvent) found.settings.handleEvent({
-            type: "mouse-down",
-            redraw: () => {
-                this.layout()
-                this.redraw()
-            },
-        })
+        if(found) {
+            console.log("clicked on", found.settings.id)
+            if (found.settings.handleEvent) found.settings.handleEvent({
+                type: "mouse-down",
+                redraw: () => {
+                    this.layout()
+                    this.redraw()
+                },
+            })
+        }
     }
 }
