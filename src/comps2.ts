@@ -1,8 +1,9 @@
-import {ElementSettings, GElement, GRenderNode, LayoutConstraints, Style, TRANSPARENT, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {ElementSettings, GElement, GRenderNode, LayoutConstraints, TRANSPARENT, ZERO_INSETS, ZERO_POINT} from "./base.ts";
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
 import {Point, Size} from "josh_js_util";
 import {Icons} from "./icons.ts";
 import {MHBoxElement} from "./layout.ts";
+import {Style} from "./style.ts";
 
 export class TextElement implements GElement {
     settings: ElementSettings;

@@ -48,6 +48,7 @@ import {HSeparator, Icon, Label, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
+import {TabbedBox} from "./tabbedBox.ts";
 
 const canvas = makeCanvas(new Size(600, 300))
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -65,7 +66,7 @@ const rc: RenderContext = {
 
 
 function makeTree(): GElement {
-    return new MVBoxElement({
+    const compsDemo = new MVBoxElement({
         crossAxisLayout: "center",
         crossAxisSelfLayout: "grow",
         mainAxisLayout: "center",
@@ -85,7 +86,8 @@ function makeTree(): GElement {
                     // Square(50,"green"),
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
-                    new Icon({icon: Icons.Document}),
+                    Button({text: "toggle", selected:true}),
+                    // new Icon({icon: Icons.Document}),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     CheckBox({
                         text: "Checkbox",
@@ -125,6 +127,23 @@ function makeTree(): GElement {
                 ]
             })
         ]
+    })
+
+    const secondDemo = new MVBoxElement({
+        children:[
+            Button({text: "second demo"}),
+        ]
+    })
+
+    return TabbedBox({
+        titles:[
+            'Components',
+            'Second',
+        ],
+        children:[
+            compsDemo,
+            secondDemo,
+        ],
     })
 }
 

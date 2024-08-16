@@ -1,12 +1,14 @@
-import {AxisLayout, AxisSelfLayout, GElement, GRenderNode, LayoutConstraints, Style, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {AxisLayout, AxisSelfLayout, GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from "./base.ts";
 import {RenderContext } from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
+import {Style} from "./style.ts";
 
 type BoxParameters = {
-    mainAxisSelfLayout: AxisSelfLayout,
-    crossAxisSelfLayout: AxisSelfLayout,
-    mainAxisLayout: AxisLayout,
-    crossAxisLayout: AxisLayout,
+    id?:string,
+    mainAxisSelfLayout?: AxisSelfLayout,
+    crossAxisSelfLayout?: AxisSelfLayout,
+    mainAxisLayout?: AxisLayout,
+    crossAxisLayout?: AxisLayout,
     children: GElement[],
     background?: string,
     padding?: Insets
@@ -17,6 +19,7 @@ type BoxParameters = {
 }
 
 type BoxRequirements = {
+    id:string,
     mainAxisSelfLayout: AxisSelfLayout,
     crossAxisSelfLayout: AxisSelfLayout,
     mainAxisLayout: AxisLayout,
@@ -57,11 +60,12 @@ export class MHBoxElement implements GElement {
 
     constructor(param: BoxParameters) {
         this.settings = {
-            borderRadius: 0,
-            crossAxisLayout: param.crossAxisLayout,
-            crossAxisSelfLayout: param.crossAxisSelfLayout,
-            mainAxisLayout: param.mainAxisLayout,
-            mainAxisSelfLayout: param.mainAxisSelfLayout,
+            id: param.id || "hbox",
+            borderRadius: param.borderRadius || 0,
+            mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout,'shrink'),
+            crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout,'shrink'),
+            crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
+            mainAxisLayout: withFallback(param.mainAxisLayout,'center'),
             children: param.children,
 
             background: withFallback(param.background,Style.panelBackgroundColor),
@@ -164,7 +168,7 @@ export class MHBoxElement implements GElement {
                 pos: new Point(0, 0),
                 size: fullBounds.size(),
                 text: "",
-                id: "mhbox",
+                id: this.settings.id,
                 children: children,
                 padding: this.settings.padding,
                 contentOffset: contentBounds.position(),
@@ -223,7 +227,7 @@ export class MHBoxElement implements GElement {
                 pos: new Point(0, 0),
                 size: fullBounds.size(),
                 text: "",
-                id: "mhbox",
+                id: this.settings.id,
                 children: children,
                 padding: this.settings.padding,
                 contentOffset: contentBounds.position(),
@@ -288,7 +292,7 @@ export class HExpander implements GElement {
             borderWidth: new Insets(1, 1, 1, 1),
             children: [],
             font: "",
-            id: "",
+            id: "h-expander",
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: ZERO_POINT,
@@ -306,11 +310,12 @@ export class MVBoxElement implements GElement {
 
     constructor(param: BoxParameters) {
         this.settings = {
+            id: param.id || 'vbox',
             borderRadius: 0,
-            crossAxisLayout: param.crossAxisLayout,
-            crossAxisSelfLayout: param.crossAxisSelfLayout,
-            mainAxisLayout: param.mainAxisLayout,
-            mainAxisSelfLayout: param.mainAxisSelfLayout,
+            mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout,'shrink'),
+            crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout,'shrink'),
+            crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
+            mainAxisLayout: withFallback(param.mainAxisLayout,'center'),
             children: param.children,
 
             background: withFallback(param.background,Style.panelBackgroundColor),
@@ -350,7 +355,7 @@ export class MVBoxElement implements GElement {
             children: children,
             contentOffset: new Point(0,0),
             font: "",
-            id: "VBox",
+            id: this.settings.id,
             margin: this.settings.margin,
             padding: this.settings.padding,
             pos: new Point(0,0),

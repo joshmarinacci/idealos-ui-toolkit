@@ -1,7 +1,9 @@
 import {Icons} from "./icons.ts";
 import {Icon, TextElement} from "./comps2.ts";
-import {GElement, Style, TRANSPARENT, ZERO_INSETS} from "./base.ts";
+import {GElement, TRANSPARENT, ZERO_INSETS} from "./base.ts";
 import {MHBoxElement} from "./layout.ts";
+import {Style} from "./style.ts";
+import {Insets} from "josh_js_util";
 
 export function IconButton(param: { icon: Icons; text: string, ghost:boolean }) {
     return new MHBoxElement({
@@ -34,9 +36,10 @@ export function IconButton(param: { icon: Icons; text: string, ghost:boolean }) 
 export const CheckBox = (p: { text: string }) => IconButton({text: p.text, icon: Icons.CheckboxUnchecked, ghost:true})
 export const RadioButton = (p: { text: string }) => IconButton({text: p.text, icon: Icons.RadioButtonUnchecked, ghost:true})
 
-export function Button(param: { text: string }): GElement {
+export function Button(param: { margin?: Insets; text: string; selected?: boolean }): GElement {
     return new MHBoxElement({
-        background: Style.buttonBackground,
+        id:'button',
+        background: param.selected?Style.selectedBackgroundColor:Style.buttonBackground,
         borderColor: Style.buttonBorderColor,
         borderWidth: Style.buttonBorderWidth,
         borderRadius: Style.buttonBorderRadius,
@@ -46,7 +49,7 @@ export function Button(param: { text: string }): GElement {
             margin: ZERO_INSETS,
             borderColor: 'transparent',
             borderWidth: ZERO_INSETS,
-            backgroundColor: Style.buttonBackground,
+            backgroundColor: TRANSPARENT,
             text: param.text,
             textColor: Style.buttonTextColor,
         })],
@@ -54,7 +57,7 @@ export function Button(param: { text: string }): GElement {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: 'center',
         mainAxisSelfLayout: 'shrink',
-        margin: Style.buttonMargin,
+        margin: param.margin||Style.buttonMargin,
         padding: Style.buttonPadding,
     })
 }
