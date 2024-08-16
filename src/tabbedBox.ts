@@ -3,10 +3,14 @@ import {Button} from "./buttons.ts";
 import {withInsets} from "./gfx.ts";
 import {Style} from "./style.ts";
 import {Insets} from "josh_js_util";
-import {ZERO_INSETS} from "./base.ts";
+import {CEvent, ZERO_INSETS} from "./base.ts";
 
-export function TabbedBox(opts: { titles: string[], children: MVBoxElement[] }) {
-    const selectedIndex = 0
+export function TabbedBox(opts: {
+    titles: string[],
+    children: MVBoxElement[],
+    selectedTab:number
+    onSelectedChanged(i: number, e:CEvent): void;
+}) {
     return new MVBoxElement({
         mainAxisSelfLayout: "grow",
         mainAxisLayout: "center",
@@ -24,12 +28,15 @@ export function TabbedBox(opts: { titles: string[], children: MVBoxElement[] }) 
                 margin: ZERO_INSETS,
                 children: opts.titles.map(((title, i) => {
                     return Button({
-                        text: title, selected: selectedIndex == i,
+                        text: title, selected: opts.selectedTab == i,
                         margin: new Insets(0,2,0,2),
+                        handleEvent:(e) => {
+                            opts.onSelectedChanged(i,e)
+                        }
                     });
                 })),
             }),
-            opts.children[selectedIndex]
+            opts.children[opts.selectedTab]
         ]
     })
 

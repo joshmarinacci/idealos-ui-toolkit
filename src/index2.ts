@@ -45,7 +45,7 @@ input:
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
 import {doDraw, RenderContext} from "./gfx.ts";
-import {GElement, GRenderNode} from "./base.ts";
+import {CEvent, GElement, GRenderNode} from "./base.ts";
 import {HSeparator, Label, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
@@ -53,6 +53,12 @@ import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 
 
+const state = {
+    toggle:false,
+    checked:true,
+    radioed: false,
+    selectedTab: 0
+}
 function makeTree(): GElement {
     const compsDemo = new MVBoxElement({
         children: [
@@ -66,17 +72,29 @@ function makeTree(): GElement {
                     // Square(50,"green"),
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
-                    Button({text: "toggle", selected:true}),
+                    Button({text: "toggle", selected:state.toggle, handleEvent:(e) => {
+                        console.log('e')
+                            state.toggle = !state.toggle
+                            e.redraw()
+                        }}),
                     // new Icon({icon: Icons.Document}),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     CheckBox({
                         text: "Checkbox",
-                        // selected: state.checked, handleEvent: () => {
-                        //     state.checked = !state.checked
-                        //     c.redraw()
-                        // }
+                        selected: state.checked,
+                        handleEvent: (e) => {
+                            state.checked = !state.checked
+                            e.redraw()
+                        }
                     }),
-                    RadioButton({text: 'radio box'}),
+                    RadioButton({
+                        text: 'radio box',
+                        selected: state.radioed,
+                        handleEvent: (e) => {
+                            state.radioed = !state.radioed
+                            e.redraw()
+                        }
+                    }),
                     Tag({text:'tag'}),
                     // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
                     //         state.toggled = !state.toggled
@@ -118,6 +136,12 @@ function makeTree(): GElement {
             compsDemo,
             secondDemo,
         ],
+        selectedTab:state.selectedTab,
+        onSelectedChanged(i: number, e:CEvent) {
+            state.selectedTab = i;
+            console.log("set tab to",i)
+            e.redraw()
+        }
     })
 }
 
@@ -143,9 +167,13 @@ class Scene {
             pos = pos.subtract(new Point(rect.x,rect.y))
             this.handleMouseMove(pos)
         })
-
-
-
+        this.canvas.addEventListener('mousedown',(e) => {
+            // @ts-ignore
+            let rect = e.target.getBoundingClientRect()
+            let pos = new Point(e.clientX, e.clientY);
+            pos = pos.subtract(new Point(rect.x,rect.y))
+            this.handleMouseDown(pos)
+        })
     }
     makeRc() {
         const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
@@ -200,13 +228,23 @@ class Scene {
         if(found) {
             if(found !== this.last) {
                 if(this.last) {
-                    this.last.settings.background = 'white'
+                    // this.last.settings.background = 'white'
                 }
-                found.settings.background = 'blue'
+                // found.settings.background = 'blue'
                 scene.redraw()
                 this.last = found
             }
         }
+    }
+    handleMouseDown(pos: Point) {
+        let found = this.findTarget(pos,scene.renderRoot)
+        if(found && found.settings.handleEvent) found.settings.handleEvent({
+            type:"mouse-down",
+            redraw:() => {
+                this.layout()
+                this.redraw()
+            },
+        })
     }
 }
 

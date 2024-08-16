@@ -22,6 +22,11 @@ export type ElementSettings = {
     shadow: boolean
 }
 
+export type CEvent = {
+    type: "mouse-move" | "mouse-down"
+    redraw:()=>void
+}
+export type EventHandler = (event: CEvent) => void
 export type RenderNodeSettings = {
     text: string;
     textColor: string
@@ -39,10 +44,10 @@ export type RenderNodeSettings = {
     borderColor: string
     borderRadius?: number
     shadow?:boolean
+    handleEvent?:EventHandler,
 }
 export class GRenderNode {
     settings: RenderNodeSettings;
-
     constructor(settings: RenderNodeSettings) {
         this.settings = settings
     }

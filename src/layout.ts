@@ -1,4 +1,13 @@
-import {AxisLayout, AxisSelfLayout, GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {
+    AxisLayout,
+    AxisSelfLayout,
+    EventHandler,
+    GElement,
+    GRenderNode,
+    LayoutConstraints,
+    ZERO_INSETS,
+    ZERO_POINT
+} from "./base.ts";
 import {RenderContext } from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
@@ -16,6 +25,7 @@ type BoxParameters = {
     borderWidth?: Insets,
     borderColor?: string,
     borderRadius?: number,
+    handleEvent?:EventHandler,
 }
 
 type BoxRequirements = {
@@ -31,6 +41,7 @@ type BoxRequirements = {
     borderWidth: Insets,
     borderColor: string,
     borderRadius: number,
+    handleEvent?:EventHandler,
 }
 
 function bdsSubInsets(bds: Bounds, insets: Insets) {
@@ -72,7 +83,8 @@ export class MHBoxElement implements GElement {
             margin: withFallback(param.margin,Style.panelMargin),
             padding: withFallback(param.padding,Style.panelPadding),
             borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
-            borderColor: withFallback(param.borderColor,Style.panelBorderColor)
+            borderColor: withFallback(param.borderColor,Style.panelBorderColor),
+            handleEvent: param.handleEvent,
         }
     }
 
@@ -177,6 +189,7 @@ export class MHBoxElement implements GElement {
                 textColor: 'black',
                 borderWidth: this.settings.borderWidth,
                 borderRadius: this.settings.borderRadius,
+                handleEvent: this.settings.handleEvent,
             })
         }
         if (this.settings.mainAxisSelfLayout == 'shrink') {
@@ -236,6 +249,7 @@ export class MHBoxElement implements GElement {
                 textColor: 'black',
                 borderWidth: this.settings.borderWidth,
                 borderRadius: this.settings.borderRadius,
+                handleEvent: this.settings.handleEvent
             })
 
         }
@@ -243,7 +257,7 @@ export class MHBoxElement implements GElement {
     }
 
     private log(...output: any[]) {
-        console.log("HBox", ...output)
+        // console.log("HBox", ...output)
     }
 
     private subtractInsets(contentBounds: Bounds) {
@@ -300,7 +314,7 @@ export class HExpander implements GElement {
             text: "",
             textColor: "",
             background: Style.panelBackgroundColor,
-            contentOffset: new Point(0, 0)
+            contentOffset: new Point(0, 0),
         })
     }
 }
@@ -322,11 +336,12 @@ export class MVBoxElement implements GElement {
             margin: withFallback(param.margin,Style.panelMargin),
             padding: withFallback(param.padding,Style.panelPadding),
             borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
-            borderColor: withFallback(param.borderColor,Style.panelBorderColor)
+            borderColor: withFallback(param.borderColor,Style.panelBorderColor),
+            handleEvent: param.handleEvent,
         }
     }
     private log(...output: any[]) {
-        console.log("VBox", ...output)
+        // console.log("VBox", ...output)
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
@@ -350,6 +365,7 @@ export class MVBoxElement implements GElement {
             background: this.settings.background,
             baseline: 0,
             borderColor: this.settings.borderColor,
+            handleEvent: this.settings.handleEvent,
             borderWidth: this.settings.borderWidth,
             borderRadius: this.settings.borderRadius,
             children: children,
