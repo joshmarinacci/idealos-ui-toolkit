@@ -225,11 +225,11 @@ function makeTree(): GElement {
                             state.scrollOffset = newOffset
                             e.redraw()
                         },
-                        child: new MVBoxElement({
+                        child: new MHBoxElement({
                             children: [
-                                Square(50, 'red'),
+                                Square(20, 'red'),
                                 Square(50, 'green'),
-                                Square(50, 'blue'),
+                                Square(200, 'blue'),
                             ]
                         })
                     })

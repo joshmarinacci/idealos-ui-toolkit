@@ -84,7 +84,9 @@ export class Scene {
         const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
         if (bounds.contains(pos)) {
             if (node.settings.children) {
-                for (let ch of node.settings.children) {
+                // go backwards
+                for(let i=node.settings.children.length-1; i>=0; i--) {
+                    let ch = node.settings.children[i]
                     // console.log("ch under mouse is",ch)
                     if (ch.settings.shadow) continue
                     let p2 = pos.subtract(bounds.top_left())

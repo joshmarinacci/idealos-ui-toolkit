@@ -1,6 +1,7 @@
 import {
     AxisLayout,
-    AxisSelfLayout, CEvent,
+    AxisSelfLayout,
+    CEvent,
     EventHandler,
     GElement,
     GRenderNode,
@@ -491,6 +492,7 @@ class ScrollContainerElement implements GElement {
         const fullBounds = new Bounds(0,0,this.param.fixedWidth, this.param.fixedHeight)
         const contentBounds =  bdsSubInsets(fullBounds,borderInsets)
 
+        let os = this.param.onScrollChanged
         let children = [child]
         {
             let leftb = Button({text: "<"})
@@ -498,7 +500,7 @@ class ScrollContainerElement implements GElement {
             leftr.settings.pos.x = contentBounds.left()
             leftr.settings.pos.y = contentBounds.bottom() - leftr.settings.size.h
             children.push(leftr)
-            leftr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(10, 0)), e)
+            leftr.settings.handleEvent = (e) => os(this.addToOffset(new Point(10, 0), child.settings.size, contentBounds), e)
         }
         {
             let rightb = Button({text: ">"})
@@ -506,30 +508,29 @@ class ScrollContainerElement implements GElement {
             rightr.settings.pos.x = contentBounds.left() + rightr.settings.size.w
             rightr.settings.pos.y = contentBounds.bottom() - rightr.settings.size.h
             children.push(rightr)
-            rightr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(10, 0)), e)
+            rightr.settings.handleEvent = (e) => os(this.addToOffset(new Point(-10, 0), child.settings.size, contentBounds), e)
         }
 
 
         {
-            let upb = Button({text:"^"})
-            let upr = upb.layout(rc,cons)
-            upr.settings.pos.x = contentBounds.right() - upr.settings.size.w
-            upr.settings.pos.y = contentBounds.top()
-            children.push(upr)
-            upr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(0, 10)), e)
+            let button = Button({text:"^"})
+            let node = button.layout(rc,cons)
+            node.settings.pos.x = contentBounds.right() - node.settings.size.w
+            node.settings.pos.y = contentBounds.top()
+            children.push(node)
+            node.settings.handleEvent = (e) => os(this.addToOffset(new Point(0, 10), child.settings.size, contentBounds), e)
         }
 
         {
-            let downb = Button({text:"!^"})
-            let downr = downb.layout(rc,cons)
-            downr.settings.pos.x = contentBounds.right() - downr.settings.size.w
-            downr.settings.pos.y = contentBounds.top() + downr.settings.size.h
-            children.push(downr)
-            downr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(0, -10)), e)
+            let button = Button({text:"!^"})
+            let node = button.layout(rc,cons)
+            node.settings.pos.x = contentBounds.right() - node.settings.size.w
+            node.settings.pos.y = contentBounds.top() + node.settings.size.h
+            children.push(node)
+            node.settings.handleEvent = (e) => os(this.addToOffset(new Point(0, -10), child.settings.size, contentBounds), e)
         }
 
-        let offset = this.param.scrollOffset.add(contentBounds.position())
-        child.settings.pos = offset
+        child.settings.pos = this.param.scrollOffset.add(contentBounds.position())
 
         return new GRenderNode({
             id: 'scroll',
@@ -551,6 +552,33 @@ class ScrollContainerElement implements GElement {
     }
 
 
+    private addToOffset(moveBy: Point, size: Size, contentBounds: Bounds) {
+        let off = this.param.scrollOffset
+        let newOff = off.add(moveBy)
+        if(size.w < contentBounds.size().w) {
+            newOff.x = 0
+        } else {
+            if(newOff.x > 0) {
+                newOff.x = 0
+            }
+            if (newOff.x + size.w < contentBounds.size().w) {
+                newOff.x = contentBounds.size().w - size.w
+            }
+        }
+
+        if(size.h < contentBounds.size().h) {
+            newOff.y = 0
+        } else {
+            if (newOff.y > 0) {
+                newOff.y = 0
+            }
+            if (newOff.y + size.h < contentBounds.size().h) {
+                newOff.y = contentBounds.size().h - size.h
+            }
+        }
+
+        return newOff
+    }
 }
 
 export function ScrollContainer(param: {
