@@ -20,7 +20,9 @@ next steps
 // TabbedBox    mouse support
 
 Hover support for Buttons. Where does the state live?
+
 ListView is custom VBox with NodeRenderer and clip and scrolling
+need to fix VBox sizing
 
 
 
@@ -53,7 +55,7 @@ input:
 
  */
 import {CEvent, GElement} from "./base.ts";
-import {HSeparator, Label, Tag} from "./comps2.ts";
+import {HSeparator, Label, Square, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
@@ -66,9 +68,9 @@ import {ListView} from "./listView.ts";
 const S = new Schema()
 const Names = S.list(S.string()).cloneWith([
     "John",
-    "Jacob",
-    "Jingleheimer",
-    "Schmitd",
+    // "Jacob",
+    // "Jingleheimer",
+    // "Schmitd",
 ])
 const NamesLong = S.list(S.string()).cloneWith([
     "John",
@@ -93,7 +95,7 @@ const state = {
     toggle:false,
     checked:true,
     radioed: false,
-    selectedTab: 0,
+    selectedTab: 1,
     selectedListItem: 0
 }
 
@@ -160,7 +162,7 @@ function makeTree(): GElement {
         ]
     })
 
-    const listviewDemo = new MVBoxElement({
+    const listviewDemo = new MHBoxElement({
         background:'magenta',
         id:"list view demo",
         children:[
@@ -183,7 +185,7 @@ function makeTree(): GElement {
         ]
     })
 
-    return TabbedBox({
+    let tabs = TabbedBox({
         titles:[
             'Components',
             'List View',
@@ -198,6 +200,7 @@ function makeTree(): GElement {
             e.redraw()
         }
     })
+    return tabs
 }
 
 

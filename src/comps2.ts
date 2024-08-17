@@ -71,8 +71,8 @@ class SquareElement implements GElement {
 
 }
 
-export function Square(number: number, red: string): GElement {
-    return new SquareElement(number, red)
+export function Square(number: number, fill: string): GElement {
+    return new SquareElement(number, fill)
 }
 
 export class Icon implements GElement {

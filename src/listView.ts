@@ -35,15 +35,14 @@ export function ListView(opts: ListViewParameters): GElement {
     return new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
+        fixedWidth: 200,
         id: 'list-view',
-        background: 'blue',
-        children: opts.data.map((item, index) =>
-            ListViewItem({
+        children: opts.data.map((item, index) => {
+            return ListViewItem({
                 text: item,
                 selected: opts.selected === index,
-                handleEvent: (e) => {
-                    opts.onSelectedChanged(index, e)
-                }
-            }))
+                handleEvent: (e) => opts.onSelectedChanged(index, e)
+            })
+        })
     })
 }

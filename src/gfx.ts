@@ -16,9 +16,13 @@ export function fillRect(ctx: CanvasRenderingContext2D, bounds: Bounds, color: s
     ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
 }
 
-function strokeRect(ctx: CanvasRenderingContext2D, bounds: Bounds, color: string) {
+function drawBorder(ctx: CanvasRenderingContext2D, b: Bounds, color: string, w: Insets) {
+    // console.log("DRAW BORDER", b,color,w)
     ctx.fillStyle = color
-    ctx.strokeRect(bounds.x, bounds.y, bounds.w, bounds.h);
+    ctx.fillRect(b.x, b.y, b.w, w.top);
+    ctx.fillRect(b.x, b.y, w.left, b.h);
+    ctx.fillRect(b.x2-w.right,b.y,w.right,b.h)
+    ctx.fillRect(b.x,b.y2-w.bottom,b.w,w.bottom)
 }
 
 export function withPadding(ss: Bounds, padding: Insets) {
@@ -79,7 +83,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
             strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.borderColor)
             // rc.ctx.clip()
         } else {
-            strokeRect(rc.ctx, bounds, n.settings.borderColor)
+            drawBorder(rc.ctx, bounds, n.settings.borderColor, n.settings.borderWidth)
         }
     }
     // account for the border
