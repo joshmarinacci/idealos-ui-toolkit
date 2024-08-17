@@ -24,7 +24,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                 crossAxisLayout: "end",
                 crossAxisSelfLayout: "shrink",
                 borderColor:Style.panelBorderColor,
-                borderWidth: withInsets(5),
+                borderWidth: withInsets(1),
                 padding: new Insets(5,0,0,0),
                 margin: ZERO_INSETS,
                 children: opts.titles.map(((title, i) => {

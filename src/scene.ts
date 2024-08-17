@@ -122,7 +122,7 @@ export class Scene {
     handleMouseDown(pos: Point) {
         let found = this.findTarget(pos, this.renderRoot)
         if(found) {
-            console.log("clicked on", found.settings.id)
+            console.log("clicked on", found.settings.id, found.settings)
             if (found.settings.handleEvent) found.settings.handleEvent({
                 type: "mouse-down",
                 redraw: () => {

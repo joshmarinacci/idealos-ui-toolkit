@@ -96,7 +96,8 @@ const state = {
     checked:true,
     radioed: false,
     selectedTab: 1,
-    selectedListItem: 0
+    selectedListItem1: 0,
+    selectedListItem2: 0
 }
 
 
@@ -163,22 +164,21 @@ function makeTree(): GElement {
     })
 
     const listviewDemo = new MHBoxElement({
-        background:'magenta',
         id:"list view demo",
         children:[
             ListView({
                 data:["john","Jacob",'jingleheimer'],
-                selected:state.selectedListItem,
+                selected:state.selectedListItem1,
                 onSelectedChanged:((i: number, e: CEvent)=> {
-                    state.selectedListItem = i
+                    state.selectedListItem1 = i
                     e.redraw()
                 })
             }),
             ListView({
-                data:["john","Jacob",'jingleheimer'],
-                selected:state.selectedListItem,
+                data:["john","Jacob",'jingleheimer','foo','bar'],
+                selected:state.selectedListItem2,
                 onSelectedChanged:((i: number, e: CEvent)=> {
-                    state.selectedListItem = i
+                    state.selectedListItem2 = i
                     e.redraw()
                 })
             })

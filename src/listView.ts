@@ -2,6 +2,7 @@ import {CEvent, EventHandler, GElement} from "./base.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
 import {Label} from "./comps2.ts";
+import {withInsets} from "./gfx.ts";
 
 type ListViewItemParameters = {
     text: string
@@ -37,6 +38,8 @@ export function ListView(opts: ListViewParameters): GElement {
         crossAxisSelfLayout: 'shrink',
         fixedWidth: 200,
         id: 'list-view',
+        borderColor: Style.panelBorderColor,
+        borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {
             return ListViewItem({
                 text: item,

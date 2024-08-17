@@ -369,16 +369,18 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             background: withFallback(param.background,Style.panelBackgroundColor),
             margin: withFallback(param.margin,Style.panelMargin),
             padding: withFallback(param.padding,Style.panelPadding),
+
             borderRadius: withFallback(param.borderRadius,0),
             borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
             borderColor: withFallback(param.borderColor,Style.panelBorderColor),
+
             handleEvent: param.handleEvent,
             fixedWidth: param.fixedWidth,
             fixedHeight: param.fixedHeight,
         })
     }
     private log(...output: any[]) {
-        console.log("VBox", ...output)
+        // console.log("VBox", ...output)
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
@@ -449,8 +451,6 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         return new GRenderNode({
             ... this.settings,
             baseline: 0,
-            borderColor: this.settings.borderColor,
-            borderWidth: this.settings.borderWidth,
             children: children,
             contentOffset: new Point(5,5),
             font: "",
