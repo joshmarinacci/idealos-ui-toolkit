@@ -74,7 +74,11 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
 
     // fill background inside padding  + border area
     if (n.settings.background) {
-        fillRect(rc.ctx,bounds, n.settings.background)
+        if(n.settings.borderRadius && n.settings.borderRadius > 0) {
+            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.background)
+        } else {
+            fillRect(rc.ctx, bounds, n.settings.background)
+        }
     }
 
     // draw / fill border

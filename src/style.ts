@@ -31,7 +31,25 @@ import {withInsets} from "./gfx.ts";
 import {Insets} from "josh_js_util";
 import {TRANSPARENT, ZERO_INSETS} from "./base.ts";
 
-export const Style = {
+export type BorderStyle = {
+    borderColor: string
+    borderWidth: Insets
+    borderRadius: number|undefined
+}
+
+const LightStyle = {
+    panelBackgroundColor: 'white',
+}
+const DarkStyle = {
+    panelBackgroundColor: '#222',
+    buttonBorderColor: '#666',
+    textColor: '#fff',
+    panelBorderColor: '#333',
+    buttonBackground: "#333",
+    buttonTextColor: '#fff',
+}
+
+const BaseStyle = {
     fontSize: '16px',
     font: '16px sans-serif',
 
@@ -57,14 +75,10 @@ export const Style = {
     tagBorderRadius: 16,
 
     selectedBackgroundColor: 'orange',
+}
+export const Style = {...BaseStyle,...DarkStyle};
 
 
-}
-export type BorderStyle = {
-    borderColor: string
-    borderWidth: Insets
-    borderRadius: number|undefined
-}
 export const NULL_BORDER_STYLE: BorderStyle = {
     borderColor: TRANSPARENT,
     borderWidth: ZERO_INSETS,

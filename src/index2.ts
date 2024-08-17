@@ -55,7 +55,7 @@ input:
 
  */
 import {CEvent, GElement} from "./base.ts";
-import {HSeparator, Label, Square, Tag} from "./comps2.ts";
+import {HSeparator, Label, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
@@ -66,30 +66,30 @@ import {Schema} from "rtds-core";
 import {ListView} from "./listView.ts";
 
 const S = new Schema()
-const Names = S.list(S.string()).cloneWith([
-    "John",
-    // "Jacob",
-    // "Jingleheimer",
-    // "Schmitd",
-])
-const NamesLong = S.list(S.string()).cloneWith([
-    "John",
-    "Jacob",
-    "Jingleheimer",
-    "Schmitd",
-    "John",
-    "Jacob",
-    "Jingleheimer",
-    "Schmitd",
-    "John",
-    "Jacob",
-    "Jingleheimer",
-    "Schmitd",
-    "John",
-    "Jacob",
-    "Jingleheimer",
-    "Schmitd",
-])
+// const Names = S.list(S.string()).cloneWith([
+//     "John",
+//     // "Jacob",
+//     // "Jingleheimer",
+//     // "Schmitd",
+// ])
+// const NamesLong = S.list(S.string()).cloneWith([
+//     "John",
+//     "Jacob",
+//     "Jingleheimer",
+//     "Schmitd",
+//     "John",
+//     "Jacob",
+//     "Jingleheimer",
+//     "Schmitd",
+//     "John",
+//     "Jacob",
+//     "Jingleheimer",
+//     "Schmitd",
+//     "John",
+//     "Jacob",
+//     "Jingleheimer",
+//     "Schmitd",
+// ])
 
 const state = {
     toggle:false,

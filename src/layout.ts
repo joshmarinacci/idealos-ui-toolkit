@@ -74,16 +74,27 @@ function withFallback<T>(value: T | undefined, fallback: T): T {
 
 class BoxElementBase {
     protected settings: BoxRequirements;
+    private log_enabled: boolean;
 
     constructor(settings: BoxRequirements) {
         this.settings = settings
+        this.log_enabled = false
     }
+
+    // @ts-ignore
+    protected log(...output: any[]) {
+        if(this.log_enabled) console.log("HBox", ...output)
+    }
+
     protected subtractInsets(contentBounds: Bounds) {
         // subtract padding
         contentBounds = bdsSubInsets(contentBounds, this.settings.margin)
         contentBounds = bdsSubInsets(contentBounds, this.settings.borderWidth)
         contentBounds = bdsSubInsets(contentBounds, this.settings.padding)
         return contentBounds
+    }
+    protected getTotalInsets() {
+        return addInsets(addInsets(this.settings.margin, this.settings.borderWidth),this.settings.padding)
     }
 }
 export class MHBoxElement extends BoxElementBase implements GElement {
@@ -283,10 +294,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         throw new Error(`unknown self layout type ${this.settings.mainAxisSelfLayout}`)
     }
 
-    // @ts-ignore
-    private log(...output: any[]) {
-        // console.log("HBox", ...output)
-    }
 
     private addInsets(contentBounds: Bounds) {
         contentBounds = bdsAddInsets(contentBounds, this.settings.margin)
@@ -379,9 +386,6 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             fixedHeight: param.fixedHeight,
         })
     }
-    private log(...output: any[]) {
-        // console.log("VBox", ...output)
-    }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         this.log("space = ", cons.layout, cons.space)
@@ -463,7 +467,4 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         })
     }
 
-    private getTotalInsets() {
-        return addInsets(addInsets(this.settings.margin, this.settings.borderWidth),this.settings.padding)
-    }
 }
