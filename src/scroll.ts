@@ -76,9 +76,12 @@ class ScrollContainerElement implements GElement {
         return new GRenderNode({
             id: 'scroll',
             size: fullBounds.size(),
-            background: "magenta",
+            visualStyle: {
+                background: "magenta",
+                borderColor: "yellow",
+                textColor: "white",
+            },
             baseline: 0,
-            borderColor: "yellow",
             borderWidth: borderInsets,
             children: children,
             contentOffset: ZERO_POINT,
@@ -87,7 +90,6 @@ class ScrollContainerElement implements GElement {
             padding: ZERO_INSETS,
             pos: fullBounds.position(),
             text: "",
-            textColor: "",
             clip: true,
         })
     }

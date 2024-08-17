@@ -14,11 +14,9 @@ export type ElementSettings = {
     text: string
     padding: Insets
     margin: Insets
+    visualStyle:VisualStyle
     borderWidth: Insets
-    borderColor: string
-    backgroundColor: string
     font: string
-    textColor: string
     shadow: boolean
 }
 
@@ -27,11 +25,16 @@ export type CEvent = {
     redraw:()=>void
 }
 export type EventHandler = (event: CEvent) => void
+
+export type VisualStyle = {
+    borderColor: string
+    textColor:string
+    background:string
+}
 export type RenderNodeSettings = {
     text: string;
-    textColor: string
+    visualStyle:VisualStyle
     contentOffset: Point,
-    background: string,
     font: string;
     size: Size;
     pos: Point;
@@ -41,7 +44,6 @@ export type RenderNodeSettings = {
     padding: Insets
     margin: Insets
     borderWidth: Insets
-    borderColor: string
     borderRadius?: number
     shadow?:boolean
     handleEvent?:EventHandler,

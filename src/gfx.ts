@@ -73,21 +73,21 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
     bounds = bounds.grow(-n.settings.margin.left)
 
     // fill background inside padding  + border area
-    if (n.settings.background) {
+    if (n.settings.visualStyle.background) {
         if(n.settings.borderRadius && n.settings.borderRadius > 0) {
-            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.background)
+            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.visualStyle.background)
         } else {
-            fillRect(rc.ctx, bounds, n.settings.background)
+            fillRect(rc.ctx, bounds, n.settings.visualStyle.background)
         }
     }
 
     // draw / fill border
-    if (n.settings.borderColor && n.settings.borderWidth.left > 0) {
+    if (n.settings.visualStyle.borderColor && n.settings.borderWidth.left > 0) {
         if(n.settings.borderRadius && n.settings.borderRadius > 0) {
-            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.borderColor)
+            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.visualStyle.borderColor)
             // rc.ctx.clip()
         } else {
-            drawBorder(rc.ctx, bounds, n.settings.borderColor, n.settings.borderWidth)
+            drawBorder(rc.ctx, bounds, n.settings.visualStyle.borderColor, n.settings.borderWidth)
         }
     }
     // account for the border
@@ -98,7 +98,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
 
     // draw text
     if (n.settings.text && n.settings.text.trim().length > 0) {
-        rc.ctx.fillStyle = n.settings.textColor
+        rc.ctx.fillStyle = n.settings.visualStyle.textColor
         rc.ctx.font = n.settings.font
         rc.ctx.textRendering = 'optimizeLegibility'
         rc.ctx.textAlign = 'start'

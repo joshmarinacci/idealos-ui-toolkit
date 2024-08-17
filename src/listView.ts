@@ -17,7 +17,11 @@ function ListViewItem(opts: ListViewItemParameters): GElement {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: 'start',
         crossAxisLayout: 'center',
-        background: opts.selected ? Style.selectedBackgroundColor : Style.buttonBackground,
+        visualStyle:{
+            background: opts.selected ? Style.selectedBackgroundColor : Style.buttonBackground,
+            textColor: Style.textColor,
+            borderColor: Style.panelBorderColor,
+        },
         children: [
             Label({text: opts.text, shadow: true}),
             // Label({text: opts.text, shadow: true}),
@@ -37,7 +41,11 @@ export function ListView(opts: ListViewParameters): GElement {
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
         id: 'list-view',
-        borderColor: Style.panelBorderColor,
+        visualStyle: {
+            borderColor: Style.panelBorderColor,
+            textColor: Style.textColor,
+            background: Style.panelBackgroundColor
+        },
         borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {
             return ListViewItem({

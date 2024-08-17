@@ -18,8 +18,11 @@ type IconButtonParameters = {
 
 export function IconButton(opts: IconButtonParameters) {
     return new MHBoxElement({
-        background: opts.ghost ? TRANSPARENT : Style.buttonBackground,
-        borderColor: Style.buttonBorderColor,
+        visualStyle: {
+            borderColor:Style.buttonBorderColor,
+            background: opts.ghost ? TRANSPARENT : Style.buttonBackground,
+            textColor: Style.buttonTextColor,
+        },
         borderWidth: opts.ghost ? ZERO_INSETS : Style.buttonBorderWidth,
         borderRadius: Style.buttonBorderRadius,
         children: [
@@ -28,11 +31,13 @@ export function IconButton(opts: IconButtonParameters) {
                 padding: ZERO_INSETS,
                 font: Style.font,
                 margin: ZERO_INSETS,
-                borderColor: TRANSPARENT,
+                visualStyle:{
+                    borderColor: TRANSPARENT,
+                    background: TRANSPARENT,
+                    textColor: Style.buttonTextColor,
+                },
                 borderWidth: ZERO_INSETS,
-                backgroundColor: TRANSPARENT,
                 text: opts.text || "",
-                textColor: Style.buttonTextColor,
                 shadow: true,
             }),
         ],
@@ -58,19 +63,24 @@ export const RadioButton = (p: ButtonParameters) => IconButton({
 export function Button(opts: ButtonParameters ):GElement {
     return new MHBoxElement({
         id:'button',
-        background: opts.selected?Style.selectedBackgroundColor:Style.buttonBackground,
-        borderColor: Style.buttonBorderColor,
+        visualStyle: {
+            background: opts.selected?Style.selectedBackgroundColor:Style.buttonBackground,
+            borderColor: Style.buttonBorderColor,
+            textColor: Style.buttonTextColor,
+        },
         borderWidth: Style.buttonBorderWidth,
         borderRadius: Style.buttonBorderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
             font: Style.font,
             margin: ZERO_INSETS,
-            borderColor: TRANSPARENT,
+            visualStyle:{
+                borderColor: TRANSPARENT,
+                background: TRANSPARENT,
+                textColor: Style.buttonTextColor,
+            },
             borderWidth: ZERO_INSETS,
-            backgroundColor: TRANSPARENT,
             text: opts.text || "",
-            textColor: Style.buttonTextColor,
             shadow: true,
         })],
         crossAxisLayout: 'center',

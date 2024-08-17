@@ -1,25 +1,32 @@
-import {GElement, GRenderNode} from "./base.ts";
-import {BorderStyle, NULL_BORDER_STYLE} from "./style.ts";
-import {doDraw, RenderContext, withInsets} from "./gfx.ts";
+import {GElement, GRenderNode, TRANSPARENT, VisualStyle} from "./base.ts";
+import {doDraw, RenderContext} from "./gfx.ts";
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
+
+let NULL_VISUAL_STYLE:VisualStyle = {
+    borderColor:TRANSPARENT,
+    background:TRANSPARENT,
+    textColor:TRANSPARENT,
+};
 
 export class Scene {
     private elementRoot!: GElement;
     renderRoot!: GRenderNode;
     canvas!: HTMLCanvasElement;
     private last: GRenderNode | undefined
-    private lastBorderStyle: BorderStyle
-    private debugBorder: BorderStyle
+    private lastStyle: VisualStyle
+    private debugStyle: VisualStyle
     private makeTree: () => GElement;
+    private borderDebugEnabled: boolean;
 
     constructor(makeTree: () => GElement) {
+        this.borderDebugEnabled = false
         this.makeTree = makeTree
-        this.lastBorderStyle = NULL_BORDER_STYLE
-        this.debugBorder = {
+        this.lastStyle = NULL_VISUAL_STYLE
+        this.debugStyle = {
             borderColor: "red",
-            borderWidth: withInsets(1),
-            borderRadius: 0,
+            textColor: 'black',
+            background:'white',
         }
     }
 
@@ -102,18 +109,12 @@ export class Scene {
         let found = this.findTarget(pos, this.renderRoot)
         // console.log("mouse at",pos,found?found.settings.id:"nothing")
         if (found) {
-            if (found !== this.last) {
+            if (found !== this.last && this.borderDebugEnabled) {
                 if (this.last) {
-                    this.last.settings.borderWidth = this.lastBorderStyle.borderWidth
-                    this.last.settings.borderColor = this.lastBorderStyle.borderColor
+                    this.last.settings.visualStyle = this.lastStyle
                 }
-                this.lastBorderStyle = {
-                    borderColor: found.settings.borderColor,
-                    borderWidth: found.settings.borderWidth,
-                    borderRadius: found.settings.borderRadius,
-                }
-                found.settings.borderWidth = this.debugBorder.borderWidth
-                found.settings.borderColor = this.debugBorder.borderColor
+                this.lastStyle = found.settings.visualStyle
+                found.settings.visualStyle = this.debugStyle
                 // found.settings.background = 'blue'
                 this.redraw()
                 this.last = found

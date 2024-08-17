@@ -28,14 +28,12 @@
 // }
 // dark style
 import {withInsets} from "./gfx.ts";
-import {Insets} from "josh_js_util";
-import {TRANSPARENT, ZERO_INSETS} from "./base.ts";
 
-export type BorderStyle = {
-    borderColor: string
-    borderWidth: Insets
-    borderRadius: number|undefined
-}
+// export type BorderStyle = {
+//     borderColor: string
+//     borderWidth: Insets
+//     borderRadius: number|undefined
+// }
 
 const LightStyle = {
     panelBackgroundColor: 'white',
@@ -80,8 +78,3 @@ const BaseStyle = {
 export const Style = {...BaseStyle,...LightStyle};
 
 
-export const NULL_BORDER_STYLE: BorderStyle = {
-    borderColor: TRANSPARENT,
-    borderWidth: ZERO_INSETS,
-    borderRadius: 0
-}

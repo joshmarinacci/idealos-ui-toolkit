@@ -29,13 +29,11 @@ export class TextElement implements GElement {
             pos: new Point(0, 0),
             contentOffset: new Point(this.settings.padding.left,this.settings.padding.top),
             baseline: metrics.emHeightAscent + metrics.emHeightDescent,
-            background: this.settings.backgroundColor,
+            visualStyle: this.settings.visualStyle,
             children: [],
             padding: this.settings.padding,
             margin: this.settings.margin,
             borderWidth: this.settings.borderWidth,
-            textColor: this.settings.textColor,
-            borderColor: this.settings.borderColor,
             shadow: this.settings.shadow,
         })
     }
@@ -54,7 +52,11 @@ class SquareElement implements GElement {
         return new GRenderNode({
             id: 'square',
             text: "",
-            background: this.fill,
+            visualStyle: {
+                background: this.fill,
+                borderColor:'black',
+                textColor:'black'
+            },
             size: new Size(this.size, this.size),
             pos: new Point(0, 0),
             baseline: this.size/2,
@@ -64,8 +66,6 @@ class SquareElement implements GElement {
             borderWidth: ZERO_INSETS,
             padding: ZERO_INSETS,
             contentOffset:ZERO_POINT,
-            borderColor:'black',
-            textColor:'black'
         })
     }
 
@@ -85,9 +85,12 @@ export class Icon implements GElement {
 
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         return new GRenderNode({
-            background: "",
+            visualStyle: {
+                background: "",
+                borderColor: "",
+                textColor: Style.textColor,
+            },
             baseline: 24,
-            borderColor: "",
             borderWidth: ZERO_INSETS,
             children: [],
             contentOffset: new Point(0,0),
@@ -98,7 +101,6 @@ export class Icon implements GElement {
             pos: new Point(0,0),
             size: new Size(24,24),
             text: this.icon,
-            textColor: Style.textColor,
             shadow: this.shadow
         })
     }
@@ -107,32 +109,39 @@ export class Icon implements GElement {
 export function Label(opts: { text: string, shadow?:boolean }) {
     return new TextElement({
         text: opts.text,
-        textColor: Style.textColor,
+        visualStyle: {
+            textColor: Style.textColor,
+            borderColor: TRANSPARENT,
+            background: TRANSPARENT,
+        },
         padding: withInsets(5),
         font: Style.font,
         margin: withInsets(5),
-        borderColor: TRANSPARENT,
         borderWidth: ZERO_INSETS,
-        backgroundColor: TRANSPARENT,
         shadow: opts.shadow?opts.shadow:false
     })
 }
 
 export function Tag(opts: { text: string }) {
     return new MHBoxElement({
-        background: 'blue',
-        borderColor: Style.buttonBorderColor,
+        visualStyle: {
+            background: 'blue',
+            borderColor: Style.buttonBorderColor,
+            textColor:Style.textColor,
+        },
         borderWidth: Style.buttonBorderWidth,
         borderRadius: Style.tagBorderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
             font: Style.font,
             margin: ZERO_INSETS,
-            borderColor: 'transparent',
+            visualStyle: {
+                borderColor: 'transparent',
+                background: TRANSPARENT,
+                textColor: Style.buttonTextColor,
+            },
             borderWidth: ZERO_INSETS,
-            backgroundColor: TRANSPARENT,
             text: opts.text,
-            textColor: Style.buttonTextColor,
             shadow: true,
         })],
         crossAxisLayout: 'center',
@@ -147,9 +156,12 @@ export function Tag(opts: { text: string }) {
 export class HSeparator implements GElement {
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         return new GRenderNode({
-            background: "#aaa",
+            visualStyle:{
+                background: "#aaa",
+                borderColor: "",
+                textColor: ""
+            },
             baseline: 0,
-            borderColor: "",
             borderWidth: ZERO_INSETS,
             children: [],
             contentOffset: ZERO_POINT,
@@ -160,8 +172,6 @@ export class HSeparator implements GElement {
             pos: ZERO_POINT,
             size: new Size(20, 32),
             text: "",
-            textColor: ""
-
         })
     }
 

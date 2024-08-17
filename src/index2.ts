@@ -19,12 +19,22 @@ next steps
 // ToggleButton mouse support
 // TabbedBox    mouse support
 
-Hover support for Buttons. Where does the state live?
 
-ListView is custom VBox with NodeRenderer and clip and scrolling
-add listview scrolling. needs keydown/keyup to nav to next/prev
+// ListView is custom VBox with NodeRenderer and clip and scrolling
+// add listview scrolling. needs keydown/keyup to nav to next/prev
 // need to fix VBox sizing
 
+add keyboard support. when listview has the focus let it nav up and down with arrow keys
+when a component has the focus, draw a focused border then switch back to the default
+screen tracks the current keyboard focus
+
+Hover support for Buttons. Where does the state live? in the render node?
+    has currentBg, swaps out with stdbg and hoverbg and selectionbg. if hoverbg is set
+
+focus is rendered on the render node
+    if currently focused, then swap out bg and border with stdbg and focusbg and selectedbg
+
+need a style object to represent the non-layout style of text color, borders, bg,
 
 
 DropdownButton

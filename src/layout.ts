@@ -4,7 +4,7 @@ import {
     EventHandler,
     GElement,
     GRenderNode,
-    LayoutConstraints,
+    LayoutConstraints, VisualStyle,
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.ts";
@@ -19,11 +19,10 @@ type BoxParameters = {
     mainAxisLayout?: AxisLayout,
     crossAxisLayout?: AxisLayout,
     children: GElement[],
-    background?: string,
+    visualStyle?:VisualStyle
     padding?: Insets
     margin?: Insets,
     borderWidth?: Insets,
-    borderColor?: string,
     borderRadius?: number,
     handleEvent?: EventHandler,
 
@@ -38,11 +37,10 @@ type BoxRequirements = {
     mainAxisLayout: AxisLayout,
     crossAxisLayout: AxisLayout,
     children: GElement[],
-    background: string,
+    visualStyle:VisualStyle,
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
-    borderColor: string,
     borderRadius: number,
     handleEvent?: EventHandler,
 
@@ -111,11 +109,14 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
             children: param.children,
 
-            background: withFallback(param.background, Style.panelBackgroundColor),
+            visualStyle: param.visualStyle || {
+                background: Style.panelBackgroundColor,
+                textColor: Style.textColor,
+                borderColor: Style.panelBorderColor
+            },
             margin: withFallback(param.margin, Style.panelMargin),
             padding: withFallback(param.padding, Style.panelPadding),
             borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
-            borderColor: withFallback(param.borderColor, Style.panelBorderColor),
             handleEvent: param.handleEvent,
 
             fixedWidth: param.fixedWidth,
@@ -214,7 +215,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             this.log(`content bounds ${contentBounds}`)
             this.log(`full bounds ${fullBounds}`)
             return new GRenderNode({
-                background: this.settings.background,
+                visualStyle: this.settings.visualStyle,
                 baseline: 0,
                 font: Style.font,
                 pos: new Point(0, 0),
@@ -224,9 +225,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 children: children,
                 padding: this.settings.padding,
                 contentOffset: contentBounds.position(),
-                borderColor: this.settings.borderColor,
                 margin: this.settings.margin,
-                textColor: 'black',
                 borderWidth: this.settings.borderWidth,
                 borderRadius: this.settings.borderRadius,
                 handleEvent: this.settings.handleEvent,
@@ -278,7 +277,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
             let children = chs.map(ch => map.get(ch) as GRenderNode)
             return new GRenderNode({
-                background: this.settings.background,
+                visualStyle: this.settings.visualStyle,
                 baseline: 0,
                 font: Style.font,
                 pos: new Point(0, 0),
@@ -288,9 +287,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 children: children,
                 padding: this.settings.padding,
                 contentOffset: contentBounds.position(),
-                borderColor: this.settings.borderColor,
                 margin: this.settings.margin,
-                textColor: 'black',
                 borderWidth: this.settings.borderWidth,
                 borderRadius: this.settings.borderRadius,
                 handleEvent: this.settings.handleEvent
@@ -335,7 +332,11 @@ export class HExpander implements GElement {
         }
         return new GRenderNode({
             baseline: 0,
-            borderColor: "cyan",
+            visualStyle: {
+                background:Style.panelBackgroundColor,
+                textColor:'cyan',
+                borderColor:'cyan',
+            },
             borderWidth: new Insets(1, 1, 1, 1),
             children: [],
             font: "",
@@ -345,8 +346,6 @@ export class HExpander implements GElement {
             pos: ZERO_POINT,
             size: size,
             text: "",
-            textColor: "",
-            background: Style.panelBackgroundColor,
             contentOffset: new Point(0, 0),
         })
     }
@@ -380,13 +379,16 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
             children: param.children,
 
-            background: withFallback(param.background, Style.panelBackgroundColor),
+            visualStyle: param.visualStyle || {
+                background: Style.panelBackgroundColor,
+                textColor: Style.textColor,
+                borderColor: Style.panelBorderColor
+            },
             margin: withFallback(param.margin, Style.panelMargin),
             padding: withFallback(param.padding, Style.panelPadding),
 
             borderRadius: withFallback(param.borderRadius, 0),
             borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
-            borderColor: withFallback(param.borderColor, Style.panelBorderColor),
 
             handleEvent: param.handleEvent,
             fixedWidth: param.fixedWidth,
@@ -469,8 +471,6 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            textColor: ""
-
         })
     }
 
