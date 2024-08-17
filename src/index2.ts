@@ -56,10 +56,10 @@ input:
 
  */
 import {CEvent, GElement} from "./base.ts";
-import {HSeparator, Label, Tag} from "./comps2.ts";
+import {HSeparator, Label, Square, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
-import {MHBoxElement, MVBoxElement} from "./layout.ts";
+import {MHBoxElement, MVBoxElement, ScrollContainer} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
@@ -93,8 +93,8 @@ const S = new Schema()
 // ])
 
 const state = {
-    toggle:false,
-    checked:true,
+    toggle: false,
+    checked: true,
     radioed: false,
     selectedTab: 1,
     selectedListItem1: 0,
@@ -186,14 +186,55 @@ function makeTree(): GElement {
         ]
     })
 
+    const panelDemo = new MHBoxElement({
+        children:[
+            new MVBoxElement({
+                children:[
+                    Label({text:'hbox'}),
+                    new MHBoxElement({
+                        children:[
+                            Button({text: "one"}),
+                            Button({text: "two"}),
+                            Button({text: "three"}),
+                        ]
+                    })
+                ]
+            }),
+            new MVBoxElement({
+                children:[
+                    Label({text:'hbox'}),
+                    new MVBoxElement({
+                        children:[
+                            Button({text: "one"}),
+                            Button({text: "two"}),
+                            Button({text: "three"}),
+                        ]
+                    })
+                ]
+            }),
+            new MVBoxElement({
+                children:[
+                    Label({text:'scroll container'}),
+                    ScrollContainer({
+                        fixedWidth: 100,
+                        fixedHeight: 100,
+                        child: Square(200,'red'),
+                    })
+                ]
+            })
+        ]
+    })
+
     let tabs = TabbedBox({
         titles:[
             'Components',
             'List View',
+            'Panels'
         ],
         children:[
             compsDemo,
             listviewDemo,
+            panelDemo,
         ],
         selectedTab:state.selectedTab,
         onSelectedChanged(i: number, e:CEvent) {

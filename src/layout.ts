@@ -8,7 +8,7 @@ import {
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.ts";
-import {RenderContext } from "./gfx.ts";
+import {RenderContext} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
 
@@ -467,4 +467,44 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         })
     }
 
+}
+
+class ScrollContainerElement implements GElement {
+    private param: {
+        fixedWidth: number
+        child: GElement
+        fixedHeight: number
+    };
+
+    constructor(param: { fixedWidth: number; child: GElement; fixedHeight: number }) {
+        this.param = param
+    }
+
+    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        let child = this.param.child.layout(rc, cons)
+        let size = new Size(this.param.fixedWidth, this.param.fixedHeight)
+        return new GRenderNode({
+            id: 'scroll',
+            size: size,
+            background: "magenta",
+            baseline: 0,
+            borderColor: "",
+            borderWidth: ZERO_INSETS,
+            children: [child],
+            contentOffset: ZERO_POINT,
+            font: "",
+            margin: ZERO_INSETS,
+            padding: ZERO_INSETS,
+            pos: new Point(0, 0),
+            text: "",
+            textColor: "",
+            clip: true,
+        })
+    }
+
+
+}
+
+export function ScrollContainer(param: { fixedWidth: number; child: GElement; fixedHeight: number }): GElement {
+    return new ScrollContainerElement(param)
 }

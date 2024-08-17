@@ -110,6 +110,11 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
         rc.ctx.fillText(n.settings.text, x,y)
     }
 
+    if(n.settings.clip && n.settings.clip===true) {
+        rc.ctx.beginPath()
+        rc.ctx.rect(0,0,bounds.w,bounds.h)
+        rc.ctx.clip()
+    }
     n.settings.children.forEach(ch => {
         doDraw(ch, rc)
     })

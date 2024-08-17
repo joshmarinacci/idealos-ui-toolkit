@@ -45,6 +45,7 @@ export type RenderNodeSettings = {
     borderRadius?: number
     shadow?:boolean
     handleEvent?:EventHandler,
+    clip?:boolean
 }
 export class GRenderNode {
     settings: RenderNodeSettings;

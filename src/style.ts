@@ -76,7 +76,8 @@ const BaseStyle = {
 
     selectedBackgroundColor: 'orange',
 }
-export const Style = {...BaseStyle,...DarkStyle};
+// export const Style = {...BaseStyle,...DarkStyle};
+export const Style = {...BaseStyle,...LightStyle};
 
 
 export const NULL_BORDER_STYLE: BorderStyle = {
