@@ -22,7 +22,8 @@ next steps
 Hover support for Buttons. Where does the state live?
 
 ListView is custom VBox with NodeRenderer and clip and scrolling
-need to fix VBox sizing
+add listview scrolling. needs keydown/keyup to nav to next/prev
+// need to fix VBox sizing
 
 
 

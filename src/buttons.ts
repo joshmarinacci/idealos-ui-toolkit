@@ -47,7 +47,7 @@ export function IconButton(opts: IconButtonParameters) {
 }
 
 export const CheckBox = (p: ButtonParameters) => IconButton({
-    icon: p.selected?Icons.CheckboxUnchecked:Icons.CheckboxChecked,
+    icon: p.selected?Icons.CheckboxChecked:Icons.CheckboxUnchecked,
     ghost:true, ...p
 })
 export const RadioButton = (p: ButtonParameters) => IconButton({
