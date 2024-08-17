@@ -1,6 +1,6 @@
 import {
     AxisLayout,
-    AxisSelfLayout,
+    AxisSelfLayout, CEvent,
     EventHandler,
     GElement,
     GRenderNode,
@@ -8,9 +8,10 @@ import {
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.ts";
-import {RenderContext} from "./gfx.ts";
+import {RenderContext, withInsets} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
+import {Button} from "./buttons.ts";
 
 type BoxParameters = {
     id?:string,
@@ -469,33 +470,80 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
 }
 
-class ScrollContainerElement implements GElement {
-    private param: {
-        fixedWidth: number
-        child: GElement
-        fixedHeight: number
-    };
 
-    constructor(param: { fixedWidth: number; child: GElement; fixedHeight: number }) {
+type ScrollContainerSettings = {
+    fixedWidth:number,
+    fixedHeight:number,
+    child:GElement,
+    scrollOffset:Point,
+    onScrollChanged: (newOffset: Point, e:CEvent) => void
+}
+class ScrollContainerElement implements GElement {
+    private param: ScrollContainerSettings
+
+    constructor(param: ScrollContainerSettings) {
         this.param = param
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        let borderInsets = withInsets(1)
         let child = this.param.child.layout(rc, cons)
-        let size = new Size(this.param.fixedWidth, this.param.fixedHeight)
+        const fullBounds = new Bounds(0,0,this.param.fixedWidth, this.param.fixedHeight)
+        const contentBounds =  bdsSubInsets(fullBounds,borderInsets)
+
+        let children = [child]
+        {
+            let leftb = Button({text: "<"})
+            let leftr = leftb.layout(rc, cons)
+            leftr.settings.pos.x = contentBounds.left()
+            leftr.settings.pos.y = contentBounds.bottom() - leftr.settings.size.h
+            children.push(leftr)
+            leftr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(10, 0)), e)
+        }
+        {
+            let rightb = Button({text: ">"})
+            let rightr = rightb.layout(rc, cons)
+            rightr.settings.pos.x = contentBounds.left() + rightr.settings.size.w
+            rightr.settings.pos.y = contentBounds.bottom() - rightr.settings.size.h
+            children.push(rightr)
+            rightr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(10, 0)), e)
+        }
+
+
+        {
+            let upb = Button({text:"^"})
+            let upr = upb.layout(rc,cons)
+            upr.settings.pos.x = contentBounds.right() - upr.settings.size.w
+            upr.settings.pos.y = contentBounds.top()
+            children.push(upr)
+            upr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(0, 10)), e)
+        }
+
+        {
+            let downb = Button({text:"!^"})
+            let downr = downb.layout(rc,cons)
+            downr.settings.pos.x = contentBounds.right() - downr.settings.size.w
+            downr.settings.pos.y = contentBounds.top() + downr.settings.size.h
+            children.push(downr)
+            downr.settings.handleEvent = (e) => this.param.onScrollChanged(this.param.scrollOffset.add(new Point(0, -10)), e)
+        }
+
+        let offset = this.param.scrollOffset.add(contentBounds.position())
+        child.settings.pos = offset
+
         return new GRenderNode({
             id: 'scroll',
-            size: size,
+            size: fullBounds.size(),
             background: "magenta",
             baseline: 0,
-            borderColor: "",
-            borderWidth: ZERO_INSETS,
-            children: [child],
+            borderColor: "yellow",
+            borderWidth: borderInsets,
+            children: children,
             contentOffset: ZERO_POINT,
             font: "",
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
-            pos: new Point(0, 0),
+            pos: fullBounds.position(),
             text: "",
             textColor: "",
             clip: true,
@@ -505,6 +553,12 @@ class ScrollContainerElement implements GElement {
 
 }
 
-export function ScrollContainer(param: { fixedWidth: number; child: GElement; fixedHeight: number }): GElement {
+export function ScrollContainer(param: {
+    fixedWidth: number;
+    onScrollChanged: (newOffset: Point, e:CEvent) => void;
+    scrollOffset: Point;
+    fixedHeight: number;
+    child: MVBoxElement
+}): GElement {
     return new ScrollContainerElement(param)
 }

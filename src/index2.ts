@@ -65,6 +65,7 @@ import {Scene} from "./scene.ts";
 
 import {Schema} from "rtds-core";
 import {ListView} from "./listView.ts";
+import {Point} from "josh_js_util";
 
 const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([
@@ -96,9 +97,10 @@ const state = {
     toggle: false,
     checked: true,
     radioed: false,
-    selectedTab: 1,
+    selectedTab: 2,
     selectedListItem1: 0,
-    selectedListItem2: 0
+    selectedListItem2: 0,
+    scrollOffset: new Point(0, 0)
 }
 
 
@@ -218,7 +220,18 @@ function makeTree(): GElement {
                     ScrollContainer({
                         fixedWidth: 100,
                         fixedHeight: 100,
-                        child: Square(200,'red'),
+                        scrollOffset: state.scrollOffset,
+                        onScrollChanged:(newOffset:Point, e:CEvent):void => {
+                            state.scrollOffset = newOffset
+                            e.redraw()
+                        },
+                        child: new MVBoxElement({
+                            children: [
+                                Square(50, 'red'),
+                                Square(50, 'green'),
+                                Square(50, 'blue'),
+                            ]
+                        })
                     })
                 ]
             })
