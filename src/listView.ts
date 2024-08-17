@@ -20,7 +20,7 @@ function ListViewItem(opts: ListViewItemParameters): GElement {
         background: opts.selected ? Style.selectedBackgroundColor : Style.buttonBackground,
         children: [
             Label({text: opts.text, shadow: true}),
-            Label({text: opts.text, shadow: true}),
+            // Label({text: opts.text, shadow: true}),
         ],
         handleEvent: opts.handleEvent,
     })
@@ -36,7 +36,6 @@ export function ListView(opts: ListViewParameters): GElement {
     return new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
-        fixedWidth: 200,
         id: 'list-view',
         borderColor: Style.panelBorderColor,
         borderWidth: withInsets(1),

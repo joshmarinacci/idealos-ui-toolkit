@@ -59,13 +59,14 @@ import {CEvent, GElement} from "./base.ts";
 import {HSeparator, Label, Square, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
-import {MHBoxElement, MVBoxElement, ScrollContainer} from "./layout.ts";
+import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
 import {Schema} from "rtds-core";
 import {ListView} from "./listView.ts";
 import {Point} from "josh_js_util";
+import {ScrollContainer} from "./scroll.ts";
 
 const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([
@@ -100,7 +101,8 @@ const state = {
     selectedTab: 2,
     selectedListItem1: 0,
     selectedListItem2: 0,
-    scrollOffset: new Point(0, 0)
+    scrollOffset1: new Point(0, 0),
+    scrollOffset2: new Point(0, 0),
 }
 
 
@@ -168,6 +170,7 @@ function makeTree(): GElement {
 
     const listviewDemo = new MHBoxElement({
         id:"list view demo",
+        fixedWidth:200,
         children:[
             ListView({
                 data:["john","Jacob",'jingleheimer'],
@@ -218,11 +221,11 @@ function makeTree(): GElement {
                 children:[
                     Label({text:'scroll container'}),
                     ScrollContainer({
-                        fixedWidth: 100,
-                        fixedHeight: 100,
-                        scrollOffset: state.scrollOffset,
+                        fixedWidth: 150,
+                        fixedHeight: 150,
+                        scrollOffset: state.scrollOffset1,
                         onScrollChanged:(newOffset:Point, e:CEvent):void => {
-                            state.scrollOffset = newOffset
+                            state.scrollOffset1 = newOffset
                             e.redraw()
                         },
                         child: new MHBoxElement({
@@ -231,6 +234,28 @@ function makeTree(): GElement {
                                 Square(50, 'green'),
                                 Square(200, 'blue'),
                             ]
+                        })
+                    })
+                ]
+            }),
+            new MVBoxElement({
+                children:[
+                    Label({text:'scrolling list'}),
+                    ScrollContainer({
+                        fixedWidth: 150,
+                        fixedHeight: 200,
+                        scrollOffset: state.scrollOffset2,
+                        onScrollChanged: (newOffset: Point, e: CEvent): void => {
+                            state.scrollOffset2 = newOffset
+                            e.redraw()
+                        },
+                        child: ListView({
+                            data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar','baz','qux'],
+                            selected: state.selectedListItem2,
+                            onSelectedChanged: ((i: number, e: CEvent) => {
+                                state.selectedListItem2 = i
+                                e.redraw()
+                            })
                         })
                     })
                 ]

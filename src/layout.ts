@@ -1,7 +1,6 @@
 import {
     AxisLayout,
     AxisSelfLayout,
-    CEvent,
     EventHandler,
     GElement,
     GRenderNode,
@@ -9,13 +8,12 @@ import {
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.ts";
-import {RenderContext, withInsets} from "./gfx.ts";
+import {RenderContext} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
-import {Button} from "./buttons.ts";
 
 type BoxParameters = {
-    id?:string,
+    id?: string,
     mainAxisSelfLayout?: AxisSelfLayout,
     crossAxisSelfLayout?: AxisSelfLayout,
     mainAxisLayout?: AxisLayout,
@@ -27,14 +25,14 @@ type BoxParameters = {
     borderWidth?: Insets,
     borderColor?: string,
     borderRadius?: number,
-    handleEvent?:EventHandler,
+    handleEvent?: EventHandler,
 
-    fixedWidth?:number
-    fixedHeight?:number
+    fixedWidth?: number
+    fixedHeight?: number
 }
 
 type BoxRequirements = {
-    id:string,
+    id: string,
     mainAxisSelfLayout: AxisSelfLayout,
     crossAxisSelfLayout: AxisSelfLayout,
     mainAxisLayout: AxisLayout,
@@ -46,13 +44,13 @@ type BoxRequirements = {
     borderWidth: Insets,
     borderColor: string,
     borderRadius: number,
-    handleEvent?:EventHandler,
+    handleEvent?: EventHandler,
 
-    fixedWidth?:number
-    fixedHeight?:number
+    fixedWidth?: number
+    fixedHeight?: number
 }
 
-function bdsSubInsets(bds: Bounds, insets: Insets) {
+export function bdsSubInsets(bds: Bounds, insets: Insets) {
     return new Bounds(
         bds.x + insets.left,
         bds.y + insets.top,
@@ -61,7 +59,7 @@ function bdsSubInsets(bds: Bounds, insets: Insets) {
     )
 }
 
-function bdsAddInsets(bds: Bounds, insets: Insets) {
+export function bdsAddInsets(bds: Bounds, insets: Insets) {
     return new Bounds(
         bds.x - insets.left,
         bds.y - insets.top,
@@ -85,7 +83,7 @@ class BoxElementBase {
 
     // @ts-ignore
     protected log(...output: any[]) {
-        if(this.log_enabled) console.log("HBox", ...output)
+        if (this.log_enabled) console.log("HBox", ...output)
     }
 
     protected subtractInsets(contentBounds: Bounds) {
@@ -95,27 +93,29 @@ class BoxElementBase {
         contentBounds = bdsSubInsets(contentBounds, this.settings.padding)
         return contentBounds
     }
+
     protected getTotalInsets() {
-        return addInsets(addInsets(this.settings.margin, this.settings.borderWidth),this.settings.padding)
+        return addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
     }
 }
+
 export class MHBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxParameters) {
-        super( {
+        super({
             id: param.id || "hbox",
             borderRadius: param.borderRadius || 0,
-            mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout,'shrink'),
-            crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout,'shrink'),
+            mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
+            crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
-            mainAxisLayout: withFallback(param.mainAxisLayout,'center'),
+            mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
             children: param.children,
 
-            background: withFallback(param.background,Style.panelBackgroundColor),
-            margin: withFallback(param.margin,Style.panelMargin),
-            padding: withFallback(param.padding,Style.panelPadding),
-            borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
-            borderColor: withFallback(param.borderColor,Style.panelBorderColor),
+            background: withFallback(param.background, Style.panelBackgroundColor),
+            margin: withFallback(param.margin, Style.panelMargin),
+            padding: withFallback(param.padding, Style.panelPadding),
+            borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
+            borderColor: withFallback(param.borderColor, Style.panelBorderColor),
             handleEvent: param.handleEvent,
 
             fixedWidth: param.fixedWidth,
@@ -139,7 +139,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             contentBounds.w = cons.space.w
             fullBounds.w = cons.space.w
 
-            if(this.settings.fixedWidth) {
+            if (this.settings.fixedWidth) {
                 contentBounds.w = this.settings.fixedWidth
                 fullBounds.w = this.settings.fixedWidth
             }
@@ -238,6 +238,10 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             fullBounds.w = cons.space.w
             contentBounds.h = cons.space.h
             fullBounds.h = cons.space.h
+            if (this.settings.fixedWidth) {
+                contentBounds.w = this.settings.fixedWidth
+                fullBounds.w = this.settings.fixedWidth
+            }
             contentBounds = this.subtractInsets(contentBounds)
             this.log("started content bounds", contentBounds)
             // layout all children.
@@ -350,9 +354,9 @@ export class HExpander implements GElement {
 
 function addInsets(a: Insets, b: Insets) {
     return new Insets(
-        a.top+b.top,
-        a.right+b.right,
-        a.bottom+b.bottom,
+        a.top + b.top,
+        a.right + b.right,
+        a.bottom + b.bottom,
         a.left + b.left
     )
 }
@@ -360,6 +364,7 @@ function addInsets(a: Insets, b: Insets) {
 function insetsWidth(insets: Insets) {
     return insets.left + insets.right
 }
+
 function insetsHeight(insets: Insets) {
     return insets.top + insets.bottom
 }
@@ -369,19 +374,19 @@ export class MVBoxElement extends BoxElementBase implements GElement {
     constructor(param: BoxParameters) {
         super({
             id: param.id || 'vbox',
-            mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout,'shrink'),
-            crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout,'shrink'),
+            mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
+            crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
-            mainAxisLayout: withFallback(param.mainAxisLayout,'center'),
+            mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
             children: param.children,
 
-            background: withFallback(param.background,Style.panelBackgroundColor),
-            margin: withFallback(param.margin,Style.panelMargin),
-            padding: withFallback(param.padding,Style.panelPadding),
+            background: withFallback(param.background, Style.panelBackgroundColor),
+            margin: withFallback(param.margin, Style.panelMargin),
+            padding: withFallback(param.padding, Style.panelPadding),
 
-            borderRadius: withFallback(param.borderRadius,0),
-            borderWidth: withFallback(param.borderWidth,Style.panelBorderWidth),
-            borderColor: withFallback(param.borderColor,Style.panelBorderColor),
+            borderRadius: withFallback(param.borderRadius, 0),
+            borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
+            borderColor: withFallback(param.borderColor, Style.panelBorderColor),
 
             handleEvent: param.handleEvent,
             fixedWidth: param.fixedWidth,
@@ -398,25 +403,25 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         // let non_expanders = chs.filter(ch => !(ch instanceof HExpander))
         // this.log(`exp ${expanders.length} non = ${non_expanders.length}`)
 
-        let fullBounds = new Bounds(0,0,0,0)
-        if(this.settings.mainAxisSelfLayout === 'grow') {
+        let fullBounds = new Bounds(0, 0, 0, 0)
+        if (this.settings.mainAxisSelfLayout === 'grow') {
             fullBounds.h = cons.space.h
         }
-        if(this.settings.mainAxisSelfLayout === 'shrink') {
+        if (this.settings.mainAxisSelfLayout === 'shrink') {
             fullBounds.h = cons.space.h
         }
-        if(this.settings.crossAxisSelfLayout === 'grow') {
+        if (this.settings.crossAxisSelfLayout === 'grow') {
             fullBounds.w = cons.space.w
         }
-        if(this.settings.crossAxisSelfLayout === 'shrink') {
+        if (this.settings.crossAxisSelfLayout === 'shrink') {
             fullBounds.w = cons.space.w
         }
-        if(this.settings.fixedWidth) {
+        if (this.settings.fixedWidth) {
             fullBounds.w = this.settings.fixedWidth
         }
         let contentBounds = fullBounds.copy()
         contentBounds = this.subtractInsets(contentBounds)
-        this.log(this.settings.id,fullBounds,contentBounds)
+        this.log(this.settings.id, fullBounds, contentBounds)
 
         // layout children
         let children = chs.map(ch => {
@@ -429,7 +434,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         // position children
         let y = contentBounds.y
         let x = contentBounds.x
-        for(let ch of children) {
+        for (let ch of children) {
             ch.settings.pos.y = y
             ch.settings.pos.x = x
             y += ch.settings.size.h
@@ -438,30 +443,30 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         //resize myself back out
         let total_children_length = 0
         let max_child_size = 0
-        for(let ch of children) {
+        for (let ch of children) {
             total_children_length += ch.settings.size.h
             max_child_size = Math.max(max_child_size, ch.settings.size.w)
         }
         let total_insets = this.getTotalInsets()
-        if(this.settings.mainAxisSelfLayout === 'shrink') {
-            fullBounds.h = total_children_length +  insetsHeight(total_insets)
+        if (this.settings.mainAxisSelfLayout === 'shrink') {
+            fullBounds.h = total_children_length + insetsHeight(total_insets)
         }
-        if(this.settings.crossAxisSelfLayout === 'shrink') {
+        if (this.settings.crossAxisSelfLayout === 'shrink') {
             fullBounds.w = max_child_size + insetsWidth(total_insets)
         }
-        this.log("using fixed width",this.settings.fixedWidth)
-        if(this.settings.fixedWidth) {
+        this.log("using fixed width", this.settings.fixedWidth)
+        if (this.settings.fixedWidth) {
             fullBounds.w = this.settings.fixedWidth
         }
 
         return new GRenderNode({
-            ... this.settings,
+            ...this.settings,
             baseline: 0,
             children: children,
-            contentOffset: new Point(5,5),
+            contentOffset: new Point(5, 5),
             font: "",
             id: this.settings.id,
-            pos: new Point(0,0),
+            pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
             textColor: ""
@@ -472,121 +477,3 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 }
 
 
-type ScrollContainerSettings = {
-    fixedWidth:number,
-    fixedHeight:number,
-    child:GElement,
-    scrollOffset:Point,
-    onScrollChanged: (newOffset: Point, e:CEvent) => void
-}
-class ScrollContainerElement implements GElement {
-    private param: ScrollContainerSettings
-
-    constructor(param: ScrollContainerSettings) {
-        this.param = param
-    }
-
-    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        let borderInsets = withInsets(1)
-        let child = this.param.child.layout(rc, cons)
-        const fullBounds = new Bounds(0,0,this.param.fixedWidth, this.param.fixedHeight)
-        const contentBounds =  bdsSubInsets(fullBounds,borderInsets)
-
-        let os = this.param.onScrollChanged
-        let children = [child]
-        {
-            let leftb = Button({text: "<"})
-            let leftr = leftb.layout(rc, cons)
-            leftr.settings.pos.x = contentBounds.left()
-            leftr.settings.pos.y = contentBounds.bottom() - leftr.settings.size.h
-            children.push(leftr)
-            leftr.settings.handleEvent = (e) => os(this.addToOffset(new Point(10, 0), child.settings.size, contentBounds), e)
-        }
-        {
-            let rightb = Button({text: ">"})
-            let rightr = rightb.layout(rc, cons)
-            rightr.settings.pos.x = contentBounds.left() + rightr.settings.size.w
-            rightr.settings.pos.y = contentBounds.bottom() - rightr.settings.size.h
-            children.push(rightr)
-            rightr.settings.handleEvent = (e) => os(this.addToOffset(new Point(-10, 0), child.settings.size, contentBounds), e)
-        }
-
-
-        {
-            let button = Button({text:"^"})
-            let node = button.layout(rc,cons)
-            node.settings.pos.x = contentBounds.right() - node.settings.size.w
-            node.settings.pos.y = contentBounds.top()
-            children.push(node)
-            node.settings.handleEvent = (e) => os(this.addToOffset(new Point(0, 10), child.settings.size, contentBounds), e)
-        }
-
-        {
-            let button = Button({text:"!^"})
-            let node = button.layout(rc,cons)
-            node.settings.pos.x = contentBounds.right() - node.settings.size.w
-            node.settings.pos.y = contentBounds.top() + node.settings.size.h
-            children.push(node)
-            node.settings.handleEvent = (e) => os(this.addToOffset(new Point(0, -10), child.settings.size, contentBounds), e)
-        }
-
-        child.settings.pos = this.param.scrollOffset.add(contentBounds.position())
-
-        return new GRenderNode({
-            id: 'scroll',
-            size: fullBounds.size(),
-            background: "magenta",
-            baseline: 0,
-            borderColor: "yellow",
-            borderWidth: borderInsets,
-            children: children,
-            contentOffset: ZERO_POINT,
-            font: "",
-            margin: ZERO_INSETS,
-            padding: ZERO_INSETS,
-            pos: fullBounds.position(),
-            text: "",
-            textColor: "",
-            clip: true,
-        })
-    }
-
-
-    private addToOffset(moveBy: Point, size: Size, contentBounds: Bounds) {
-        let off = this.param.scrollOffset
-        let newOff = off.add(moveBy)
-        if(size.w < contentBounds.size().w) {
-            newOff.x = 0
-        } else {
-            if(newOff.x > 0) {
-                newOff.x = 0
-            }
-            if (newOff.x + size.w < contentBounds.size().w) {
-                newOff.x = contentBounds.size().w - size.w
-            }
-        }
-
-        if(size.h < contentBounds.size().h) {
-            newOff.y = 0
-        } else {
-            if (newOff.y > 0) {
-                newOff.y = 0
-            }
-            if (newOff.y + size.h < contentBounds.size().h) {
-                newOff.y = contentBounds.size().h - size.h
-            }
-        }
-
-        return newOff
-    }
-}
-
-export function ScrollContainer(param: {
-    fixedWidth: number;
-    onScrollChanged: (newOffset: Point, e:CEvent) => void;
-    scrollOffset: Point;
-    fixedHeight: number;
-    child: MVBoxElement
-}): GElement {
-    return new ScrollContainerElement(param)
-}

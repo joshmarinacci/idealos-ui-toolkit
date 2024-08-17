@@ -41,4 +41,8 @@ export enum Icons {
     ShoppingCart = 'shopping_cart',
     ToggleOn = 'toggle_on',
     ToggleOff= 'toggle_off',
+    KeyboardArrowLeft = 'keyboard_arrow_left',
+    KeyboardArrowRight = 'keyboard_arrow_right',
+    KeyboardArrowUp = 'keyboard_arrow_up',
+    KeyboardArrowDown = 'keyboard_arrow_down',
 }

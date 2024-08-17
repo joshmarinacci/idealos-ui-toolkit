@@ -7,13 +7,13 @@ import {Insets} from "josh_js_util";
 
 type ButtonParameters = {
     margin?:Insets,
-    text:string,
+    text?:string,
     selected?:boolean
     handleEvent?: EventHandler
 }
 type IconButtonParameters = {
     icon: Icons
-    ghost: boolean
+    ghost?: boolean
 } & ButtonParameters;
 
 export function IconButton(opts: IconButtonParameters) {
@@ -31,7 +31,7 @@ export function IconButton(opts: IconButtonParameters) {
                 borderColor: TRANSPARENT,
                 borderWidth: ZERO_INSETS,
                 backgroundColor: TRANSPARENT,
-                text: opts.text,
+                text: opts.text || "",
                 textColor: Style.buttonTextColor,
                 shadow: true,
             }),
@@ -69,7 +69,7 @@ export function Button(opts: ButtonParameters ):GElement {
             borderColor: TRANSPARENT,
             borderWidth: ZERO_INSETS,
             backgroundColor: TRANSPARENT,
-            text: opts.text,
+            text: opts.text || "",
             textColor: Style.buttonTextColor,
             shadow: true,
         })],
