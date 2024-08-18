@@ -45,7 +45,7 @@ class TextInputElement implements GElement {
         }
     }
 
-    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+    layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         // console.log("redoing layout",this.opts.text)
         rc.ctx.font = Style.font
         let metrics = rc.ctx.measureText(this.opts.text)
@@ -83,7 +83,7 @@ class TextInputElement implements GElement {
             handleEvent: (e) => {
                 if (e.type === 'keyboard-typed') {
                     let kbe = e as MKeyboardEvent;
-                    console.log("typed", e)
+                    // console.log("typed", kbe)
                     this.opts.onChange(processText(this.opts.text,kbe), e)
                 }
             }

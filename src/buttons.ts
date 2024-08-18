@@ -1,6 +1,6 @@
 import {Icons} from "./icons.ts";
 import {Icon, TextElement} from "./comps2.ts";
-import {EventHandler, GElement, TRANSPARENT, ZERO_INSETS} from "./base.ts";
+import {EventHandler, GElement, TRANSPARENT, VisualStyle, ZERO_INSETS} from "./base.ts";
 import {MHBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
 import {Insets} from "josh_js_util";
@@ -14,16 +14,17 @@ type ButtonParameters = {
 type IconButtonParameters = {
     icon: Icons
     ghost?: boolean
+    hoverStyle?:VisualStyle
 } & ButtonParameters;
 
 export function IconButton(opts: IconButtonParameters) {
     return new MHBoxElement({
         visualStyle: {
-            borderColor:opts.ghost?TRANSPARENT : Style.buttonBorderColor,
+            borderColor:opts.ghost ? TRANSPARENT : Style.buttonBorderColor,
             background: opts.ghost ? TRANSPARENT : Style.buttonBackground,
             textColor: Style.buttonTextColor,
         },
-        hoverStyle: {
+        hoverStyle: opts.hoverStyle || {
             background: Style.buttonBackground,
             borderColor: Style.buttonBorderColor,
             textColor: Style.buttonTextColor,
@@ -56,12 +57,17 @@ export function IconButton(opts: IconButtonParameters) {
     })
 }
 
+const NULL_HOVER:VisualStyle = {
+    borderColor:TRANSPARENT,
+}
 export const CheckBox = (p: ButtonParameters) => IconButton({
     icon: p.selected?Icons.CheckboxChecked:Icons.CheckboxUnchecked,
+    hoverStyle: NULL_HOVER,
     ghost:true, ...p
 })
 export const RadioButton = (p: ButtonParameters) => IconButton({
     icon: p.selected?Icons.RadioButtonUnchecked:Icons.RadioButtonChecked,
+    hoverStyle: NULL_HOVER,
     ghost:true, ...p
 })
 

@@ -19,14 +19,13 @@ next steps
 // ToggleButton mouse support
 // TabbedBox    mouse support
 
-
 // ListView is custom VBox with NodeRenderer and clip and scrolling
 // add listview scrolling. needs keydown/keyup to nav to next/prev
 // need to fix VBox sizing
 
-add keyboard support. when listview has the focus let it nav up and down with arrow keys
-when a component has the focus, draw a focused border then switch back to the default
-screen tracks the current keyboard focus
+// add keyboard support. when listview has the focus let it nav up and down with arrow keys
+// when a component has the focus, draw a focused border then switch back to the default
+// screen tracks the current keyboard focus
 
 // Hover support for Buttons. Where does the state live? in the render node?
 //     has currentBg, swaps out with stdbg and hoverbg and selectionbg. if hoverbg is set
@@ -34,6 +33,14 @@ screen tracks the current keyboard focus
 //    if currently focused, then swap out bg and border with stdbg and focusbg and selectedbg
 
 // need a style object to represent the non-layout style of text color, borders, bg,
+
+text input:
+    draw a text render node + a rect for the cursor
+    support cursor movement with left and right arrow keys
+    support caps
+
+support scrolling with scroll wheel events
+make list view fill the width of the scroll parent by default
 
 
 DropdownButton
@@ -72,13 +79,12 @@ import {HBox, MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
-import {Schema} from "rtds-core";
 import {ListView, ListViewItem} from "./listView.ts";
 import {Point} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
 import {TextBox} from "./text.ts";
 
-const S = new Schema()
+// const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([
 //     "John",
 //     // "Jacob",
