@@ -54,8 +54,8 @@ export class Scene {
             pos = pos.subtract(new Point(rect.x, rect.y))
             this.handleMouseDown(pos)
         })
-        window.addEventListener('keypress', (e) => {
-            this.handleKeyTypeEvent(e)
+        window.addEventListener('keydown', (e) => {
+            this.handleKeydownEvent(e)
         })
     }
 
@@ -156,8 +156,9 @@ export class Scene {
         }
     }
 
-    handleKeyTypeEvent(e: KeyboardEvent) {
+    handleKeydownEvent(e: KeyboardEvent) {
         if(this.keyboard_target) {
+            console.log("native event",e)
             let target = this.findByInputId(this.keyboard_target, this.renderRoot)
             if(target && target.settings.handleEvent) {
                 let evt: MKeyboardEvent = {

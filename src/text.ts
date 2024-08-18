@@ -19,6 +19,20 @@ type TextInputRequirements = {
     borderWidth: Insets
 }
 
+const META_KEYS = ['Shift','Enter','Control','Alt','Meta']
+
+function processText(text: string, kbe: MKeyboardEvent) {
+    if(META_KEYS.includes(kbe.key)) return text
+    if(kbe.key === 'Backspace') {
+        if(text.length > 0) {
+            return text.substring(0,text.length - 1)
+        } else {
+            return text
+        }
+    }
+    return text + kbe.key
+}
+
 class TextInputElement implements GElement {
     private opts: TextInputRequirements
 
@@ -68,9 +82,9 @@ class TextInputElement implements GElement {
             clip: true,
             handleEvent: (e) => {
                 if (e.type === 'keyboard-typed') {
-                    console.log("typed", e)
                     let kbe = e as MKeyboardEvent;
-                    this.opts.onChange(this.opts.text + kbe.key, e)
+                    console.log("typed", e)
+                    this.opts.onChange(processText(this.opts.text,kbe), e)
                 }
             }
         })
