@@ -10,6 +10,12 @@ export interface GElement {
     layout(rc: RenderContext, cons:LayoutConstraints): GRenderNode
 }
 
+export type VisualStyle = {
+    borderColor?: string
+    textColor?:string
+    background?:string
+}
+
 export type ElementSettings = {
     text: string
     padding: Insets
@@ -26,14 +32,12 @@ export type CEvent = {
 }
 export type EventHandler = (event: CEvent) => void
 
-export type VisualStyle = {
-    borderColor: string
-    textColor:string
-    background:string
-}
 export type RenderNodeSettings = {
     text: string;
+    currentStyle?:VisualStyle
     visualStyle:VisualStyle
+    hoverStyle?:VisualStyle
+    focusedStyle?:VisualStyle
     contentOffset: Point,
     font: string;
     size: Size;

@@ -18,9 +18,12 @@ function ListViewItem(opts: ListViewItemParameters): GElement {
         mainAxisLayout: 'start',
         crossAxisLayout: 'center',
         visualStyle:{
-            background: opts.selected ? Style.selectedBackgroundColor : Style.buttonBackground,
+            background: opts.selected ? Style.selectedBackgroundColor : Style.panelBackgroundColor,
             textColor: Style.textColor,
             borderColor: Style.panelBorderColor,
+        },
+        hoverStyle: {
+            background: opts.selected ? Style.selectedBackgroundHoverColor : Style.selectedBackgroundHoverColor,
         },
         children: [
             Label({text: opts.text, shadow: true}),

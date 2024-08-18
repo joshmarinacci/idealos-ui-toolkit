@@ -18,6 +18,7 @@ export class Scene {
     private debugStyle: VisualStyle
     private makeTree: () => GElement;
     private borderDebugEnabled: boolean;
+    private current_hover: GRenderNode | undefined;
 
     constructor(makeTree: () => GElement) {
         this.borderDebugEnabled = false
@@ -118,6 +119,12 @@ export class Scene {
                 // found.settings.background = 'blue'
                 this.redraw()
                 this.last = found
+            }
+            if(found.settings.hoverStyle && found !== this.current_hover) {
+                if(this.current_hover) this.current_hover.settings.currentStyle = this.current_hover.settings.visualStyle
+                found.settings.currentStyle = found.settings.hoverStyle
+                this.current_hover = found
+                this.redraw()
             }
         }
     }

@@ -19,11 +19,16 @@ type IconButtonParameters = {
 export function IconButton(opts: IconButtonParameters) {
     return new MHBoxElement({
         visualStyle: {
-            borderColor:Style.buttonBorderColor,
+            borderColor:opts.ghost?TRANSPARENT : Style.buttonBorderColor,
             background: opts.ghost ? TRANSPARENT : Style.buttonBackground,
             textColor: Style.buttonTextColor,
         },
-        borderWidth: opts.ghost ? ZERO_INSETS : Style.buttonBorderWidth,
+        hoverStyle: {
+            background: Style.buttonBackground,
+            borderColor: Style.buttonBorderColor,
+            textColor: Style.buttonTextColor,
+        },
+        borderWidth: opts.ghost ? Style.buttonBorderWidth : Style.buttonBorderWidth,
         borderRadius: Style.buttonBorderRadius,
         children: [
             new Icon({icon: opts.icon, shadow:true}),
@@ -65,6 +70,11 @@ export function Button(opts: ButtonParameters ):GElement {
         id:'button',
         visualStyle: {
             background: opts.selected?Style.selectedBackgroundColor:Style.buttonBackground,
+            borderColor: Style.buttonBorderColor,
+            textColor: Style.buttonTextColor,
+        },
+        hoverStyle: {
+            background:opts.selected?Style.selectedBackgroundHoverColor:Style.buttonBackgroundHoverColor,
             borderColor: Style.buttonBorderColor,
             textColor: Style.buttonTextColor,
         },

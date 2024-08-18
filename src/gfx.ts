@@ -64,6 +64,11 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
 
 export function doDraw(n: GRenderNode, rc: RenderContext): void {
     // console.log("drawing", n.settings.id, n.settings.borderRadius)
+    if(!n.settings.visualStyle) throw new Error("no visual style found")
+    if(!n.settings.currentStyle) n.settings.currentStyle = n.settings.visualStyle
+    if(!n.settings.currentStyle.background) n.settings.currentStyle.background = n.settings.currentStyle.background = n.settings.visualStyle.background
+    if(!n.settings.currentStyle.borderColor) n.settings.currentStyle.borderColor = n.settings.currentStyle.borderColor = n.settings.visualStyle.borderColor
+
     rc.ctx.save()
     rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
 
@@ -73,21 +78,21 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
     bounds = bounds.grow(-n.settings.margin.left)
 
     // fill background inside padding  + border area
-    if (n.settings.visualStyle.background) {
+    if (n.settings.currentStyle.background) {
         if(n.settings.borderRadius && n.settings.borderRadius > 0) {
-            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.visualStyle.background)
+            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.currentStyle.background)
         } else {
-            fillRect(rc.ctx, bounds, n.settings.visualStyle.background)
+            fillRect(rc.ctx, bounds, n.settings.currentStyle.background)
         }
     }
 
     // draw / fill border
-    if (n.settings.visualStyle.borderColor && n.settings.borderWidth.left > 0) {
+    if (n.settings.currentStyle.borderColor && n.settings.borderWidth.left > 0) {
         if(n.settings.borderRadius && n.settings.borderRadius > 0) {
-            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.visualStyle.borderColor)
+            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.currentStyle.borderColor)
             // rc.ctx.clip()
         } else {
-            drawBorder(rc.ctx, bounds, n.settings.visualStyle.borderColor, n.settings.borderWidth)
+            drawBorder(rc.ctx, bounds, n.settings.currentStyle.borderColor, n.settings.borderWidth)
         }
     }
     // account for the border
@@ -98,7 +103,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
 
     // draw text
     if (n.settings.text && n.settings.text.trim().length > 0) {
-        rc.ctx.fillStyle = n.settings.visualStyle.textColor
+        rc.ctx.fillStyle = n.settings.currentStyle.textColor || "black"
         rc.ctx.font = n.settings.font
         rc.ctx.textRendering = 'optimizeLegibility'
         rc.ctx.textAlign = 'start'

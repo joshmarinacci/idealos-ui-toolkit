@@ -20,6 +20,8 @@ type BoxParameters = {
     crossAxisLayout?: AxisLayout,
     children: GElement[],
     visualStyle?:VisualStyle
+    hoverStyle?:VisualStyle
+    focusedStyle?:VisualStyle
     padding?: Insets
     margin?: Insets,
     borderWidth?: Insets,
@@ -37,7 +39,9 @@ type BoxRequirements = {
     mainAxisLayout: AxisLayout,
     crossAxisLayout: AxisLayout,
     children: GElement[],
-    visualStyle:VisualStyle,
+    visualStyle:VisualStyle
+    hoverStyle?:VisualStyle
+    focusedStyle?:VisualStyle
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
@@ -114,6 +118,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 textColor: Style.textColor,
                 borderColor: Style.panelBorderColor
             },
+            hoverStyle: param.hoverStyle || {},
             margin: withFallback(param.margin, Style.panelMargin),
             padding: withFallback(param.padding, Style.panelPadding),
             borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
@@ -216,6 +221,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             this.log(`full bounds ${fullBounds}`)
             return new GRenderNode({
                 visualStyle: this.settings.visualStyle,
+                hoverStyle: this.settings.hoverStyle,
                 baseline: 0,
                 font: Style.font,
                 pos: new Point(0, 0),
@@ -278,6 +284,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             let children = chs.map(ch => map.get(ch) as GRenderNode)
             return new GRenderNode({
                 visualStyle: this.settings.visualStyle,
+                hoverStyle: this.settings.hoverStyle,
                 baseline: 0,
                 font: Style.font,
                 pos: new Point(0, 0),
