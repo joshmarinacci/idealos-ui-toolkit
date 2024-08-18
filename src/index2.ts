@@ -120,7 +120,8 @@ const state = {
     selectedListItem2: 0,
     scrollOffset1: new Point(0, 0),
     scrollOffset2: new Point(0, 0),
-    textInputValue: "text"
+    textInputValue: "some long text",
+    textInputCursorPosition: new Point(5,0)
 }
 
 
@@ -175,12 +176,15 @@ function makeTree(): GElement {
             HBox({children:[
                 Label({text: 'text input'}),
                 TextBox({
+                    cursorPosition: state.textInputCursorPosition,
                     inputid:"text-box-1",
                     text:state.textInputValue,
                     onChange:(v,e) => {
-                        state.textInputValue = v
+                        state.textInputValue = v[0]
+                        state.textInputCursorPosition = v[1]
                         e.redraw()
                     }}),
+
             ]})
         ]
     })
