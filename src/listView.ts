@@ -1,21 +1,22 @@
-import {CEvent, EventHandler, GElement} from "./base.ts";
+import {AxisLayout, CEvent, EventHandler, GElement} from "./base.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
 import {Label} from "./comps2.ts";
 import {withInsets} from "./gfx.ts";
 
 type ListViewItemParameters = {
-    text: string
+    children:GElement[],
     selected: boolean
     handleEvent: EventHandler
+    mainAxisLayout?: AxisLayout
 }
 
-function ListViewItem(opts: ListViewItemParameters): GElement {
+export function ListViewItem(opts: ListViewItemParameters): GElement {
     return new MHBoxElement({
         id: 'ListViewItem',
         mainAxisSelfLayout: 'grow',
         crossAxisSelfLayout: 'shrink',
-        mainAxisLayout: 'start',
+        mainAxisLayout: opts.mainAxisLayout || 'start',
         crossAxisLayout: 'center',
         visualStyle:{
             background: opts.selected ? Style.selectedBackgroundColor : Style.panelBackgroundColor,
@@ -25,21 +26,41 @@ function ListViewItem(opts: ListViewItemParameters): GElement {
         hoverStyle: {
             background: opts.selected ? Style.selectedBackgroundHoverColor : Style.selectedBackgroundHoverColor,
         },
-        children: [
-            Label({text: opts.text, shadow: true}),
-            // Label({text: opts.text, shadow: true}),
-        ],
+        children: opts.children,
         handleEvent: opts.handleEvent,
     })
 }
 
-type ListViewParameters = {
+
+export type OnSelectedChangedCallback = (i: number, e: CEvent) => void;
+
+export type ListItemRenderer = (item:string,
+                         selected:number,
+                         index:number,
+                         onSelectedChanged:OnSelectedChangedCallback
+                         ) => GElement
+
+export type ListViewParameters = {
     data: string[]
-    selected: number,
-    onSelectedChanged(i: number, e: CEvent): void;
+    selected: number
+    onSelectedChanged:OnSelectedChangedCallback
+    renderItem?:ListItemRenderer
+}
+
+const DefaultItemRenderer:ListItemRenderer = (item:string,selected:number,index:number, onSelectedChanged   ) => {
+    return ListViewItem({
+        // text:item,
+        children: [
+            Label({text: item, shadow: true}),
+        // Label({text: opts.text, shadow: true}),
+        ],
+        selected: index === selected,
+        handleEvent: (e) => onSelectedChanged(index, e)
+    })
 }
 
 export function ListView(opts: ListViewParameters): GElement {
+    const renderer = opts.renderItem || DefaultItemRenderer
     return new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
@@ -51,11 +72,7 @@ export function ListView(opts: ListViewParameters): GElement {
         },
         borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {
-            return ListViewItem({
-                text: item,
-                selected: opts.selected === index,
-                handleEvent: (e) => opts.onSelectedChanged(index, e)
-            })
+            return renderer(item,opts.selected,index, opts.onSelectedChanged)
         })
     })
 }

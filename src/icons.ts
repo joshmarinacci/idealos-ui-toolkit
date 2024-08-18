@@ -45,4 +45,5 @@ export enum Icons {
     KeyboardArrowRight = 'keyboard_arrow_right',
     KeyboardArrowUp = 'keyboard_arrow_up',
     KeyboardArrowDown = 'keyboard_arrow_down',
+    DragHandle = 'drag_handle',
 }

@@ -187,9 +187,11 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
             //find the max child height
             let max_child_height = 0
+            let final_children_length = 0
             chs.forEach(ch => {
                 let node = map.get(ch) as GRenderNode
                 max_child_height = Math.max(node.settings.size.h, max_child_height)
+                final_children_length += node.settings.size.w
             })
 
             if (this.settings.crossAxisSelfLayout === 'shrink') {
@@ -215,6 +217,9 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 node.settings.pos.x = x
                 x += node.settings.size.w
             })
+            if(this.settings.mainAxisLayout === 'between' && chs.length >= 2) {
+                this.layout_between(chs,map,contentBounds)
+            }
             let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
             fullBounds = this.addInsets(contentBounds)
             this.log(`content bounds ${contentBounds}`)
@@ -324,6 +329,25 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             if (this.settings.crossAxisLayout === 'end') {
                 node.settings.pos.y = contentBounds.y + contentBounds.h - node.settings.size.h
             }
+        })
+    }
+
+    private layout_between(chs: GElement[], map: Map<GElement, GRenderNode>, contentBounds: Bounds) {
+        let max_child_height = 0
+        let final_children_length = 0
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            max_child_height = Math.max(node.settings.size.h, max_child_height)
+            final_children_length += node.settings.size.w
+        })
+        let leftover = contentBounds.w - final_children_length
+        let leftover_per_child = leftover/(chs.length-1)
+        let x = contentBounds.x
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            node.settings.pos.x = x
+            x += node.settings.size.w
+            x += leftover_per_child
         })
     }
 }

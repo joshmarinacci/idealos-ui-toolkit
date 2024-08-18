@@ -66,7 +66,7 @@ input:
 
  */
 import {CEvent, GElement} from "./base.ts";
-import {HSeparator, Label, Square, Tag} from "./comps2.ts";
+import {HSeparator, Icon, Label, Square, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
@@ -74,7 +74,7 @@ import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
 import {Schema} from "rtds-core";
-import {ListView} from "./listView.ts";
+import {ListView, ListViewItem} from "./listView.ts";
 import {Point} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
 
@@ -129,11 +129,13 @@ function makeTree(): GElement {
                     // Square(50,"green"),
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
-                    Button({text: "toggle", selected:state.toggle, handleEvent:(e) => {
-                        console.log('e')
+                    Button({
+                        text: "toggle", selected: state.toggle, handleEvent: (e) => {
+                            console.log('e')
                             state.toggle = !state.toggle
                             e.redraw()
-                        }}),
+                        }
+                    }),
                     // new Icon({icon: Icons.Document}),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     CheckBox({
@@ -152,7 +154,7 @@ function makeTree(): GElement {
                             e.redraw()
                         }
                     }),
-                    Tag({text:'tag'}),
+                    Tag({text: 'tag'}),
                     // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
                     //         state.toggled = !state.toggled
                     //         c.redraw()
@@ -179,21 +181,32 @@ function makeTree(): GElement {
     })
 
     const listviewDemo = new MHBoxElement({
-        id:"list view demo",
-        fixedWidth:200,
-        children:[
+        id: "list view demo",
+        fixedWidth: 200,
+        children: [
             ListView({
-                data:["john","Jacob",'jingleheimer'],
-                selected:state.selectedListItem1,
-                onSelectedChanged:((i: number, e: CEvent)=> {
+                data: ["john", "Jacob", 'jingleheimer'],
+                selected: state.selectedListItem1,
+                onSelectedChanged: ((i: number, e: CEvent) => {
                     state.selectedListItem1 = i
                     e.redraw()
                 })
             }),
             ListView({
-                data:["john","Jacob",'jingleheimer','foo','bar'],
-                selected:state.selectedListItem2,
-                onSelectedChanged:((i: number, e: CEvent)=> {
+                data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar'],
+                selected: state.selectedListItem2,
+                renderItem: (item, selected, index, onSelectedChanged) => {
+                    return ListViewItem({
+                        mainAxisLayout:'between',
+                        children: [
+                            Label({text: item, shadow:true}),
+                            new Icon({icon:Icons.DragHandle, shadow:true})
+                        ],
+                        selected: index === selected,
+                        handleEvent: (e) => onSelectedChanged(index, e)
+                    })
+                },
+                onSelectedChanged: ((i: number, e: CEvent) => {
                     state.selectedListItem2 = i
                     e.redraw()
                 })
@@ -202,12 +215,12 @@ function makeTree(): GElement {
     })
 
     const panelDemo = new MHBoxElement({
-        children:[
+        children: [
             new MVBoxElement({
-                children:[
-                    Label({text:'hbox'}),
+                children: [
+                    Label({text: 'hbox'}),
                     new MHBoxElement({
-                        children:[
+                        children: [
                             Button({text: "one"}),
                             Button({text: "two"}),
                             Button({text: "three"}),
@@ -216,10 +229,10 @@ function makeTree(): GElement {
                 ]
             }),
             new MVBoxElement({
-                children:[
-                    Label({text:'hbox'}),
+                children: [
+                    Label({text: 'hbox'}),
                     new MVBoxElement({
-                        children:[
+                        children: [
                             Button({text: "one"}),
                             Button({text: "two"}),
                             Button({text: "three"}),
@@ -228,13 +241,13 @@ function makeTree(): GElement {
                 ]
             }),
             new MVBoxElement({
-                children:[
-                    Label({text:'scroll container'}),
+                children: [
+                    Label({text: 'scroll container'}),
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 150,
                         scrollOffset: state.scrollOffset1,
-                        onScrollChanged:(newOffset:Point, e:CEvent):void => {
+                        onScrollChanged: (newOffset: Point, e: CEvent): void => {
                             state.scrollOffset1 = newOffset
                             e.redraw()
                         },
@@ -249,8 +262,8 @@ function makeTree(): GElement {
                 ]
             }),
             new MVBoxElement({
-                children:[
-                    Label({text:'scrolling list'}),
+                children: [
+                    Label({text: 'scrolling list'}),
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 200,
@@ -260,7 +273,7 @@ function makeTree(): GElement {
                             e.redraw()
                         },
                         child: ListView({
-                            data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar','baz','qux'],
+                            data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
                             selected: state.selectedListItem2,
                             onSelectedChanged: ((i: number, e: CEvent) => {
                                 state.selectedListItem2 = i
@@ -274,18 +287,18 @@ function makeTree(): GElement {
     })
 
     let tabs = TabbedBox({
-        titles:[
+        titles: [
             'Components',
             'List View',
             'Panels'
         ],
-        children:[
+        children: [
             compsDemo,
             listviewDemo,
             panelDemo,
         ],
-        selectedTab:state.selectedTab,
-        onSelectedChanged(i: number, e:CEvent) {
+        selectedTab: state.selectedTab,
+        onSelectedChanged(i: number, e: CEvent) {
             state.selectedTab = i;
             e.redraw()
         }
