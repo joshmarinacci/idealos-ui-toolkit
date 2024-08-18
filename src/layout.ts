@@ -4,13 +4,15 @@ import {
     EventHandler,
     GElement,
     GRenderNode,
-    LayoutConstraints, VisualStyle,
+    LayoutConstraints,
+    VisualStyle,
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.ts";
 import {RenderContext} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
+import {addInsets, insetsHeight, insetsWidth} from "./util.ts";
 
 type BoxParameters = {
     id?: string,
@@ -382,23 +384,6 @@ export class HExpander implements GElement {
     }
 }
 
-function addInsets(a: Insets, b: Insets) {
-    return new Insets(
-        a.top + b.top,
-        a.right + b.right,
-        a.bottom + b.bottom,
-        a.left + b.left
-    )
-}
-
-function insetsWidth(insets: Insets) {
-    return insets.left + insets.right
-}
-
-function insetsHeight(insets: Insets) {
-    return insets.top + insets.bottom
-}
-
 export class MVBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxParameters) {
@@ -508,3 +493,11 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 }
 
 
+export function HBox(param: { children: GElement[] }) {
+    return new MHBoxElement({
+        mainAxisSelfLayout: 'grow',
+        mainAxisLayout: 'start',
+        crossAxisSelfLayout: 'shrink',
+        children: param.children
+    })
+}

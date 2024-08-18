@@ -1,4 +1,4 @@
-import {GElement, GRenderNode, TRANSPARENT, VisualStyle} from "./base.ts";
+import {GElement, GRenderNode, MKeyboardEvent, MMouseEvent, TRANSPARENT, VisualStyle} from "./base.ts";
 import {doDraw, RenderContext} from "./gfx.ts";
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
@@ -19,6 +19,7 @@ export class Scene {
     private makeTree: () => GElement;
     private borderDebugEnabled: boolean;
     private current_hover: GRenderNode | undefined;
+    private keyboard_target: string | undefined
 
     constructor(makeTree: () => GElement) {
         this.borderDebugEnabled = false
@@ -52,6 +53,9 @@ export class Scene {
             let pos = new Point(e.clientX, e.clientY);
             pos = pos.subtract(new Point(rect.x, rect.y))
             this.handleMouseDown(pos)
+        })
+        window.addEventListener('keypress', (e) => {
+            this.handleKeyTypeEvent(e)
         })
     }
 
@@ -132,14 +136,48 @@ export class Scene {
     handleMouseDown(pos: Point) {
         let found = this.findTarget(pos, this.renderRoot)
         if(found) {
-            console.log("clicked on", found.settings.id, found.settings)
-            if (found.settings.handleEvent) found.settings.handleEvent({
-                type: "mouse-down",
+            // console.log("clicked on", found.settings.id, found.settings)
+            let evt:MMouseEvent = {
+                type:'mouse-down',
                 redraw: () => {
                     this.layout()
                     this.redraw()
                 },
-            })
+                position:pos
+            }
+            if (found.settings.handleEvent) found.settings.handleEvent(evt)
+            if(found.settings.inputid) {
+                this.keyboard_target = found.settings.inputid
+                if(found.settings.focusedStyle) {
+                    found.settings.currentStyle = found.settings.focusedStyle
+                    this.redraw()
+                }
+            }
+        }
+    }
+
+    handleKeyTypeEvent(e: KeyboardEvent) {
+        if(this.keyboard_target) {
+            let target = this.findByInputId(this.keyboard_target, this.renderRoot)
+            if(target && target.settings.handleEvent) {
+                let evt: MKeyboardEvent = {
+                    type: 'keyboard-typed',
+                    redraw: () => {
+                        this.layout()
+                        this.redraw()
+                    },
+                    key: e.key
+                }
+                target.settings.handleEvent(evt)
+            }
+        }
+    }
+
+    private findByInputId(keyboard_target: string, renderRoot: GRenderNode):GRenderNode|undefined {
+        if(renderRoot.settings.inputid === keyboard_target) return renderRoot
+        for(let ch of renderRoot.settings.children) {
+            let found = this.findByInputId(keyboard_target,ch)
+            if(found) return found
         }
     }
 }

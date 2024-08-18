@@ -26,10 +26,18 @@ export type ElementSettings = {
     shadow: boolean
 }
 
-export type CEvent = {
-    type: "mouse-move" | "mouse-down"
+export type MMouseEvent = {
+    type: 'mouse-move' | 'mouse-down'
+    position:Point
     redraw:()=>void
 }
+export type MKeyboardEvent = {
+    type: 'keyboard-typed'
+    key:string,
+    redraw:()=>void
+}
+export type CEvent = MMouseEvent | MKeyboardEvent
+
 export type EventHandler = (event: CEvent) => void
 
 export type RenderNodeSettings = {
@@ -44,6 +52,7 @@ export type RenderNodeSettings = {
     pos: Point;
     baseline: number;
     id:string,
+    inputid?:string,
     children:GRenderNode[],
     padding: Insets
     margin: Insets

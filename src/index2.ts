@@ -28,13 +28,12 @@ add keyboard support. when listview has the focus let it nav up and down with ar
 when a component has the focus, draw a focused border then switch back to the default
 screen tracks the current keyboard focus
 
-Hover support for Buttons. Where does the state live? in the render node?
-    has currentBg, swaps out with stdbg and hoverbg and selectionbg. if hoverbg is set
+// Hover support for Buttons. Where does the state live? in the render node?
+//     has currentBg, swaps out with stdbg and hoverbg and selectionbg. if hoverbg is set
+//focus is rendered on the render node
+//    if currently focused, then swap out bg and border with stdbg and focusbg and selectedbg
 
-focus is rendered on the render node
-    if currently focused, then swap out bg and border with stdbg and focusbg and selectedbg
-
-need a style object to represent the non-layout style of text color, borders, bg,
+// need a style object to represent the non-layout style of text color, borders, bg,
 
 
 DropdownButton
@@ -69,7 +68,7 @@ import {CEvent, GElement} from "./base.ts";
 import {HSeparator, Icon, Label, Square, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
-import {MHBoxElement, MVBoxElement} from "./layout.ts";
+import {HBox, MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
@@ -77,6 +76,7 @@ import {Schema} from "rtds-core";
 import {ListView, ListViewItem} from "./listView.ts";
 import {Point} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
+import {TextBox} from "./text.ts";
 
 const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([
@@ -108,35 +108,28 @@ const state = {
     toggle: false,
     checked: true,
     radioed: false,
-    selectedTab: 2,
+    selectedTab: 0,
     selectedListItem1: 0,
     selectedListItem2: 0,
     scrollOffset1: new Point(0, 0),
     scrollOffset2: new Point(0, 0),
+    textInputValue: "text"
 }
 
 
 function makeTree(): GElement {
     const compsDemo = new MVBoxElement({
         children: [
-            new MHBoxElement({
+            HBox({
                 children: [
-                    // Square(50,"red"),
-                    // new HExpander(),
-                    // MHLabel("Every Text"),
-                    // MHButton({text: "hello"}),
-                    // new Icon(Icons.Document),
-                    // Square(50,"green"),
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
                     Button({
                         text: "toggle", selected: state.toggle, handleEvent: (e) => {
-                            console.log('e')
                             state.toggle = !state.toggle
                             e.redraw()
                         }
                     }),
-                    // new Icon({icon: Icons.Document}),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     CheckBox({
                         text: "Checkbox",
@@ -155,14 +148,9 @@ function makeTree(): GElement {
                         }
                     }),
                     Tag({text: 'tag'}),
-                    // ToggleButton(c, {text: 'toggle', selected: state.toggled, handleEvent: () => {
-                    //         state.toggled = !state.toggled
-                    //         c.redraw()
-                    //     }})
                 ],
             }),
-            new MHBoxElement({
-                crossAxisLayout: 'center',
+            HBox({
                 children: [
                     Label({text: 'toolbar'}),
                     new MHBoxElement({
@@ -176,7 +164,17 @@ function makeTree(): GElement {
                         ]
                     }),
                 ]
-            })
+            }),
+            HBox({children:[
+                Label({text: 'text input'}),
+                TextBox({
+                    inputid:"text-box-1",
+                    text:state.textInputValue,
+                    onChange:(v,e) => {
+                        state.textInputValue = v
+                        e.redraw()
+                    }}),
+            ]})
         ]
     })
 
