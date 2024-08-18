@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.js",
-    "serve": "npx http-server .",
+    "esbuild-serve": "esbuild src/index2.ts --bundle --outdir=build --watch --serve --servedir=build",
+    "start": "mkdir -p build && cp index.html build && esbuild src/index2.ts --bundle --watch --outdir=build --servedir=build",
     "clean": "rm -rf build",
     "tsc": "tsc"
   },

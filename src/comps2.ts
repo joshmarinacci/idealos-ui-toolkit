@@ -1,9 +1,21 @@
-import {ElementSettings, GElement, GRenderNode, LayoutConstraints, TRANSPARENT, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {
+    ElementSettings,
+    GElement,
+    GRenderNode,
+    LayoutConstraints,
+    MGlobals,
+    TRANSPARENT,
+    ZERO_INSETS,
+    ZERO_POINT
+} from "./base.ts";
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
 import {Point, Size} from "josh_js_util";
 import {Icons} from "./icons.ts";
 import {MHBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
+
+
+export const SYMBOL_FONT_ENABLED = 'SYMBOL_FONT_ENABLED';
 
 export class TextElement implements GElement {
     settings: ElementSettings;
@@ -86,7 +98,7 @@ export class Icon implements GElement {
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         return new GRenderNode({
             visualStyle: {
-                background: "",
+                background: MGlobals.get(SYMBOL_FONT_ENABLED)===true?TRANSPARENT:"red",
                 borderColor: "",
                 textColor: Style.textColor,
             },
@@ -100,7 +112,7 @@ export class Icon implements GElement {
             padding: ZERO_INSETS,
             pos: new Point(0,0),
             size: new Size(24,24),
-            text: this.icon,
+            text: MGlobals.get(SYMBOL_FONT_ENABLED)===true?this.icon:"",
             shadow: this.shadow
         })
     }

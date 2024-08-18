@@ -74,3 +74,6 @@ export type AxisLayout = 'start' | 'center' | 'end' | 'between'
 export const ZERO_INSETS = new Insets(0, 0, 0, 0);
 export const ZERO_POINT = new Point(0, 0)
 export const TRANSPARENT = 'transparent';
+
+
+export const MGlobals = new Map<string,any>

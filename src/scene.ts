@@ -33,10 +33,10 @@ export class Scene {
     }
 
     async init() {
-        const font = new FontFace('material-icons',
-            'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
-        document.fonts.add(font)
-        await font.load()
+        // const font = new FontFace('material-icons',
+        //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+        // document.fonts.add(font)
+        // await font.load()
 
         this.canvas = makeCanvas(new Size(600, 300))
         this.last = undefined

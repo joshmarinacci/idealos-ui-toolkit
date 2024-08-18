@@ -71,8 +71,9 @@ input:
   when down, keep sending event to same target until up again
 
  */
-import {CEvent, GElement} from "./base.ts";
-import {HSeparator, Icon, Label, Square, Tag} from "./comps2.ts";
+
+import {CEvent, GElement, MGlobals} from "./base.ts";
+import {HSeparator, Icon, Label, Square, SYMBOL_FONT_ENABLED, Tag} from "./comps2.ts";
 import {Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
 import {HBox, MHBoxElement, MVBoxElement} from "./layout.ts";
@@ -312,6 +313,8 @@ function makeTree(): GElement {
 
 
 const scene = new Scene(makeTree)
+MGlobals.set(Scene.name,scene)
+MGlobals.set(SYMBOL_FONT_ENABLED, false)
 scene.init().then(() => {
     scene.layout()
     scene.redraw()
