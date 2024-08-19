@@ -91,6 +91,12 @@ class ScrollContainerElement implements GElement {
             pos: fullBounds.position(),
             text: "",
             clip: true,
+            canScroll:true,
+            handleEvent: (e) => {
+                if(e.type === 'wheel') {
+                    os(this.addToOffset(new Point(-e.deltaX,-e.deltaY), child.settings.size, contentBounds), e)
+                }
+            }
         })
     }
 

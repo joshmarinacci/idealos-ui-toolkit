@@ -1,4 +1,4 @@
-import {GElement, GRenderNode, MKeyboardEvent, MMouseEvent, TRANSPARENT, VisualStyle} from "./base.ts";
+import {GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent, TRANSPARENT, VisualStyle} from "./base.ts";
 import {doDraw, RenderContext} from "./gfx.ts";
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
@@ -47,6 +47,7 @@ export class Scene {
             pos = pos.subtract(new Point(rect.x, rect.y))
             this.handleMouseMove(pos)
         })
+
         this.canvas.addEventListener('mousedown', (e) => {
             // @ts-ignore
             let rect = e.target.getBoundingClientRect()
@@ -56,6 +57,13 @@ export class Scene {
         })
         window.addEventListener('keydown', (e) => {
             this.handleKeydownEvent(e)
+        })
+        window.addEventListener('wheel', (e) => {
+            // @ts-ignore
+            let rect = e.target.getBoundingClientRect()
+            let pos = new Point(e.clientX, e.clientY);
+            pos = pos.subtract(new Point(rect.x, rect.y))
+            this.handleWheelEvent(pos,e)
         })
     }
 
@@ -107,6 +115,25 @@ export class Scene {
                 }
             }
             return node
+        }
+    }
+    private findScrollTarget(pos: Point, node: GRenderNode):GRenderNode | undefined {
+        const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
+        if (bounds.contains(pos)) {
+            if (node.settings.children) {
+                // go backwards
+                for(let i=node.settings.children.length-1; i>=0; i--) {
+                    let ch = node.settings.children[i]
+                    // console.log("ch under mouse is",ch)
+                    if (ch.settings.shadow) continue
+                    let p2 = pos.subtract(bounds.top_left())
+                    let found = this.findScrollTarget(p2, ch)
+                    if (found) return found
+                }
+            }
+            if(node.settings.canScroll === true) {
+                return node
+            }
         }
     }
 
@@ -181,4 +208,23 @@ export class Scene {
             if(found) return found
         }
     }
+
+    private handleWheelEvent(pos: Point, e: WheelEvent) {
+        let found = this.findScrollTarget(pos, this.renderRoot)
+        if(found) {
+            // console.log("scroll target",found)
+            const evt:MWheelEvent = {
+                type: 'wheel',
+                deltaX:e.deltaX,
+                deltaY:e.deltaY,
+                redraw: () => {
+                    this.layout()
+                    this.redraw()
+                },
+            }
+            // console.log(evt.type,evt.deltaX,evt.deltaY)
+            if(found.settings.handleEvent) found.settings.handleEvent(evt)
+        }
+    }
+
 }

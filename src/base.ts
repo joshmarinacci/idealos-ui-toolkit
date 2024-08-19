@@ -36,7 +36,13 @@ export type MKeyboardEvent = {
     key:string,
     redraw:()=>void
 }
-export type CEvent = MMouseEvent | MKeyboardEvent
+export type MWheelEvent = {
+    type: 'wheel'
+    deltaX:number,
+    deltaY:number,
+    redraw:()=>void
+}
+export type CEvent = MMouseEvent | MKeyboardEvent | MWheelEvent
 
 export type EventHandler = (event: CEvent) => void
 
@@ -61,6 +67,7 @@ export type RenderNodeSettings = {
     shadow?:boolean
     handleEvent?:EventHandler,
     clip?:boolean
+    canScroll?:boolean
 }
 export class GRenderNode {
     settings: RenderNodeSettings;
