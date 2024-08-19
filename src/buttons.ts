@@ -1,9 +1,9 @@
-import {Icons} from "./icons.ts";
-import {Icon, TextElement} from "./comps2.ts";
+import {Icon, Icons} from "./icons.ts";
 import {EventHandler, GElement, TRANSPARENT, VisualStyle, ZERO_INSETS} from "./base.ts";
 import {MHBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
 import {Insets} from "josh_js_util";
+import {TextElement} from "./text.ts";
 
 type ButtonParameters = {
     margin?:Insets,
@@ -106,5 +106,36 @@ export function Button(opts: ButtonParameters ):GElement {
         margin: opts.margin||Style.buttonMargin,
         padding: Style.buttonPadding,
         handleEvent: opts.handleEvent,
+    })
+}
+
+export function Tag(opts: { text: string }) {
+    return new MHBoxElement({
+        visualStyle: {
+            background: 'blue',
+            borderColor: Style.buttonBorderColor,
+            textColor: Style.textColor,
+        },
+        borderWidth: Style.buttonBorderWidth,
+        borderRadius: Style.tagBorderRadius,
+        children: [new TextElement({
+            padding: ZERO_INSETS,
+            font: Style.font,
+            margin: ZERO_INSETS,
+            visualStyle: {
+                borderColor: 'transparent',
+                background: TRANSPARENT,
+                textColor: Style.buttonTextColor,
+            },
+            borderWidth: ZERO_INSETS,
+            text: opts.text,
+            shadow: true,
+        })],
+        crossAxisLayout: 'center',
+        crossAxisSelfLayout: 'shrink',
+        mainAxisLayout: 'center',
+        mainAxisSelfLayout: 'shrink',
+        margin: Style.buttonMargin,
+        padding: Style.buttonPadding,
     })
 }

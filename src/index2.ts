@@ -72,10 +72,10 @@ input:
 
  */
 
-import {CEvent, GElement, MGlobals} from "./base.ts";
-import {HSeparator, Icon, Label, Square, SYMBOL_FONT_ENABLED, Tag} from "./comps2.ts";
-import {Icons} from "./icons.ts";
-import {Button, CheckBox, IconButton, RadioButton} from "./buttons.ts";
+import {CEvent, GElement, MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
+import {HSeparator, Square} from "./comps2.ts";
+import {Icon, Icons} from "./icons.ts";
+import {Button, CheckBox, IconButton, RadioButton, Tag} from "./buttons.ts";
 import {HBox, MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
@@ -83,7 +83,7 @@ import {Scene} from "./scene.ts";
 import {ListView, ListViewItem} from "./listView.ts";
 import {Point} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
-import {TextBox} from "./text.ts";
+import {Label, TextBox} from "./text.ts";
 
 // const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([

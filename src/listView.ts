@@ -1,8 +1,8 @@
 import {AxisLayout, CEvent, EventHandler, GElement} from "./base.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
-import {Label} from "./comps2.ts";
 import {withInsets} from "./gfx.ts";
+import {Label} from "./text.ts";
 
 type ListViewItemParameters = {
     children:GElement[],

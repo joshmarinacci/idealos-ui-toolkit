@@ -84,3 +84,4 @@ export const TRANSPARENT = 'transparent';
 
 
 export const MGlobals = new Map<string,any>
+export const SYMBOL_FONT_ENABLED = 'SYMBOL_FONT_ENABLED';

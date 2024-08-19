@@ -1,9 +1,18 @@
-import {CEvent, GElement, GRenderNode, LayoutConstraints, MKeyboardEvent, TRANSPARENT, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {
+    CEvent,
+    ElementSettings,
+    GElement,
+    GRenderNode,
+    LayoutConstraints,
+    MKeyboardEvent,
+    TRANSPARENT,
+    ZERO_INSETS,
+    ZERO_POINT
+} from "./base.ts";
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
 import {Style} from "./style.ts";
 import {Insets, Point, Size} from "josh_js_util";
 import {addInsets} from "./util.ts";
-import {TextElement} from "./comps2.ts";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
@@ -52,6 +61,40 @@ function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[
         let cp = cursorPosition.copy()
         cp.x += 1
         return [text2 + kbe.key + text3, cp]
+    }
+}
+
+export class TextElement implements GElement {
+    settings: ElementSettings;
+
+    constructor(settings: ElementSettings) {
+        this.settings = settings
+    }
+
+    layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        rc.ctx.font = this.settings.font
+        let metrics = rc.ctx.measureText(this.settings.text)
+        let size = new Size(
+            Math.floor(metrics.width),
+            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        size = sizeWithPadding(size, this.settings.padding)
+        size = sizeWithPadding(size, this.settings.margin)
+        size = sizeWithPadding(size, this.settings.borderWidth)
+        return new GRenderNode({
+            id: "text element",
+            text: this.settings.text,
+            font: Style.font,
+            size: size,
+            pos: new Point(0, 0),
+            contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
+            baseline: metrics.emHeightAscent + metrics.emHeightDescent,
+            visualStyle: this.settings.visualStyle,
+            children: [],
+            padding: this.settings.padding,
+            margin: this.settings.margin,
+            borderWidth: this.settings.borderWidth,
+            shadow: this.settings.shadow,
+        })
     }
 }
 
@@ -158,14 +201,18 @@ export function TextBox(param: TextInputSettings): GElement {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
+export function Label(opts: { text: string, shadow?: boolean }) {
+    return new TextElement({
+        text: opts.text,
+        visualStyle: {
+            textColor: Style.textColor,
+            borderColor: TRANSPARENT,
+            background: TRANSPARENT,
+        },
+        padding: withInsets(5),
+        font: Style.font,
+        margin: withInsets(5),
+        borderWidth: ZERO_INSETS,
+        shadow: opts.shadow ? opts.shadow : false
+    })
+}
