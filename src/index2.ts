@@ -319,6 +319,7 @@ function makeTree(): GElement {
 const scene = new Scene(makeTree)
 MGlobals.set(Scene.name,scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, false)
+// MGlobals.set(STYLE_)
 scene.init().then(() => {
     scene.layout()
     scene.redraw()

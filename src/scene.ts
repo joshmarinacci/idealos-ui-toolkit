@@ -158,7 +158,7 @@ export class Scene {
 
     handleKeydownEvent(e: KeyboardEvent) {
         if(this.keyboard_target) {
-            console.log("native event",e)
+            // console.log("native event",e)
             let target = this.findByInputId(this.keyboard_target, this.renderRoot)
             if(target && target.settings.handleEvent) {
                 let evt: MKeyboardEvent = {

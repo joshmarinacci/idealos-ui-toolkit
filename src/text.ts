@@ -74,7 +74,7 @@ class TextInputElement implements GElement {
             font: Style.font,
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
-            shadow: false,
+            shadow: true,
             visualStyle: {
                 textColor: Style.textColor,
                 background: TRANSPARENT,
@@ -87,7 +87,7 @@ class TextInputElement implements GElement {
 
         rc.ctx.font = Style.font
         let text_before = this.opts.text.substring(0,this.opts.cursorPosition.x)
-        console.log("text before is",text_before, this.opts.cursorPosition)
+        // console.log("text before is",text_before, this.opts.cursorPosition)
         let metrics = rc.ctx.measureText(text_before)
         let total_insets = addInsets(addInsets(this.opts.margin, this.opts.borderWidth), this.opts.padding)
         text_node.settings.pos.x = total_insets.left
@@ -146,6 +146,7 @@ class TextInputElement implements GElement {
                 borderColor:'blue',
                 textColor:TRANSPARENT,
             },
+            shadow:true,
             baseline:0
 
         })
