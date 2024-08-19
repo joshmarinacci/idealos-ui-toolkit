@@ -22,8 +22,11 @@ class ScrollContainerElement implements GElement {
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         let borderInsets = withInsets(1)
-        let child = this.param.child.layout(rc, cons)
         const fullBounds = new Bounds(0, 0, this.param.fixedWidth, this.param.fixedHeight)
+        let child = this.param.child.layout(rc, {
+            space: fullBounds.size(),
+            layout: "grow",
+        })
         const contentBounds = bdsSubInsets(fullBounds, borderInsets)
 
         let os = this.param.onScrollChanged

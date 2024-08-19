@@ -84,6 +84,7 @@ import {ListView, ListViewItem} from "./listView.ts";
 import {Point} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
 import {Label, TextBox} from "./text.ts";
+import {EmailDemo} from "./demo/email.ts";
 
 // const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([
@@ -295,16 +296,20 @@ function makeTree(): GElement {
         ]
     })
 
+    const emailDemo = EmailDemo()
+
     let tabs = TabbedBox({
         titles: [
             'Components',
             'List View',
-            'Panels'
+            'Panels',
+            'Email',
         ],
         children: [
             compsDemo,
             listviewDemo,
             panelDemo,
+            emailDemo,
         ],
         selectedTab: state.selectedTab,
         onSelectedChanged(i: number, e: CEvent) {
