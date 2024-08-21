@@ -4,6 +4,7 @@ import {
     GElement,
     GRenderNode,
     LayoutConstraints,
+    MGlobals,
     MKeyboardEvent,
     TRANSPARENT,
     ZERO_INSETS,
@@ -13,6 +14,7 @@ import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
 import {Style} from "./style.ts";
 import {Insets, Point, Size} from "josh_js_util";
 import {addInsets} from "./util.ts";
+import {STATE_CACHE, StateCache} from "./state.ts";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
@@ -112,6 +114,11 @@ class TextInputElement implements GElement {
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         // console.log("redoing layout",this.opts.text)
+        const cache:StateCache = MGlobals.get(STATE_CACHE)
+        cache.startLayout(this.opts.inputid)
+        let [cursorPosition,setCursorPosition] = cache.useState("cursor",() => {
+            return new Point(0,0)
+        })
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
             font: Style.font,
@@ -129,7 +136,7 @@ class TextInputElement implements GElement {
         const cursor_node = this.makeCursor()
 
         rc.ctx.font = Style.font
-        let text_before = this.opts.text.substring(0,this.opts.cursorPosition.x)
+        let text_before = this.opts.text.substring(0,cursorPosition.x)
         // console.log("text before is",text_before, this.opts.cursorPosition)
         let metrics = rc.ctx.measureText(text_before)
         let total_insets = addInsets(addInsets(this.opts.margin, this.opts.borderWidth), this.opts.padding)
@@ -140,7 +147,7 @@ class TextInputElement implements GElement {
         cursor_node.settings.pos.y = total_insets.top
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         const size = new Size(200,100)
-        return new GRenderNode({
+        let node = new GRenderNode({
             id: 'text-input-node',
             inputid: this.opts.inputid,
             text:"",
@@ -166,10 +173,15 @@ class TextInputElement implements GElement {
             handleEvent: (e) => {
                 if (e.type === 'keyboard-typed') {
                     let kbe = e as MKeyboardEvent;
-                    this.opts.onChange(processText(this.opts.text,this.opts.cursorPosition,kbe), e)
+                    let t2 = processText(this.opts.text,cursorPosition,kbe)
+                    setCursorPosition(t2[1])
+                    this.opts.onChange(t2, e)
                 }
             }
         })
+
+        cache.endLayout(this.opts.inputid)
+        return node
     }
 
     private makeCursor() {
@@ -197,7 +209,11 @@ class TextInputElement implements GElement {
 }
 
 export function TextBox(param: TextInputSettings): GElement {
-    return new TextInputElement(param)
+    const cache:StateCache =  MGlobals.get(STATE_CACHE);
+    cache.startElement(param.inputid)
+    let elem = new TextInputElement(param)
+    cache.endElement(param.inputid)
+    return elem
 }
 
 

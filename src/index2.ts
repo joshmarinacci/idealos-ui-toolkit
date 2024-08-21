@@ -85,6 +85,7 @@ import {Point} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
 import {Label, TextBox} from "./text.ts";
 import {EmailDemo} from "./demo/email.ts";
+import {STATE_CACHE, StateCache} from "./state.ts";
 
 // const S = new Schema()
 // const Names = S.list(S.string()).cloneWith([
@@ -181,8 +182,9 @@ function makeTree(): GElement {
                     inputid:"text-box-1",
                     text:state.textInputValue,
                     onChange:(v,e) => {
+                        // console.log("new text input value",state.textInputValue)
                         state.textInputValue = v[0]
-                        state.textInputCursorPosition = v[1]
+                        // state.textInputCursorPosition = v[1]
                         e.redraw()
                     }}),
 
@@ -324,6 +326,7 @@ function makeTree(): GElement {
 const scene = new Scene(makeTree)
 MGlobals.set(Scene.name,scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, false)
+MGlobals.set(STATE_CACHE, new StateCache())
 // MGlobals.set(STYLE_)
 scene.init().then(() => {
     scene.layout()
