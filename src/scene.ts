@@ -20,6 +20,7 @@ export class Scene {
     private borderDebugEnabled: boolean;
     private current_hover: GRenderNode | undefined;
     private keyboard_target: string | undefined
+    private current_target: GRenderNode | undefined;
 
     constructor(makeTree: () => GElement) {
         this.borderDebugEnabled = false
@@ -97,6 +98,7 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc)
+        this.drawDebugOverlay(rc)
         rc.ctx.restore()
     }
 
@@ -163,7 +165,8 @@ export class Scene {
     handleMouseDown(pos: Point) {
         let found = this.findTarget(pos, this.renderRoot)
         if(found) {
-            // console.log("clicked on", found.settings.id, found.settings)
+            this.current_target = found
+            this.debugPrintTarget()
             let evt:MMouseEvent = {
                 type:'mouse-down',
                 redraw: () => {
@@ -180,6 +183,7 @@ export class Scene {
                     this.redraw()
                 }
             }
+            this.redraw()
         }
     }
 
@@ -227,4 +231,42 @@ export class Scene {
         }
     }
 
+    private debugPrintTarget() {
+        if(this.current_target) {
+            console.log("clicked on",
+                this.current_target.settings.id,
+                this.current_target.settings.pos.toString(),
+                this.current_target.settings.size.toString())
+        }
+    }
+
+    private drawDebugOverlay(rc: RenderContext) {
+        rc.ctx.save()
+        rc.ctx.translate(0, rc.size.h-100)
+        rc.ctx.strokeStyle = 'red'
+        const bounds = new Bounds(0,0,rc.canvas.width,rc.size.h-100)
+        this.debugStrokeBounds(rc,bounds,'red',1)
+        this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
+        if(this.current_target) {
+            let t = this.current_target.settings
+            this.debugText(rc,bounds,` id=${t.id} ${t.pos} ${t.size}`)
+        }
+        rc.ctx.restore()
+    }
+
+    private debugStrokeBounds(rc: RenderContext, bounds: Bounds, fill: string, thickness: number) {
+        rc.ctx.strokeStyle = fill
+        rc.ctx.lineWidth = thickness
+        rc.ctx.strokeRect(bounds.x,bounds.y,bounds.w,bounds.h)
+    }
+
+    private debugFillBounds(rc: RenderContext, bounds: Bounds, fill: string) {
+        rc.ctx.fillStyle = fill
+        rc.ctx.fillRect(bounds.x,bounds.y,bounds.w,bounds.h)
+    }
+
+    private debugText(rc: RenderContext, bounds: Bounds, s: string) {
+        rc.ctx.fillStyle = 'black'
+        rc.ctx.fillText(s,bounds.x,bounds.y+20)
+    }
 }
