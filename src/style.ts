@@ -1,4 +1,5 @@
 import {withInsets} from "./gfx.ts";
+import {Insets} from "josh_js_util";
 const LightStyle = {
     panelBackgroundColor: 'white',
 }
@@ -16,14 +17,14 @@ const BaseStyle = {
     font: '16px sans-serif',
 
     textColor: 'black',
-    borderRadius: 0,
+    borderRadius: withInsets(0),
 
     panelMargin: withInsets(0),
     panelBorderColor: 'black',
     panelBorderWidth: withInsets(0),
     panelPadding: withInsets(0),
     panelBackgroundColor: 'white',
-    panelBorderRadius: 4,
+    panelBorderRadius: withInsets(4),
 
     buttonBackground: "white",
     buttonTextColor: 'black',
@@ -32,10 +33,11 @@ const BaseStyle = {
     buttonBorderColor: 'black',
     buttonBorderWidth: withInsets(1),
     buttonPadding: withInsets(7),
-    buttonBorderRadius: 4,
+    buttonBorderRadius: withInsets(4),
     buttonBackgroundHoverColor: '#ccc',
 
-    tagBorderRadius: 16,
+    tagBorderRadius: withInsets(16),
+    tabButtonBorderRadius: new Insets(5,5,0,0),
 
     selectedBackgroundColor: 'hsl(35,100%,50%)',
     selectedBackgroundHoverColor: 'hsl(35,100%,70%)',

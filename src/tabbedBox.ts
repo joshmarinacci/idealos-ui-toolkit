@@ -3,6 +3,7 @@ import {Button} from "./buttons.ts";
 import {withInsets} from "./gfx.ts";
 import {Insets} from "josh_js_util";
 import {CEvent, ZERO_INSETS} from "./base.ts";
+import {Style} from "./style.ts";
 
 export type TabbedBoxOptions = {
     titles: string[],
@@ -30,6 +31,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                         text: title,
                         selected: opts.selectedTab == i,
                         margin: new Insets(0,2,0,2),
+                        borderRadius: Style.tabButtonBorderRadius,
                         handleEvent:(e) => {
                             opts.onSelectedChanged(i,e)
                         }

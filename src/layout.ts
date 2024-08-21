@@ -27,7 +27,7 @@ type BoxParameters = {
     padding?: Insets
     margin?: Insets,
     borderWidth?: Insets,
-    borderRadius?: number,
+    borderRadius?: Insets,
     handleEvent?: EventHandler,
 
     fixedWidth?: number
@@ -47,7 +47,7 @@ type BoxRequirements = {
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
-    borderRadius: number,
+    borderRadius: Insets,
     handleEvent?: EventHandler,
 
     fixedWidth?: number
@@ -108,7 +108,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
     constructor(param: BoxParameters) {
         super({
             id: param.id || "hbox",
-            borderRadius: param.borderRadius || 0,
+            borderRadius: param.borderRadius || ZERO_INSETS,
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
@@ -403,7 +403,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             margin: withFallback(param.margin, Style.panelMargin),
             padding: withFallback(param.padding, Style.panelPadding),
 
-            borderRadius: withFallback(param.borderRadius, 0),
+            borderRadius: withFallback(param.borderRadius, ZERO_INSETS),
             borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
 
             handleEvent: param.handleEvent,

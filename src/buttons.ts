@@ -10,6 +10,7 @@ type ButtonParameters = {
     text?:string,
     selected?:boolean
     handleEvent?: EventHandler
+    borderRadius?: Insets
 }
 type IconButtonParameters = {
     icon: Icons
@@ -30,7 +31,7 @@ export function IconButton(opts: IconButtonParameters) {
             textColor: Style.buttonTextColor,
         },
         borderWidth: opts.ghost ? Style.buttonBorderWidth : Style.buttonBorderWidth,
-        borderRadius: Style.buttonBorderRadius,
+        borderRadius: opts.borderRadius || Style.buttonBorderRadius,
         children: [
             new Icon({icon: opts.icon, shadow:true}),
             new TextElement({
@@ -85,7 +86,7 @@ export function Button(opts: ButtonParameters ):GElement {
             textColor: Style.buttonTextColor,
         },
         borderWidth: Style.buttonBorderWidth,
-        borderRadius: Style.buttonBorderRadius,
+        borderRadius: opts.borderRadius || Style.buttonBorderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
             font: Style.font,

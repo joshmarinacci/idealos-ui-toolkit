@@ -48,17 +48,17 @@ export function strokeBounds(rc: RenderContext, size: Bounds, color: string) {
     rc.ctx.strokeRect(size.x, size.y, size.w, size.h)
 }
 
-function fillRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: number, fill: string) {
+function fillRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, fill: string) {
     ctx.fillStyle = fill
     ctx.beginPath()
-    ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, radius)
+    ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
     ctx.fill()
 }
 
-function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: number, color: string) {
+function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, color: string) {
     ctx.strokeStyle = color
     ctx.beginPath()
-    ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, radius)
+    ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
     ctx.stroke()
 }
 
@@ -79,7 +79,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
 
     // fill background inside padding  + border area
     if (n.settings.currentStyle.background) {
-        if(n.settings.borderRadius && n.settings.borderRadius > 0) {
+        if(n.settings.borderRadius) {
             fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.currentStyle.background)
         } else {
             fillRect(rc.ctx, bounds, n.settings.currentStyle.background)
@@ -87,8 +87,8 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
     }
 
     // draw / fill border
-    if (n.settings.currentStyle.borderColor && n.settings.borderWidth.left > 0) {
-        if(n.settings.borderRadius && n.settings.borderRadius > 0) {
+    if (n.settings.currentStyle.borderColor) {
+        if(n.settings.borderRadius) {
             strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.currentStyle.borderColor)
             // rc.ctx.clip()
         } else {
