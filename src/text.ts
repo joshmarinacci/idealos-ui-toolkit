@@ -15,6 +15,7 @@ import {Style} from "./style.ts";
 import {Insets, Point, Size} from "josh_js_util";
 import {addInsets} from "./util.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
+import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.ts";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
@@ -33,41 +34,6 @@ type TextInputRequirements = {
     borderWidth: Insets
 }
 
-const META_KEYS = ['Shift','Enter','Control','Alt','Meta']
-
-type KeyStrokeDef = { key: string, control?:boolean}
-type KeyActionArgs = {text:string, pos:Point, key?:string}
-type KeyAction = (args:KeyActionArgs) => {text:string, pos:Point}
-
-class ActionMap {
-    actions: Map<string, any>;
-    keystrokes: Map<any, any>;
-    controls: Map<string,string>
-    constructor() {
-        this.actions = new Map()
-        this.keystrokes = new Map()
-        this.controls = new Map()
-    }
-    addAction(name: string, cb: KeyAction) {
-        this.actions.set(name,cb)
-    }
-    match(e: KeyStrokeDef):string|undefined {
-        if(e.control) {
-            return this.controls.get(e.key)
-        }
-        return this.keystrokes.get(e.key)
-    }
-
-    registerKeystroke(def:KeyStrokeDef, action:string) {
-        if(def.control) {
-            this.controls.set(def.key,action)
-        } else {
-            this.keystrokes.set(def.key,action)
-        }
-    }
-}
-
-const ACTION_MAP = new ActionMap()
 ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
     return {
         text:args.text,
@@ -108,14 +74,6 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let after = text.substring(pos.x)
     return {text:before + key + after, pos:pos.add(new Point(1,0))}
 })
-
-ACTION_MAP.registerKeystroke({key:'f',control:true},'cursor-forward')
-ACTION_MAP.registerKeystroke({key:'b',control:true},'cursor-backward')
-ACTION_MAP.registerKeystroke({key:'ArrowLeft'},'cursor-backward')
-ACTION_MAP.registerKeystroke({key:'ArrowRight'},'cursor-forward')
-
-ACTION_MAP.registerKeystroke({key:'Backspace'},'delete-backward')
-ACTION_MAP.registerKeystroke({key:'d', control:true},'delete-forward')
 
 function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[string, Point] {
     if(META_KEYS.includes(kbe.key)) return [text,cursorPosition]

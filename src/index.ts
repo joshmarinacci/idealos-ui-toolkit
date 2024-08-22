@@ -12,6 +12,7 @@ import {ScrollContainer} from "./scroll.ts";
 import {Label, TextBox} from "./text.ts";
 import {EmailDemo} from "./demo/email.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
+import {setup_common_keybindings} from "./actions.ts";
 
 const state = {
     toggle: false,
@@ -228,6 +229,7 @@ function makeTree(): GElement {
 }
 
 
+setup_common_keybindings()
 const scene = new Scene(makeTree)
 MGlobals.set(Scene.name,scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
