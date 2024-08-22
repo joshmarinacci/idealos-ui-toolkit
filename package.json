@@ -18,6 +18,7 @@
     "esbuild": "^0.23.0",
     "josh_js_util": "^0.1.25",
     "rtds-core": "^0.0.19",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "material-symbols": "^0.22.2"
   }
 }

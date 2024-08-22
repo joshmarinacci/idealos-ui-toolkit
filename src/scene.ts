@@ -46,8 +46,10 @@ export class Scene {
 
     async init() {
         if(MGlobals.get(SYMBOL_FONT_ENABLED) === true) {
+            // const font = new FontFace('material-icons',
+            //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
             const font = new FontFace('material-icons',
-                'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+                'url(material-symbols/material-symbols-outlined.woff2)')
             document.fonts.add(font)
             await font.load()
         }
