@@ -38,6 +38,7 @@ const BaseStyle = {
 
     tagBorderRadius: withInsets(16),
     tabButtonBorderRadius: new Insets(5,5,0,0),
+    tabButtonBorderWidth: new Insets(1,1,0,1),
 
     selectedBackgroundColor: 'hsl(35,100%,50%)',
     selectedBackgroundHoverColor: 'hsl(35,100%,70%)',

@@ -19,6 +19,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
         crossAxisSelfLayout: "grow",
         children: [
             new MHBoxElement({
+                id:'tabbed-titles',
                 mainAxisSelfLayout: "grow",
                 mainAxisLayout: "start",
                 crossAxisLayout: "end",
@@ -32,6 +33,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                         selected: opts.selectedTab == i,
                         margin: new Insets(0,2,0,2),
                         borderRadius: Style.tabButtonBorderRadius,
+                        borderWidth: Style.tabButtonBorderWidth,
                         handleEvent:(e) => {
                             opts.onSelectedChanged(i,e)
                         }

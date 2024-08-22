@@ -7,6 +7,8 @@ import {TextElement} from "./text.ts";
 
 type ButtonParameters = {
     margin?:Insets,
+    borderWidth?: Insets
+    padding?:Insets,
     text?:string,
     selected?:boolean
     handleEvent?: EventHandler
@@ -30,7 +32,7 @@ export function IconButton(opts: IconButtonParameters) {
             borderColor: Style.buttonBorderColor,
             textColor: Style.buttonTextColor,
         },
-        borderWidth: opts.ghost ? Style.buttonBorderWidth : Style.buttonBorderWidth,
+        borderWidth: opts.ghost ? Style.buttonBorderWidth : opts.borderWidth || Style.buttonBorderWidth,
         borderRadius: opts.borderRadius || Style.buttonBorderRadius,
         children: [
             new Icon({icon: opts.icon, shadow:true}),
@@ -85,7 +87,7 @@ export function Button(opts: ButtonParameters ):GElement {
             borderColor: Style.buttonBorderColor,
             textColor: Style.buttonTextColor,
         },
-        borderWidth: Style.buttonBorderWidth,
+        borderWidth: opts.borderWidth || Style.buttonBorderWidth,
         borderRadius: opts.borderRadius || Style.buttonBorderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
@@ -105,7 +107,7 @@ export function Button(opts: ButtonParameters ):GElement {
         mainAxisLayout: 'center',
         mainAxisSelfLayout: 'shrink',
         margin: opts.margin||Style.buttonMargin,
-        padding: Style.buttonPadding,
+        padding: opts.padding || Style.buttonPadding,
         handleEvent: opts.handleEvent,
     })
 }

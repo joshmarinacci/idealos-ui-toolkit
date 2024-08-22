@@ -241,6 +241,10 @@ export class Scene {
                 this.current_target.settings.id,
                 this.current_target.settings.pos.toString(),
                 this.current_target.settings.size.toString())
+            console.log("insets")
+            console.log('margin', this.current_target.settings.margin)
+            console.log('border',this.current_target.settings.borderWidth)
+            console.log('padding',this.current_target.settings.padding)
         }
     }
 

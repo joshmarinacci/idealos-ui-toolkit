@@ -1,5 +1,6 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {GRenderNode} from "./base.ts";
+import {bdsSubInsets} from "./layout.ts";
 
 export type RenderContext = {
     size: Size;
@@ -75,7 +76,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
     let bounds = Bounds.fromPointSize(new Point(0,0,),n.settings.size)
 
     // account for margin
-    bounds = bounds.grow(-n.settings.margin.left)
+    bounds = bdsSubInsets(bounds,n.settings.margin)
 
     // fill background inside padding  + border area
     if (n.settings.currentStyle.background) {
@@ -96,10 +97,10 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
         }
     }
     // account for the border
-    bounds = bounds.grow(-n.settings.borderWidth.left)
+    bounds = bdsSubInsets(bounds, n.settings.borderWidth)
 
     // account for the padding
-    bounds = bounds.grow(-n.settings.padding.left)
+    bounds = bdsSubInsets(bounds,n.settings.padding)
 
     // draw text
     if (n.settings.text && n.settings.text.trim().length > 0) {
