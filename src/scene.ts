@@ -1,4 +1,14 @@
-import {GElement, GRenderNode, MGlobals, MKeyboardEvent, MMouseEvent, MWheelEvent, TRANSPARENT, VisualStyle} from "./base.ts";
+import {
+    GElement,
+    GRenderNode,
+    MGlobals,
+    MKeyboardEvent,
+    MMouseEvent,
+    MWheelEvent,
+    SYMBOL_FONT_ENABLED,
+    TRANSPARENT,
+    VisualStyle
+} from "./base.ts";
 import {doDraw, RenderContext} from "./gfx.ts";
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
@@ -35,11 +45,12 @@ export class Scene {
     }
 
     async init() {
-        // const font = new FontFace('material-icons',
-        //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
-        // document.fonts.add(font)
-        // await font.load()
-
+        if(MGlobals.get(SYMBOL_FONT_ENABLED) === true) {
+            const font = new FontFace('material-icons',
+                'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+            document.fonts.add(font)
+            await font.load()
+        }
         this.canvas = makeCanvas(new Size(600, 300))
         this.last = undefined
         this.canvas.addEventListener('mousemove', (e) => {
