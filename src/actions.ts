@@ -1,6 +1,6 @@
 import {Point} from "josh_js_util";
 
-export const META_KEYS = ['Shift', 'Enter', 'Control', 'Alt', 'Meta']
+export const META_KEYS = ['Shift', 'Control', 'Alt', 'Meta']
 type KeyStrokeDef = { key: string, control?: boolean }
 export type KeyActionArgs = { text: string, pos: Point, key?: string }
 type KeyAction = (args: KeyActionArgs) => { text: string, pos: Point }
@@ -42,12 +42,13 @@ export const ACTION_MAP = new ActionMap()
 export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key:'f',control:true},'cursor-forward')
     ACTION_MAP.registerKeystroke({key:'b',control:true},'cursor-backward')
-    ACTION_MAP.registerKeystroke({key:'n', control:true},'cursor-previous-line')
-    ACTION_MAP.registerKeystroke({key:'p', control:true},'cursor-next-line')
+    ACTION_MAP.registerKeystroke({key:'p', control:true},'cursor-previous-line')
+    ACTION_MAP.registerKeystroke({key:'n', control:true},'cursor-next-line')
     ACTION_MAP.registerKeystroke({key:'ArrowLeft'},'cursor-backward')
     ACTION_MAP.registerKeystroke({key:'ArrowRight'},'cursor-forward')
     ACTION_MAP.registerKeystroke({key:'ArrowUp'},'cursor-previous-line')
     ACTION_MAP.registerKeystroke({key:'ArrowDown'},'cursor-next-line')
+    ACTION_MAP.registerKeystroke({key:'Enter'},'insert-newline')
 
     ACTION_MAP.registerKeystroke({key:'Backspace'},'delete-backward')
     ACTION_MAP.registerKeystroke({key:'d', control:true},'delete-forward')

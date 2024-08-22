@@ -36,77 +36,171 @@ type TextInputRequirements = {
     multiline:boolean
 }
 
+class TextModel {
+    private lines: string[];
+    constructor(text: string) {
+        this.lines = text.split('\n')
+    }
+
+    splitLineAt(pos: Point) {
+        let line = this.lines[pos.y]
+        let before = line.substring(0, pos.x)
+        let after = line.substring(pos.x)
+        this.lines.splice(pos.y, 1,before,after)
+    }
+
+    mergeLineAt(pos: Point) {
+        let line = this.lines[pos.y]
+        let line2 = this.lines[pos.y+1]
+        let newLine = line + line2
+        this.lines.splice(pos.y, 2,newLine)
+    }
+
+    toText() {
+        return this.lines.join("\n")
+    }
+
+    lineLengthAt(pos: Point) {
+        return this.lines[pos.y].length
+    }
+
+    lineCount() {
+        return this.lines.length
+    }
+
+    deleteCharAt(pos: Point) {
+        let line = this.lines[pos.y]
+        let char = line.substring(pos.x-1,pos.x)
+        let before = line.substring(0, pos.x-1)
+        let after = line.substring(pos.x)
+        line = before + after
+        this.lines[pos.y] = line
+        return char
+    }
+
+    insertCharAt(pos: Point, key: string | undefined) {
+        let line = this.lines[pos.y]
+        let before = line.substring(0, pos.x)
+        let after = line.substring(pos.x)
+        line = before + key + after
+        this.lines[pos.y] = line
+    }
+
+}
+
 ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
+    let model = new TextModel(args.text)
+    let pos = args.pos.subtract(new Point(1,0))
+    if(pos.x < 0) {
+        if(pos.y > 0) {
+            pos.y--
+            pos.x = model.lineLengthAt(pos)
+        } else {
+            pos.x = 0
+            pos.y = 0
+        }
+    }
     return {
         text:args.text,
-        pos:args.pos.subtract(new Point(1, 0)),
+        pos:pos,
     }
 })
 ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
+    let model = new TextModel(args.text)
+    let pos = args.pos.add(new Point(1,0))
+    if(pos.x >= model.lineLengthAt(pos)) {
+        if(pos.y < model.lineCount()-1) {
+            pos.x = 0
+            pos.y += 1
+        } else {
+            pos.x = model.lineLengthAt(pos)
+        }
+    }
     return {
-        text:args.text,
-        pos:args.pos.add(new Point(1, 0)),
+        text:model.toText(),
+        pos:pos
     }
 })
 ACTION_MAP.addAction('cursor-previous-line',(args:KeyActionArgs) => {
+    let model = new TextModel(args.text)
+    let pos = args.pos.copy()
+    if(pos.y > 0) {
+        pos.y -= 1
+    }
     return {
-        text:args.text,
-        pos:args.pos.subtract(new Point(0, 1)),
+        text:model.toText(),
+        pos:pos
     }
 })
 ACTION_MAP.addAction('cursor-next-line',(args:KeyActionArgs) => {
+    let model = new TextModel(args.text)
+    let pos = args.pos.copy()
+    if(pos.y < model.lineCount()-1) {
+        pos.y += 1
+    }
     return {
-        text:args.text,
-        pos:args.pos.add(new Point(0, 1)),
+        text:model.toText(),
+        pos:pos
     }
 })
 ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
-    const {text,pos} = args
-    if(text.length > 0) {
-        let lines = text.split('\n')
-        let line = lines[args.pos.y]
-        line = line.substring(0, args.pos.x-1) + line.substring(args.pos.x)
-        lines[args.pos.y] = line
-        let output = lines.join('\n')
-        return {
-            text: output,
-            pos: pos.subtract(new Point(1,0)),
-        }
-    } else {
-        return { text, pos }
+    let model = new TextModel(args.text)
+    let pos = args.pos.copy()
+    if(pos.x > 0) {
+        model.deleteCharAt(pos)
+        pos.x -= 1
     }
+    if(pos.x === 0 && pos.y > 0) {
+        pos.y -= 1
+        pos.x = model.lineLengthAt(pos)
+        model.mergeLineAt(pos)
+    }
+    return {
+        text:model.toText(),
+        pos:pos
+    }
+
 })
 ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
-    const {text,pos} = args
-    if(text.length > 0) {
-        let lines = text.split('\n')
-        let line = lines[args.pos.y]
-        line = line.substring(0, args.pos.x) + line.substring(args.pos.x+1)
-        lines[args.pos.y] = line
-        let output = lines.join('\n')
-        return {
-            text: output,
-            pos: pos.copy()
-        }
-    } else {
-        return { text, pos }
+    let model = new TextModel(args.text)
+    let pos = args.pos.copy()
+    let p2 = pos.add(new Point(1,0))
+    if(pos.x < model.lineLengthAt(p2)) {
+        model.deleteCharAt(p2)
+    }
+    if(pos.x == model.lineLengthAt(p2) && pos.y < model.lineCount()-1) {
+        model.mergeLineAt(p2)
+    }
+    return {
+        text:model.toText(),
+        pos:pos
     }
 })
 ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
-    const {text, pos, key} = args
-    let lines = text.split('\n')
-    let line = lines[pos.y]
-    let before = line.substring(0, pos.x)
-    let after = line.substring(pos.x)
-    line = before + key + after
-    lines[pos.y] = line
-    let output = lines.join("\n")
-    return {text:output, pos:pos.add(new Point(1,0))}
+    let model = new TextModel(args.text)
+    let pos = args.pos.copy()
+    model.insertCharAt(pos,args.key)
+    pos.x += 1
+    return {
+        text:model.toText(),
+        pos:pos
+    }
+})
+
+
+ACTION_MAP.addAction('insert-newline', (args) => {
+    let model = new TextModel(args.text)
+    model.splitLineAt(args.pos)
+    let pos = args.pos.copy()
+    pos.x = 0
+    pos.y += 1
+    return {text:model.toText(), pos:pos}
 })
 
 function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[string, Point] {
     if(META_KEYS.includes(kbe.key)) return [text,cursorPosition]
     let action_name = ACTION_MAP.match(kbe)
+    // console.log('action name',action_name, cursorPosition)
     if(action_name) {
         let action_impl = ACTION_MAP.actions.get(action_name)
         if(action_impl) {
