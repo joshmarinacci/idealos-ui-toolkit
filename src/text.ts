@@ -35,35 +35,100 @@ type TextInputRequirements = {
 
 const META_KEYS = ['Shift','Enter','Control','Alt','Meta']
 
-function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[string, Point] {
-    if(META_KEYS.includes(kbe.key)) return [text,cursorPosition]
-    if(kbe.key === 'ArrowLeft') {
-        cursorPosition = cursorPosition.subtract(new Point(1,0))
-        return [text,cursorPosition]
+type KeyStrokeDef = { key: string, control?:boolean}
+type KeyActionArgs = {text:string, pos:Point, key?:string}
+type KeyAction = (args:KeyActionArgs) => {text:string, pos:Point}
+
+class ActionMap {
+    actions: Map<string, any>;
+    keystrokes: Map<any, any>;
+    controls: Map<string,string>
+    constructor() {
+        this.actions = new Map()
+        this.keystrokes = new Map()
+        this.controls = new Map()
     }
-    if(kbe.key === 'ArrowRight') {
-        cursorPosition = cursorPosition.add(new Point(1,0))
-        return [text,cursorPosition]
+    addAction(name: string, cb: KeyAction) {
+        this.actions.set(name,cb)
+    }
+    match(e: KeyStrokeDef):string|undefined {
+        if(e.control) {
+            return this.controls.get(e.key)
+        }
+        return this.keystrokes.get(e.key)
     }
 
-    if(kbe.key === 'Backspace') {
-        if(text.length > 0) {
-            let text2 = text.substring(0,cursorPosition.x-1)
-            let text3 = text.substring(cursorPosition.x)
-            let cp = cursorPosition.copy()
-            cp.x -= 1
-            return [text2 + text3, cp]
+    registerKeystroke(def:KeyStrokeDef, action:string) {
+        if(def.control) {
+            this.controls.set(def.key,action)
         } else {
-            return [text,cursorPosition]
+            this.keystrokes.set(def.key,action)
         }
     }
-    {
-        let text2 = text.substring(0, cursorPosition.x)
-        let text3 = text.substring(cursorPosition.x)
-        let cp = cursorPosition.copy()
-        cp.x += 1
-        return [text2 + kbe.key + text3, cp]
+}
+
+const ACTION_MAP = new ActionMap()
+ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
+    return {
+        text:args.text,
+        pos:args.pos.subtract(new Point(1, 0)),
     }
+})
+ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
+    return {
+        text:args.text,
+        pos:args.pos.add(new Point(1, 0)),
+    }
+})
+ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
+    const {text,pos} = args
+    if(text.length > 0) {
+        return {
+            text: text.substring(0,args.pos.x-1) + text.substring(args.pos.x),
+            pos: pos.subtract(new Point(1,0)),
+        }
+    } else {
+        return { text, pos }
+    }
+})
+ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
+    const {text,pos} = args
+    if(text.length > 0) {
+        return {
+            text: text.substring(0,args.pos.x) + text.substring(args.pos.x+1),
+            pos: pos.copy()
+        }
+    } else {
+        return { text, pos }
+    }
+})
+ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
+    const {text, pos, key} = args
+    let before = text.substring(0, pos.x)
+    let after = text.substring(pos.x)
+    return {text:before + key + after, pos:pos.add(new Point(1,0))}
+})
+
+ACTION_MAP.registerKeystroke({key:'f',control:true},'cursor-forward')
+ACTION_MAP.registerKeystroke({key:'b',control:true},'cursor-backward')
+ACTION_MAP.registerKeystroke({key:'ArrowLeft'},'cursor-backward')
+ACTION_MAP.registerKeystroke({key:'ArrowRight'},'cursor-forward')
+
+ACTION_MAP.registerKeystroke({key:'Backspace'},'delete-backward')
+ACTION_MAP.registerKeystroke({key:'d', control:true},'delete-forward')
+
+function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[string, Point] {
+    if(META_KEYS.includes(kbe.key)) return [text,cursorPosition]
+    let action_name = ACTION_MAP.match(kbe)
+    if(action_name) {
+        let action_impl = ACTION_MAP.actions.get(action_name)
+        if(action_impl) {
+            let res = ACTION_MAP.actions.get(action_name)({text,pos:cursorPosition})
+            return [res.text, res.pos]
+        }
+    }
+    let res = ACTION_MAP.actions.get('insert-character')({text, pos:cursorPosition, key:kbe.key})
+    return [res.text, res.pos]
 }
 
 export class TextElement implements GElement {

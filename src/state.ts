@@ -54,7 +54,7 @@ export class StateCache {
     }
 
     private log(...args: any[]) {
-        console.log("STATE", ...args)
+        // console.log("STATE", ...args)
     }
 
     private warn(...args: any[]) {

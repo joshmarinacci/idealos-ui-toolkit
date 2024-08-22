@@ -34,6 +34,7 @@ export type MMouseEvent = {
 export type MKeyboardEvent = {
     type: 'keyboard-typed'
     key:string,
+    control:boolean,
     redraw:()=>void
 }
 export type MWheelEvent = {

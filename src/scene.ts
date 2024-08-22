@@ -201,7 +201,8 @@ export class Scene {
                         this.layout()
                         this.redraw()
                     },
-                    key: e.key
+                    key: e.key,
+                    control: e.ctrlKey
                 }
                 target.settings.handleEvent(evt)
             }
