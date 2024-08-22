@@ -1,8 +1,9 @@
-import {AxisLayout, CEvent, EventHandler, GElement} from "./base.ts";
+import {AxisLayout, CEvent, EventHandler, GElement, MGlobals} from "./base.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
 import {withInsets} from "./gfx.ts";
 import {Label} from "./text.ts";
+import {STATE_CACHE, StateCache} from "./state.ts";
 
 type ListViewItemParameters = {
     children:GElement[],
@@ -41,9 +42,10 @@ export type ListItemRenderer = (item:string,
                          ) => GElement
 
 export type ListViewParameters = {
+    key?:string,
     data: string[]
-    selected: number
-    onSelectedChanged:OnSelectedChangedCallback
+    selected?: number
+    onSelectedChanged?:OnSelectedChangedCallback
     renderItem?:ListItemRenderer
 }
 
@@ -60,8 +62,15 @@ const DefaultItemRenderer:ListItemRenderer = (item:string,selected:number,index:
 }
 
 export function ListView(opts: ListViewParameters): GElement {
+    const cache:StateCache =  MGlobals.get(STATE_CACHE);
+    if(!opts.key) {
+        console.warn("list view without a key")
+    }
+    cache.startElement(opts.key)
+
+    const [selected, setSelected] = cache.useState("selected",()=>0)
     const renderer = opts.renderItem || DefaultItemRenderer
-    return new MVBoxElement({
+    let box = new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
         id: 'list-view',
@@ -72,7 +81,13 @@ export function ListView(opts: ListViewParameters): GElement {
         },
         borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {
-            return renderer(item,opts.selected,index, opts.onSelectedChanged)
+            return renderer(item, selected, index, (s,e) => {
+                setSelected(s)
+                e.redraw()
+                // if(opts.onSelectedChanged) opts.onSelectedChanged(s,e)
+            })
         })
     })
+    cache.endElement(opts.key)
+    return box
 }

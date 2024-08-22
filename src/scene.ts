@@ -1,7 +1,8 @@
-import {GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent, TRANSPARENT, VisualStyle} from "./base.ts";
+import {GElement, GRenderNode, MGlobals, MKeyboardEvent, MMouseEvent, MWheelEvent, TRANSPARENT, VisualStyle} from "./base.ts";
 import {doDraw, RenderContext} from "./gfx.ts";
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
+import {STATE_CACHE} from "./state.ts";
 
 let NULL_VISUAL_STYLE:VisualStyle = {
     borderColor:TRANSPARENT,
@@ -85,6 +86,8 @@ export class Scene {
     }
 
     layout() {
+        this.log("layout phase")
+        MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
         this.elementRoot = this.makeTree()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
@@ -268,5 +271,9 @@ export class Scene {
     private debugText(rc: RenderContext, bounds: Bounds, s: string) {
         rc.ctx.fillStyle = 'black'
         rc.ctx.fillText(s,bounds.x,bounds.y+20)
+    }
+
+    private log(...layoutPhase: string[]) {
+        console.log("SCENE: ",...layoutPhase)
     }
 }

@@ -1,4 +1,3 @@
-import {Point} from "josh_js_util";
 
 export const STATE_CACHE = 'STATE_CACHE';
 
@@ -32,19 +31,20 @@ export class StateCache {
         this.current_state = this.element_map.get(key)
     }
 
-    useState(key: string, fallback: () => Point): [Point, (val: Point) => void] {
-        let val: Point
+    useState<T>(key: string, fallback: () => T): [T, (val: T) => void] {
+        let val: T
         if (!this.current_state) {
             this.warn(`missing state data for ${key}`)
         }
         if (this.current_state.has(key)) {
-            val = this.current_state.get(key) as Point
+            val = this.current_state.get(key) as T
         } else {
             val = fallback()
             this.current_state.set(key, val)
         }
-        const setVal = (newVal: Point): void => {
-            this.current_state.set(key, newVal)
+        const cs = this.current_state
+        const setVal = (newVal: T): void => {
+            cs.set(key, newVal)
         }
         return [val, setVal]
     }
@@ -59,5 +59,11 @@ export class StateCache {
 
     private warn(...args: any[]) {
         console.warn("STATE", ...args)
+    }
+    public dump() {
+        this.log("dump")
+        for(let entry of this.element_map.entries()) {
+            console.log(entry)
+        }
     }
 }

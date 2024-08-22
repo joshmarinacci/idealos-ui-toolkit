@@ -197,14 +197,16 @@ function makeTree(): GElement {
         fixedWidth: 200,
         children: [
             ListView({
+                key:"first-list-view",
                 data: ["john", "Jacob", 'jingleheimer'],
-                selected: state.selectedListItem1,
-                onSelectedChanged: ((i: number, e: CEvent) => {
-                    state.selectedListItem1 = i
-                    e.redraw()
-                })
+                // selected: state.selectedListItem1,
+                // onSelectedChanged: ((i: number, e: CEvent) => {
+                //     state.selectedListItem1 = i
+                //     e.redraw()
+                // })
             }),
             ListView({
+                key:"second-list-view",
                 data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar'],
                 selected: state.selectedListItem2,
                 renderItem: (item, selected, index, onSelectedChanged) => {
@@ -258,11 +260,12 @@ function makeTree(): GElement {
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 150,
-                        scrollOffset: state.scrollOffset1,
-                        onScrollChanged: (newOffset: Point, e: CEvent): void => {
-                            state.scrollOffset1 = newOffset
-                            e.redraw()
-                        },
+                        key:'scroll-1',
+                        // scrollOffset: state.scrollOffset1,
+                        // onScrollChanged: (newOffset: Point, e: CEvent): void => {
+                        //     state.scrollOffset1 = newOffset
+                        //     e.redraw()
+                        // },
                         child: new MHBoxElement({
                             children: [
                                 Square(20, 'red'),
@@ -279,11 +282,12 @@ function makeTree(): GElement {
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 200,
-                        scrollOffset: state.scrollOffset2,
-                        onScrollChanged: (newOffset: Point, e: CEvent): void => {
-                            state.scrollOffset2 = newOffset
-                            e.redraw()
-                        },
+                        key:'scroll-2',
+                        // scrollOffset: state.scrollOffset2,
+                        // onScrollChanged: (newOffset: Point, e: CEvent): void => {
+                        //     state.scrollOffset2 = newOffset
+                        //     e.redraw()
+                        // },
                         child: ListView({
                             data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
                             selected: state.selectedListItem2,
