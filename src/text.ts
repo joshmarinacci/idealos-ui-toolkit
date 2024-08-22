@@ -23,6 +23,7 @@ type TextInputSettings = {
     cursorPosition: Point
     inputid: string
     onChange: OnChangeCallback<[string,Point]>
+    multiline?:boolean
 }
 type TextInputRequirements = {
     text: string
@@ -32,6 +33,7 @@ type TextInputRequirements = {
     margin: Insets
     padding: Insets
     borderWidth: Insets
+    multiline:boolean
 }
 
 ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
@@ -46,11 +48,28 @@ ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
         pos:args.pos.add(new Point(1, 0)),
     }
 })
+ACTION_MAP.addAction('cursor-previous-line',(args:KeyActionArgs) => {
+    return {
+        text:args.text,
+        pos:args.pos.subtract(new Point(0, 1)),
+    }
+})
+ACTION_MAP.addAction('cursor-next-line',(args:KeyActionArgs) => {
+    return {
+        text:args.text,
+        pos:args.pos.add(new Point(0, 1)),
+    }
+})
 ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
     const {text,pos} = args
     if(text.length > 0) {
+        let lines = text.split('\n')
+        let line = lines[args.pos.y]
+        line = line.substring(0, args.pos.x-1) + line.substring(args.pos.x)
+        lines[args.pos.y] = line
+        let output = lines.join('\n')
         return {
-            text: text.substring(0,args.pos.x-1) + text.substring(args.pos.x),
+            text: output,
             pos: pos.subtract(new Point(1,0)),
         }
     } else {
@@ -60,8 +79,13 @@ ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
 ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
     const {text,pos} = args
     if(text.length > 0) {
+        let lines = text.split('\n')
+        let line = lines[args.pos.y]
+        line = line.substring(0, args.pos.x) + line.substring(args.pos.x+1)
+        lines[args.pos.y] = line
+        let output = lines.join('\n')
         return {
-            text: text.substring(0,args.pos.x) + text.substring(args.pos.x+1),
+            text: output,
             pos: pos.copy()
         }
     } else {
@@ -70,9 +94,14 @@ ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
 })
 ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     const {text, pos, key} = args
-    let before = text.substring(0, pos.x)
-    let after = text.substring(pos.x)
-    return {text:before + key + after, pos:pos.add(new Point(1,0))}
+    let lines = text.split('\n')
+    let line = lines[pos.y]
+    let before = line.substring(0, pos.x)
+    let after = line.substring(pos.x)
+    line = before + key + after
+    lines[pos.y] = line
+    let output = lines.join("\n")
+    return {text:output, pos:pos.add(new Point(1,0))}
 })
 
 function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[string, Point] {
@@ -89,14 +118,18 @@ function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[
     return [res.text, res.pos]
 }
 
+type TextElementSettings = {
+    multiline?:boolean
+} & ElementSettings
 export class TextElement implements GElement {
-    settings: ElementSettings;
+    settings: TextElementSettings;
 
-    constructor(settings: ElementSettings) {
+    constructor(settings: TextElementSettings) {
         this.settings = settings
     }
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        if(this.settings.multiline) return this.layout_multiline(rc,_cons);
         rc.ctx.font = this.settings.font
         let metrics = rc.ctx.measureText(this.settings.text)
         let size = new Size(
@@ -106,7 +139,7 @@ export class TextElement implements GElement {
         size = sizeWithPadding(size, this.settings.margin)
         size = sizeWithPadding(size, this.settings.borderWidth)
         return new GRenderNode({
-            id: "text element",
+            id: "text-singleline-element",
             text: this.settings.text,
             font: Style.font,
             size: size,
@@ -121,6 +154,59 @@ export class TextElement implements GElement {
             shadow: this.settings.shadow,
         })
     }
+
+    private layout_multiline(rc: RenderContext, _cons: LayoutConstraints) {
+        rc.ctx.font = this.settings.font
+        let metrics = rc.ctx.measureText("Testy")
+        let baseline = metrics.fontBoundingBoxAscent
+
+        let lines = this.settings.text.split('\n')
+        let y = 0
+        let nodes:GRenderNode[] = lines.map(line => {
+            let pos = new Point(0,y)
+            y += baseline
+            return new GRenderNode({
+                id:"text-line-element",
+                text:line,
+                font: Style.font,
+                size: new Size(10,10),
+                pos: pos,
+                contentOffset: new Point(0,0),
+                baseline: baseline,
+                visualStyle: {
+                    textColor: Style.textColor,
+                    borderColor: TRANSPARENT,
+                    background: TRANSPARENT,
+                },
+                padding: ZERO_INSETS,
+                margin: ZERO_INSETS,
+                borderWidth: ZERO_INSETS,
+                children: []
+            })
+        })
+
+        let size = new Size(
+            Math.floor(metrics.width),
+            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        size = sizeWithPadding(size, this.settings.padding)
+        size = sizeWithPadding(size, this.settings.margin)
+        size = sizeWithPadding(size, this.settings.borderWidth)
+        return new GRenderNode({
+            id: "text-multiline-element",
+            text:"",
+            font: Style.font,
+            size: size,
+            pos: new Point(0, 0),
+            contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
+            baseline: baseline,
+            visualStyle: this.settings.visualStyle,
+            children: nodes,
+            padding: this.settings.padding,
+            margin: this.settings.margin,
+            borderWidth: this.settings.borderWidth,
+            shadow: this.settings.shadow,
+        })
+    }
 }
 
 class TextInputElement implements GElement {
@@ -129,6 +215,7 @@ class TextInputElement implements GElement {
     constructor(opts: TextInputSettings) {
         this.opts = {
             ...opts,
+            multiline: opts.multiline?opts.multiline:false,
             borderWidth: withInsets(1),
             margin: Style.buttonMargin,
             padding: Style.buttonPadding,
@@ -153,21 +240,25 @@ class TextInputElement implements GElement {
                 background: TRANSPARENT,
                 borderColor: TRANSPARENT,
             },
-            text:this.opts.text
+            text:this.opts.text,
+            multiline: this.opts.multiline,
         })
         let text_node = text.layout(rc,_cons)
         const cursor_node = this.makeCursor()
 
         rc.ctx.font = Style.font
-        let text_before = this.opts.text.substring(0,cursorPosition.x)
+        let lines = this.opts.text.split("\n")
+        let line = lines[cursorPosition.y]
+        let text_before = line.substring(0,cursorPosition.x)
         // console.log("text before is",text_before, this.opts.cursorPosition)
         let metrics = rc.ctx.measureText(text_before)
+        let baseline = metrics.fontBoundingBoxAscent
         let total_insets = addInsets(addInsets(this.opts.margin, this.opts.borderWidth), this.opts.padding)
         text_node.settings.pos.x = total_insets.left
         text_node.settings.pos.y = total_insets.top
 
-        cursor_node.settings.pos.x = metrics.width + total_insets.left
-        cursor_node.settings.pos.y = total_insets.top
+        cursor_node.settings.pos.x = total_insets.left + metrics.width
+        cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         const size = new Size(200,100)
         let node = new GRenderNode({
@@ -183,7 +274,7 @@ class TextInputElement implements GElement {
                 background: 'hsl(47,100%,79%)',
                 borderColor: 'black'
             },
-            baseline: 10,//metrics.emHeightAscent + metrics.emHeightDescent,
+            baseline: baseline,
             borderWidth: withInsets(1),
             children: [text_node,cursor_node],
             contentOffset: new Point(total_insets.left, total_insets.top),
@@ -240,7 +331,7 @@ export function TextBox(param: TextInputSettings): GElement {
 }
 
 
-export function Label(opts: { text: string, shadow?: boolean }) {
+export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean }) {
     return new TextElement({
         text: opts.text,
         visualStyle: {
@@ -252,6 +343,7 @@ export function Label(opts: { text: string, shadow?: boolean }) {
         font: Style.font,
         margin: withInsets(5),
         borderWidth: ZERO_INSETS,
-        shadow: opts.shadow ? opts.shadow : false
+        shadow: opts.shadow ? opts.shadow : false,
+        multiline: opts.multiline ? opts.multiline : false
     })
 }

@@ -100,7 +100,7 @@ export class Scene {
 
     layout() {
         this.log("layout phase")
-        MGlobals.get(STATE_CACHE).dump()
+        // MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
         this.elementRoot = this.makeTree()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})

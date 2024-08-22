@@ -42,8 +42,12 @@ export const ACTION_MAP = new ActionMap()
 export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key:'f',control:true},'cursor-forward')
     ACTION_MAP.registerKeystroke({key:'b',control:true},'cursor-backward')
+    ACTION_MAP.registerKeystroke({key:'n', control:true},'cursor-previous-line')
+    ACTION_MAP.registerKeystroke({key:'p', control:true},'cursor-next-line')
     ACTION_MAP.registerKeystroke({key:'ArrowLeft'},'cursor-backward')
     ACTION_MAP.registerKeystroke({key:'ArrowRight'},'cursor-forward')
+    ACTION_MAP.registerKeystroke({key:'ArrowUp'},'cursor-previous-line')
+    ACTION_MAP.registerKeystroke({key:'ArrowDown'},'cursor-next-line')
 
     ACTION_MAP.registerKeystroke({key:'Backspace'},'delete-backward')
     ACTION_MAP.registerKeystroke({key:'d', control:true},'delete-forward')

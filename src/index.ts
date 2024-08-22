@@ -23,8 +23,8 @@ const state = {
     selectedListItem2: 0,
     scrollOffset1: new Point(0, 0),
     scrollOffset2: new Point(0, 0),
-    textInputValue: "some long text",
-    textInputCursorPosition: new Point(5,0)
+    textInputValue: "some \nlong text",
+    textInputCursorPosition: new Point(5, 0)
 }
 
 
@@ -76,20 +76,24 @@ function makeTree(): GElement {
                     }),
                 ]
             }),
-            HBox({children:[
-                Label({text: 'text input'}),
-                TextBox({
-                    cursorPosition: state.textInputCursorPosition,
-                    inputid:"text-box-1",
-                    text:state.textInputValue,
-                    onChange:(v,e) => {
-                        // console.log("new text input value",state.textInputValue)
-                        state.textInputValue = v[0]
-                        // state.textInputCursorPosition = v[1]
-                        e.redraw()
-                    }}),
-
-            ]})
+            HBox({
+                children: [
+                    Label({text: 'text input'}),
+                    TextBox({
+                        cursorPosition: state.textInputCursorPosition,
+                        inputid: "text-box-1",
+                        text: state.textInputValue,
+                        multiline: true,
+                        onChange: (v, e) => {
+                            // console.log("new text input value",state.textInputValue)
+                            state.textInputValue = v[0]
+                            // state.textInputCursorPosition = v[1]
+                            e.redraw()
+                        }
+                    }),
+                    Label({text:'multi\nline\ntext', multiline:true})
+                ]
+            })
         ]
     })
 
@@ -98,7 +102,7 @@ function makeTree(): GElement {
         fixedWidth: 200,
         children: [
             ListView({
-                key:"first-list-view",
+                key: "first-list-view",
                 data: ["john", "Jacob", 'jingleheimer'],
                 // selected: state.selectedListItem1,
                 // onSelectedChanged: ((i: number, e: CEvent) => {
@@ -107,15 +111,15 @@ function makeTree(): GElement {
                 // })
             }),
             ListView({
-                key:"second-list-view",
+                key: "second-list-view",
                 data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar'],
                 selected: state.selectedListItem2,
                 renderItem: (item, selected, index, onSelectedChanged) => {
                     return ListViewItem({
-                        mainAxisLayout:'between',
+                        mainAxisLayout: 'between',
                         children: [
-                            Label({text: item, shadow:true}),
-                            new Icon({icon:Icons.DragHandle, shadow:true})
+                            Label({text: item, shadow: true}),
+                            new Icon({icon: Icons.DragHandle, shadow: true})
                         ],
                         selected: index === selected,
                         handleEvent: (e) => onSelectedChanged(index, e)
@@ -161,7 +165,7 @@ function makeTree(): GElement {
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 150,
-                        key:'scroll-1',
+                        key: 'scroll-1',
                         // scrollOffset: state.scrollOffset1,
                         // onScrollChanged: (newOffset: Point, e: CEvent): void => {
                         //     state.scrollOffset1 = newOffset
@@ -183,7 +187,7 @@ function makeTree(): GElement {
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 200,
-                        key:'scroll-2',
+                        key: 'scroll-2',
                         // scrollOffset: state.scrollOffset2,
                         // onScrollChanged: (newOffset: Point, e: CEvent): void => {
                         //     state.scrollOffset2 = newOffset
@@ -191,7 +195,7 @@ function makeTree(): GElement {
                         // },
                         child: ListView({
                             data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
-                            key:'list-view-xx',
+                            key: 'list-view-xx',
                             selected: state.selectedListItem2,
                             onSelectedChanged: ((i: number, e: CEvent) => {
                                 state.selectedListItem2 = i
@@ -231,7 +235,7 @@ function makeTree(): GElement {
 
 setup_common_keybindings()
 const scene = new Scene(makeTree)
-MGlobals.set(Scene.name,scene)
+MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 // MGlobals.set(STYLE_)
