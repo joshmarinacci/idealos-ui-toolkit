@@ -154,7 +154,7 @@ export class TextElement implements GElement {
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
-            baseline: metrics.emHeightAscent + metrics.emHeightDescent,
+            baseline: metrics.fontBoundingBoxAscent,
             visualStyle: this.settings.visualStyle,
             children: [],
             padding: this.settings.padding,
