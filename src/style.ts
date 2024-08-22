@@ -3,6 +3,7 @@ import {Insets} from "josh_js_util";
 const LightStyle = {
     panelBackgroundColor: 'white',
 }
+// @ts-ignore
 const DarkStyle = {
     panelBackgroundColor: '#222',
     buttonBorderColor: '#666',

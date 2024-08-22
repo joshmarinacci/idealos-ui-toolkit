@@ -65,6 +65,7 @@ export function ListView(opts: ListViewParameters): GElement {
     const cache:StateCache =  MGlobals.get(STATE_CACHE);
     if(!opts.key) {
         console.warn("list view without a key")
+        throw new Error("list view without a key")
     }
     cache.startElement(opts.key)
 

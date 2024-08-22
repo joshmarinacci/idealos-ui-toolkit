@@ -10,6 +10,7 @@ const state = {
 export function EmailDemo() {
     const lv = ListView({
         data:["a","b",'C','d','e','f','g','h','i','j','k'],
+        key:"email-lv-1",
         selected: state.selectedItem,
         onSelectedChanged:(a,e) => {
             state.selectedItem = a
@@ -21,12 +22,13 @@ export function EmailDemo() {
             ScrollContainer({
                 fixedWidth:300,
                 fixedHeight:200,
-                scrollOffset: state.scrollOffset,
+                // scrollOffset: state.scrollOffset,
                 child: lv,
-                onScrollChanged: (p,e) => {
-                    state.scrollOffset = p
-                    e.redraw()
-                }
+                key:'email-scroll'
+                // onScrollChanged: (p,e) => {
+                //     state.scrollOffset = p
+                //     e.redraw()
+                // }
             })
         ]
     })

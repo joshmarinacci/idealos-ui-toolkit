@@ -1,77 +1,3 @@
-/*
-
-next steps
-
-// Text is text without any insets
-// Label is text with padding and margins
-// Button is text with border and padding and margins
-//     states: enabled, hover, primary, secondary, destructive
-// Icon is reference to icon font with fixed size and no insets
-// IconButton is HBox shrinking with two children
-// CheckBox is IconButton with check icon and no border
-// RadioButton is IconButton with radio icon and no border
-// Tag is Text with fancy colored border and background
-// make HBox cross axis stretch to give all buttons the same height
-// make some options to Hbox and VBox be optional. good defaults.
-// ToggleButton is Button with selected state
-//    selected = true | false
-// TabbedPane is VBox(main:grow, cross:grow, HBox(main:grow, cross:shrink,titles),currentContent)
-// ToggleButton mouse support
-// TabbedBox    mouse support
-
-// ListView is custom VBox with NodeRenderer and clip and scrolling
-// add listview scrolling. needs keydown/keyup to nav to next/prev
-// need to fix VBox sizing
-
-// add keyboard support. when listview has the focus let it nav up and down with arrow keys
-// when a component has the focus, draw a focused border then switch back to the default
-// screen tracks the current keyboard focus
-
-// Hover support for Buttons. Where does the state live? in the render node?
-//     has currentBg, swaps out with stdbg and hoverbg and selectionbg. if hoverbg is set
-//focus is rendered on the render node
-//    if currently focused, then swap out bg and border with stdbg and focusbg and selectedbg
-
-// need a style object to represent the non-layout style of text color, borders, bg,
-
-text input:
-    draw a text render node + a rect for the cursor
-    support cursor movement with left and right arrow keys
-    support caps
-
-support scrolling with scroll wheel events
-make list view fill the width of the scroll parent by default
-
-
-DropdownButton
-    takes a menu list as its dropdown child
-    enabled = true | false
-    open = true | false
-MenuList = VBox(main:shrink, cross:shrink, children:[menu items])
-MenuItem = IconButton with no border + hover effect
-
-
-HSpacer is h growing
-VSpacer is v growing
-TextBox = HBox(TextInput,ClearButton,)
-    with custom focus and borders
-    enabled & disabled
-    focused & not focused
-SearchBox = HBox(SearchIcon,TextInput)
-ToggleGroup HBox(with mutually exclusive options)
-ColorWell
-
-
-
-
-
-input:
-  mouse down, move, up
-  pick repeatedly when not down
-  when down, keep sending event to same target until up again
-
- */
-
 import {CEvent, GElement, MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {HSeparator, Square} from "./comps2.ts";
 import {Icon, Icons} from "./icons.ts";
@@ -86,32 +12,6 @@ import {ScrollContainer} from "./scroll.ts";
 import {Label, TextBox} from "./text.ts";
 import {EmailDemo} from "./demo/email.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
-
-// const S = new Schema()
-// const Names = S.list(S.string()).cloneWith([
-//     "John",
-//     // "Jacob",
-//     // "Jingleheimer",
-//     // "Schmitd",
-// ])
-// const NamesLong = S.list(S.string()).cloneWith([
-//     "John",
-//     "Jacob",
-//     "Jingleheimer",
-//     "Schmitd",
-//     "John",
-//     "Jacob",
-//     "Jingleheimer",
-//     "Schmitd",
-//     "John",
-//     "Jacob",
-//     "Jingleheimer",
-//     "Schmitd",
-//     "John",
-//     "Jacob",
-//     "Jingleheimer",
-//     "Schmitd",
-// ])
 
 const state = {
     toggle: false,
@@ -290,6 +190,7 @@ function makeTree(): GElement {
                         // },
                         child: ListView({
                             data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
+                            key:'list-view-xx',
                             selected: state.selectedListItem2,
                             onSelectedChanged: ((i: number, e: CEvent) => {
                                 state.selectedListItem2 = i

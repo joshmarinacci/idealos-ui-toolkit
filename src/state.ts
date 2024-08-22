@@ -35,6 +35,7 @@ export class StateCache {
         let val: T
         if (!this.current_state) {
             this.warn(`missing state data for ${key}`)
+            throw new Error(`missing state data for ${key}`)
         }
         if (this.current_state.has(key)) {
             val = this.current_state.get(key) as T
@@ -53,6 +54,7 @@ export class StateCache {
         this.log("ending layout", key)
     }
 
+    // @ts-ignore
     private log(...args: any[]) {
         // console.log("STATE", ...args)
     }

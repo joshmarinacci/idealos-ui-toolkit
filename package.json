@@ -6,8 +6,8 @@
   "scripts": {
     "build": "node build.js",
     "prep": "cp index.html build",
-    "esbuild-serve": "esbuild src/index2.ts --bundle --outdir=build --watch --serve --servedir=build",
-    "start": "mkdir -p build && cp index.html build && esbuild src/index2.ts --bundle --watch --outdir=build --servedir=build",
+    "esbuild-serve": "esbuild src/index.ts --bundle --outdir=build --watch --serve --servedir=build",
+    "start": "mkdir -p build && cp index.html build && esbuild src/index.ts --bundle --watch --outdir=build --servedir=build",
     "clean": "rm -rf build",
     "tsc": "tsc"
   },
