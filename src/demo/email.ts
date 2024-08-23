@@ -1,11 +1,13 @@
 import {HBox, HSpacer, VBox} from "../layout.ts";
 import {ScrollContainer} from "../scroll.ts";
-import {Point} from "josh_js_util";
+import {Point, Size} from "josh_js_util";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
 import {Button, IconButton} from "../buttons.ts";
 import {Label, TextBox} from "../text.ts";
 import {Icon, Icons} from "../icons.ts";
 import {EmailMessage} from "rtds-core/build/test-models";
+import {GElement, GRenderNode, LayoutConstraints, TRANSPARENT, ZERO_INSETS} from "../base.ts";
+import {RenderContext} from "../gfx.ts";
 
 type EmailFolder = {
     name: string,
@@ -102,6 +104,51 @@ function EmailBody(selectedMessage: EmailMessage) {
     // return body
 }
 
+class PopupContainer implements GElement {
+    private child: GElement;
+    constructor(param: { child: GElement }) {
+        this.child = param.child
+    }
+    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        let child = this.child.layout(rc,cons)
+        return new GRenderNode({
+            id:"popup-container",
+            size: new Size(100,200),
+            pos: new Point(100,100),
+            margin: ZERO_INSETS,
+            padding: ZERO_INSETS,
+            borderWidth: ZERO_INSETS,
+            children: [child],
+            contentOffset: new Point(0,0),
+
+            clip:false,
+            baseline: 0,
+            font: "",
+            text: "",
+            visualStyle: {
+                textColor: TRANSPARENT,
+                background: TRANSPARENT,
+                borderColor: TRANSPARENT,
+            },
+            popup:true,
+
+        })
+    }
+
+}
+
+function DropdownButton(props: { children: GElement[]; text: string }) {
+    let button = IconButton({text:props.text, icon:Icons.KeyboardArrowDown})
+    const popup = new PopupContainer({
+        child: VBox({
+            children: props.children,
+        })
+    })
+    return HBox({
+        children:[button,popup]
+    })
+}
+
 export function EmailDemo() {
     return HBox({
         children: [
@@ -109,7 +156,10 @@ export function EmailDemo() {
                 mainAxisSelfLayout: 'shrink',
                 crossAxisSelfLayout: 'shrink',
                 children: [
-                    Button({text: "Work"}),
+                    DropdownButton({text: "Work", children:[
+                            Button({text:"Work"}),
+                            Button({text:"Personal"}),
+                        ]}),
                     ScrollContainer({
                         key: 'email-folders-scroll',
                         fixedWidth: 200,
@@ -139,7 +189,7 @@ export function EmailDemo() {
                         multiline: false,
                         text: "search",
                         inputid: "search-box",
-                        cursorPosition: new Point(0, 0),
+                        // cursorPosition: new Point(0, 0),
                         onChange: () => {
 
                         }

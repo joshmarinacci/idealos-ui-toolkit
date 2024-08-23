@@ -69,6 +69,7 @@ export type RenderNodeSettings = {
     handleEvent?:EventHandler,
     clip?:boolean
     canScroll?:boolean
+    popup?:boolean
 }
 export class GRenderNode {
     settings: RenderNodeSettings;
