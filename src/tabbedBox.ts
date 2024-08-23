@@ -29,6 +29,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                 margin: ZERO_INSETS,
                 children: opts.titles.map(((title, i) => {
                     return Button({
+                        key:'tab-title-'+title,
                         text: title,
                         selected: opts.selectedTab == i,
                         margin: new Insets(0,2,0,2),

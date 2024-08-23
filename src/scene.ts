@@ -29,9 +29,10 @@ export class Scene {
     private debugStyle: VisualStyle
     private makeTree: () => GElement;
     private borderDebugEnabled: boolean;
-    private current_hover: GRenderNode | undefined;
+    private current_hover: string | undefined;
     private keyboard_target: string | undefined
-    private current_target: GRenderNode | undefined;
+    private current_target: string | undefined;
+    private renderMap: Map<string, GRenderNode>;
 
     constructor(makeTree: () => GElement) {
         this.borderDebugEnabled = false
@@ -70,6 +71,13 @@ export class Scene {
             pos = pos.subtract(new Point(rect.x, rect.y))
             this.handleMouseDown(pos)
         })
+        this.canvas.addEventListener('mouseup', (e) => {
+            // @ts-ignore
+            let rect = e.target.getBoundingClientRect()
+            let pos = new Point(e.clientX, e.clientY);
+            pos = pos.subtract(new Point(rect.x, rect.y))
+            this.handleMouseUp(pos)
+        })
         window.addEventListener('keydown', (e) => {
             this.handleKeydownEvent(e)
         })
@@ -99,11 +107,13 @@ export class Scene {
     }
 
     layout() {
+        if(!this.renderMap) this.renderMap = new Map()
         this.log("layout phase")
         // MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
         this.elementRoot = this.makeTree()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
+        this.syncRenderMap(this.renderRoot)
     }
 
     redraw() {
@@ -156,23 +166,26 @@ export class Scene {
     }
 
     handleMouseMove(pos: Point) {
-        let found = this.findTarget(pos, this.renderRoot)
         // console.log("mouse at",pos,found?found.settings.id:"nothing")
-        if (found) {
-            if (found !== this.last && this.borderDebugEnabled) {
-                if (this.last) {
-                    this.last.settings.visualStyle = this.lastStyle
-                }
-                this.lastStyle = found.settings.visualStyle
-                found.settings.visualStyle = this.debugStyle
-                // found.settings.background = 'blue'
-                this.redraw()
-                this.last = found
+        this.ifTarget(this.current_target, (comp:GRenderNode) => {
+            let evt:MMouseEvent = {
+                type:'mouse-move',
+                redraw: () => {
+                    this.layout()
+                    this.redraw()
+                },
+                position:pos
             }
-            if(found.settings.hoverStyle && found !== this.current_hover) {
-                if(this.current_hover) this.current_hover.settings.currentStyle = this.current_hover.settings.visualStyle
+            if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
+        })
+        let found = this.findTarget(pos, this.renderRoot)
+        if (found) {
+            if(found.settings.hoverStyle && found.settings.key !== this.current_hover) {
+                this.ifTarget(this.current_hover, (comp) => {
+                    comp.settings.currentStyle = comp.settings.visualStyle
+                })
                 found.settings.currentStyle = found.settings.hoverStyle
-                this.current_hover = found
+                this.current_hover = found.settings.key
                 this.redraw()
             }
         }
@@ -181,7 +194,7 @@ export class Scene {
     handleMouseDown(pos: Point) {
         let found = this.findTarget(pos, this.renderRoot)
         if(found) {
-            this.current_target = found
+            this.current_target = found.settings.key
             this.debugPrintTarget()
             let evt:MMouseEvent = {
                 type:'mouse-down',
@@ -201,6 +214,20 @@ export class Scene {
             }
             this.redraw()
         }
+    }
+    handleMouseUp(pos:Point) {
+        this.ifTarget(this.current_target, (comp:GRenderNode) => {
+            let evt:MMouseEvent = {
+                type:'mouse-up',
+                redraw: () => {
+                    this.layout()
+                    this.redraw()
+                },
+                position:pos
+            }
+            if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
+        })
+
     }
 
     handleKeydownEvent(e: KeyboardEvent) {
@@ -249,15 +276,21 @@ export class Scene {
     }
 
     private debugPrintTarget() {
+        this.ifTarget(this.current_target, (comp)=>{
+            console.log("target on",
+                comp.settings.id,
+                comp.settings.key,
+                comp.settings.pos.toString(),
+                comp.settings.size.toString())
+            console.log("  insets")
+            console.log('  margin', comp.settings.margin)
+            console.log('  border',comp.settings.borderWidth)
+            console.log('  padding',comp.settings.padding)
+        })
         if(this.current_target) {
-            console.log("clicked on",
-                this.current_target.settings.id,
-                this.current_target.settings.pos.toString(),
-                this.current_target.settings.size.toString())
-            console.log("insets")
-            console.log('margin', this.current_target.settings.margin)
-            console.log('border',this.current_target.settings.borderWidth)
-            console.log('padding',this.current_target.settings.padding)
+            if(this.renderMap.has(this.current_target)) {
+                console.log("have target")
+            }
         }
     }
 
@@ -268,10 +301,10 @@ export class Scene {
         const bounds = new Bounds(0,0,rc.canvas.width,rc.size.h-100)
         this.debugStrokeBounds(rc,bounds,'red',1)
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
-        if(this.current_target) {
-            let t = this.current_target.settings
+        this.ifTarget(this.current_target,(comp)=>{
+            let t = comp.settings
             this.debugText(rc,bounds,` id=${t.id} ${t.pos} ${t.size}`)
-        }
+        })
         rc.ctx.restore()
     }
 
@@ -293,5 +326,20 @@ export class Scene {
 
     private log(...layoutPhase: string[]) {
         console.log("SCENE: ",...layoutPhase)
+    }
+
+    private syncRenderMap(renderRoot: GRenderNode) {
+        if(renderRoot.settings.key) this.renderMap.set(renderRoot.settings.key, renderRoot)
+        renderRoot.settings.children.forEach(child => {
+            this.syncRenderMap(child)
+        })
+    }
+
+    private ifTarget(target: string | undefined, param2: (comp: GRenderNode) => void) {
+        if(!target) return
+        if(this.renderMap.has(target)) {
+            let comp = this.renderMap.get(target) as GRenderNode
+            param2(comp)
+        }
     }
 }

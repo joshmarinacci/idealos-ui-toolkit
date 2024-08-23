@@ -32,6 +32,7 @@ type BoxParameters = {
 
     fixedWidth?: number
     fixedHeight?: number
+    key?:string
 }
 export type BoxParams = {
     mainAxisSelfLayout?: AxisSelfLayout,
@@ -59,6 +60,7 @@ type BoxRequirements = {
 
     fixedWidth?: number
     fixedHeight?: number
+    key?:string
 }
 
 export function bdsSubInsets(bds: Bounds, insets: Insets) {
@@ -135,6 +137,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
             fixedWidth: param.fixedWidth,
             fixedHeight: param.fixedHeight,
+            key: param.key,
         })
     }
 
@@ -249,6 +252,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 borderWidth: this.settings.borderWidth,
                 borderRadius: this.settings.borderRadius,
                 handleEvent: this.settings.handleEvent,
+                key: this.settings.key,
             })
         }
         if (this.settings.mainAxisSelfLayout == 'shrink') {
@@ -311,7 +315,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 margin: this.settings.margin,
                 borderWidth: this.settings.borderWidth,
                 borderRadius: this.settings.borderRadius,
-                handleEvent: this.settings.handleEvent
+                handleEvent: this.settings.handleEvent,
+                key:this.settings.key,
             })
 
         }

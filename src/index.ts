@@ -69,8 +69,8 @@ function makeCompsDemo() {
                     new MHBoxElement({
                         crossAxisLayout: "center",
                         children: [
-                            Button({text: "Button"}),
-                            IconButton({text: 'IconButton', icon: Icons.Document, ghost: false}),
+                            Button({text: "Button", key:"first-button"}),
+                            IconButton({text: 'IconButton', icon: Icons.Document, ghost: false, key:"second-button"}),
                             IconButton({icon: Icons.Document, text: "", ghost: false}),
                             new HSeparator(),
                             IconButton({icon: Icons.Document, text: "", ghost: false}),

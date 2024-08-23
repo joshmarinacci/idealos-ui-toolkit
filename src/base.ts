@@ -27,7 +27,7 @@ export type ElementSettings = {
 }
 
 export type MMouseEvent = {
-    type: 'mouse-move' | 'mouse-down'
+    type: 'mouse-move' | 'mouse-down' | 'mouse-up'
     position:Point
     redraw:()=>void
 }
@@ -70,6 +70,7 @@ export type RenderNodeSettings = {
     clip?:boolean
     canScroll?:boolean
     popup?:boolean
+    key?:string,
 }
 export class GRenderNode {
     settings: RenderNodeSettings;

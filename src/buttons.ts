@@ -13,6 +13,7 @@ type ButtonParameters = {
     selected?:boolean
     handleEvent?: EventHandler
     borderRadius?: Insets
+    key?: string
 }
 type IconButtonParameters = {
     icon: Icons
@@ -57,6 +58,7 @@ export function IconButton(opts: IconButtonParameters) {
         margin: Style.buttonMargin,
         padding: Style.buttonPadding,
         handleEvent: opts.handleEvent,
+        key: opts.key,
     })
 }
 
@@ -109,6 +111,7 @@ export function Button(opts: ButtonParameters ):GElement {
         margin: opts.margin||Style.buttonMargin,
         padding: opts.padding || Style.buttonPadding,
         handleEvent: opts.handleEvent,
+        key:opts.key
     })
 }
 

@@ -33,24 +33,21 @@ class MWindowElement implements GElement {
         })
         child.settings.pos = contentBounds.position()
         const startResize = (e: MMouseEvent) => {
-            if(size.w === 700) {
-                setSize(new Size(400,300))
-            } else {
-                setSize(new Size(700, 400))
-            }
             setDown(true)
             e.redraw()
         }
         const doResize = (e: MMouseEvent) => {
-            console.log("do resize",doResize)
-            let size2 = size.copy()
-            size2.w += 1
-            size2.h += 1
-            setSize(size2)
-            e.redraw()
+            if(down) {
+                let size2 = size.copy()
+                size2.w = e.position.x
+                size2.h = e.position.y
+                setSize(size2)
+                e.redraw()
+            }
         }
         const endResize = (e: MMouseEvent) => {
-
+            // console.log("ending the resize")
+            setDown(false)
         }
         const resize = IconButton({
             icon:Icons.Resize,
@@ -61,11 +58,12 @@ class MWindowElement implements GElement {
                 if(e.type === 'mouse-move') {
                     doResize(e)
                 }
-                // if(e.type === 'mouse-up') {
-                //     endResize(e)
-                // }
+                if(e.type === 'mouse-up') {
+                    endResize(e)
+                }
             }
         }).layout(rc, cons)
+        resize.settings.key = 'window-resize'
         resize.settings.pos = size.asPoint().subtract(new Point(50,50))
 
         let node = new GRenderNode({
