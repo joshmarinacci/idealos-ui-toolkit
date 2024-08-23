@@ -1,6 +1,6 @@
 import {CEvent, GElement, MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {HSeparator, Square} from "./comps2.ts";
-import {Icon, Icons} from "./icons.ts";
+import {IconElement, Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton, Tag} from "./buttons.ts";
 import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
@@ -125,7 +125,7 @@ function makeListDemo() {
                         mainAxisLayout: 'between',
                         children: [
                             Label({text: item, shadow: true}),
-                            new Icon({icon: Icons.DragHandle, shadow: true})
+                            new IconElement({icon: Icons.DragHandle, shadow: true})
                         ],
                         selected: index === selected,
                         handleEvent: (e) => onSelectedChanged(index, e)

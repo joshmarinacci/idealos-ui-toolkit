@@ -4,7 +4,7 @@ import {Point} from "josh_js_util";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
 import {Button, IconButton} from "../buttons.ts";
 import {Label, TextBox} from "../text.ts";
-import {Icons} from "../icons.ts";
+import {Icon, Icons} from "../icons.ts";
 import {EmailMessage} from "rtds-core/build/test-models";
 
 type EmailFolder = {
@@ -76,7 +76,7 @@ const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, inde
         mainAxisLayout: 'between',
         handleEvent: (e) => onSelectedChanged(index, e),
         children: [
-            IconButton({icon: item.icon, ghost: true}),
+            Icon({icon: item.icon}),
             Label({text: item.name, shadow: true}),
             HSpacer(),
             Label({text: item.count + "", shadow: true}),

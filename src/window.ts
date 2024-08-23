@@ -21,6 +21,7 @@ class MWindowElement implements GElement {
         const cache:StateCache =  MGlobals.get(STATE_CACHE);
         cache.startLayout('window')
         const [size,setSize] = cache.useState("window-size",() => new Size(500,300))
+        const [down,setDown] = cache.useState("window-size-down",() => false)
 
 
         console.log("layout window",size)
@@ -31,16 +32,38 @@ class MWindowElement implements GElement {
             layout: 'grow',
         })
         child.settings.pos = contentBounds.position()
-        const doResize = (e: MMouseEvent) => {
-            setSize(new Size(700,400))
+        const startResize = (e: MMouseEvent) => {
+            if(size.w === 700) {
+                setSize(new Size(400,300))
+            } else {
+                setSize(new Size(700, 400))
+            }
+            setDown(true)
             e.redraw()
+        }
+        const doResize = (e: MMouseEvent) => {
+            console.log("do resize",doResize)
+            let size2 = size.copy()
+            size2.w += 1
+            size2.h += 1
+            setSize(size2)
+            e.redraw()
+        }
+        const endResize = (e: MMouseEvent) => {
+
         }
         const resize = IconButton({
             icon:Icons.Resize,
             handleEvent: (e) => {
                 if(e.type === 'mouse-down') {
+                    startResize(e)
+                }
+                if(e.type === 'mouse-move') {
                     doResize(e)
                 }
+                // if(e.type === 'mouse-up') {
+                //     endResize(e)
+                // }
             }
         }).layout(rc, cons)
         resize.settings.pos = size.asPoint().subtract(new Point(50,50))

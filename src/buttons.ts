@@ -1,4 +1,4 @@
-import {Icon, Icons} from "./icons.ts";
+import {IconElement, Icons} from "./icons.ts";
 import {EventHandler, GElement, TRANSPARENT, VisualStyle, ZERO_INSETS} from "./base.ts";
 import {MHBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
@@ -35,7 +35,7 @@ export function IconButton(opts: IconButtonParameters) {
         borderWidth: opts.ghost ? Style.buttonBorderWidth : opts.borderWidth || Style.buttonBorderWidth,
         borderRadius: opts.borderRadius || Style.buttonBorderRadius,
         children: [
-            new Icon({icon: opts.icon, shadow:true}),
+            new IconElement({icon: opts.icon, shadow:true}),
             new TextElement({
                 padding: ZERO_INSETS,
                 font: Style.font,

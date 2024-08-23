@@ -54,7 +54,7 @@ export enum Icons {
     Resize = 'resize',
 }
 
-export class Icon implements GElement {
+export class IconElement implements GElement {
     private icon: Icons;
     private shadow: boolean;
 
@@ -85,4 +85,10 @@ export class Icon implements GElement {
             shadow: this.shadow
         })
     }
+}
+
+export function Icon(opts:{icon:Icons}) {
+    return new IconElement({
+        icon: opts.icon
+    })
 }
