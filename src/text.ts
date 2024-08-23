@@ -20,16 +20,16 @@ import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.ts";
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
     text: string
-    cursorPosition: Point
+    // cursorPosition: Point
     inputid: string
-    onChange: OnChangeCallback<[string,Point]>
+    onChange?: OnChangeCallback<[string,Point]>
     multiline?:boolean
 }
 type TextInputRequirements = {
     text: string
-    cursorPosition: Point
+    // cursorPosition: Point
     inputid: string
-    onChange: OnChangeCallback<[string,Point]>
+    onChange?: OnChangeCallback<[string,Point]>
     margin: Insets
     padding: Insets
     borderWidth: Insets
@@ -253,17 +253,19 @@ export class TextElement implements GElement {
         rc.ctx.font = this.settings.font
         let metrics = rc.ctx.measureText("Testy")
         let baseline = metrics.fontBoundingBoxAscent
-
+        let lineHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         let lines = this.settings.text.split('\n')
         let y = 0
+        let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
         let nodes:GRenderNode[] = lines.map(line => {
-            let pos = new Point(0,y)
-            y += baseline
+            let metrics = rc.ctx.measureText(line)
+            let pos = new Point(total_insets.left, total_insets.top+ y)
+            y += lineHeight
             return new GRenderNode({
                 id:"text-line-element",
                 text:line,
                 font: Style.font,
-                size: new Size(10,10),
+                size: new Size(metrics.width,lineHeight),
                 pos: pos,
                 contentOffset: new Point(0,0),
                 baseline: baseline,
@@ -281,17 +283,15 @@ export class TextElement implements GElement {
 
         let size = new Size(
             Math.floor(metrics.width),
-            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
-        size = sizeWithPadding(size, this.settings.padding)
-        size = sizeWithPadding(size, this.settings.margin)
-        size = sizeWithPadding(size, this.settings.borderWidth)
+            Math.floor(y+metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        size = sizeWithPadding(size,total_insets)
         return new GRenderNode({
             id: "text-multiline-element",
             text:"",
             font: Style.font,
             size: size,
             pos: new Point(0, 0),
-            contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
+            contentOffset: new Point(total_insets.left, total_insets.top),
             baseline: baseline,
             visualStyle: this.settings.visualStyle,
             children: nodes,
@@ -304,10 +304,10 @@ export class TextElement implements GElement {
 }
 
 class TextInputElement implements GElement {
-    private opts: TextInputRequirements
+    private settings: TextInputRequirements
 
     constructor(opts: TextInputSettings) {
-        this.opts = {
+        this.settings = {
             ...opts,
             multiline: opts.multiline?opts.multiline:false,
             borderWidth: withInsets(1),
@@ -319,7 +319,7 @@ class TextInputElement implements GElement {
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         // console.log("redoing layout",this.opts.text)
         const cache:StateCache = MGlobals.get(STATE_CACHE)
-        cache.startLayout(this.opts.inputid)
+        cache.startLayout(this.settings.inputid)
         let [cursorPosition,setCursorPosition] = cache.useState("cursor",() => {
             return new Point(0,0)
         })
@@ -334,30 +334,31 @@ class TextInputElement implements GElement {
                 background: TRANSPARENT,
                 borderColor: TRANSPARENT,
             },
-            text:this.opts.text,
-            multiline: this.opts.multiline,
+            text:this.settings.text,
+            multiline: this.settings.multiline,
         })
         let text_node = text.layout(rc,_cons)
         const cursor_node = this.makeCursor()
 
         rc.ctx.font = Style.font
-        let lines = this.opts.text.split("\n")
+        let lines = this.settings.text.split("\n")
         let line = lines[cursorPosition.y]
         let text_before = line.substring(0,cursorPosition.x)
         // console.log("text before is",text_before, this.opts.cursorPosition)
         let metrics = rc.ctx.measureText(text_before)
         let baseline = metrics.fontBoundingBoxAscent
-        let total_insets = addInsets(addInsets(this.opts.margin, this.opts.borderWidth), this.opts.padding)
+        let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
         text_node.settings.pos.x = total_insets.left
         text_node.settings.pos.y = total_insets.top
 
         cursor_node.settings.pos.x = total_insets.left + metrics.width
         cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
-        const size = new Size(200,100)
+        const size = new Size(100,100)
+        size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
         let node = new GRenderNode({
             id: 'text-input-node',
-            inputid: this.opts.inputid,
+            inputid: this.settings.inputid,
             text:"",
             visualStyle: {
                 background: '#f0f0f0',
@@ -373,22 +374,23 @@ class TextInputElement implements GElement {
             children: [text_node,cursor_node],
             contentOffset: new Point(total_insets.left, total_insets.top),
             font: Style.font,
-            margin: this.opts.margin,
-            padding: this.opts.padding,
+            margin: this.settings.margin,
+            padding: this.settings.padding,
             pos: new Point(0, 0),
             size: size,
             clip: true,
             handleEvent: (e) => {
                 if (e.type === 'keyboard-typed') {
                     let kbe = e as MKeyboardEvent;
-                    let t2 = processText(this.opts.text,cursorPosition,kbe)
+                    let t2 = processText(this.settings.text,cursorPosition,kbe)
                     setCursorPosition(t2[1])
-                    this.opts.onChange(t2, e)
+                    if(this.settings.onChange)this.settings.onChange(t2, e)
+                    e.redraw()
                 }
             }
         })
 
-        cache.endLayout(this.opts.inputid)
+        cache.endLayout(this.settings.inputid)
         return node
     }
 
