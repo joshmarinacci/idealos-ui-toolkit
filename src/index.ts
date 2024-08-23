@@ -13,6 +13,7 @@ import {Label, TextBox} from "./text.ts";
 import {EmailDemo} from "./demo/email.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {setup_common_keybindings} from "./actions.ts";
+import {MWindow} from "./window.ts";
 
 const state = {
     toggle: false,
@@ -26,7 +27,6 @@ const state = {
     textInputValue: "some \nlong text",
     textInputCursorPosition: new Point(5, 0)
 }
-
 
 function makeTree(): GElement {
     const compsDemo = new MVBoxElement({
@@ -229,7 +229,9 @@ function makeTree(): GElement {
             e.redraw()
         }
     })
-    return tabs
+
+    let window = MWindow({child:tabs})
+    return window
 }
 
 

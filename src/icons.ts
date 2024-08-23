@@ -51,6 +51,7 @@ export enum Icons {
     KeyboardArrowUp = 'keyboard_arrow_up',
     KeyboardArrowDown = 'keyboard_arrow_down',
     DragHandle = 'drag_handle',
+    Resize = 'resize',
 }
 
 export class Icon implements GElement {
