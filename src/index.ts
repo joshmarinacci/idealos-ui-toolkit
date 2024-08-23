@@ -7,7 +7,7 @@ import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
 import {ListView, ListViewItem} from "./listView.ts";
-import {Point} from "josh_js_util";
+import {Point, Size} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
 import {Label, TextBox} from "./text.ts";
 import {EmailDemo} from "./demo/email.ts";
@@ -238,8 +238,7 @@ const scene = new Scene(makeTree)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
-// MGlobals.set(STYLE_)
-scene.init().then(() => {
+scene.init(new Size(800,600)).then(() => {
     scene.layout()
     scene.redraw()
 })

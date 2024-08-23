@@ -44,7 +44,7 @@ export class Scene {
         }
     }
 
-    async init() {
+    async init(size:Size) {
         if(MGlobals.get(SYMBOL_FONT_ENABLED) === true) {
             // const font = new FontFace('material-icons',
             //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
@@ -53,7 +53,7 @@ export class Scene {
             document.fonts.add(font)
             await font.load()
         }
-        this.canvas = makeCanvas(new Size(600, 300))
+        this.canvas = makeCanvas(size)
         this.last = undefined
         this.canvas.addEventListener('mousemove', (e) => {
             // @ts-ignore

@@ -33,6 +33,13 @@ type BoxParameters = {
     fixedWidth?: number
     fixedHeight?: number
 }
+export type BoxParams = {
+    mainAxisSelfLayout?: AxisSelfLayout,
+    crossAxisSelfLayout?: AxisSelfLayout,
+    mainAxisLayout?: AxisLayout,
+    crossAxisLayout?: AxisLayout,
+    children: GElement[],
+}
 
 type BoxRequirements = {
     id: string,
@@ -492,12 +499,22 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
 }
 
-
-export function HBox(param: { children: GElement[] }) {
+export function HBox(param:BoxParams) {
     return new MHBoxElement({
-        mainAxisSelfLayout: 'grow',
-        mainAxisLayout: 'start',
-        crossAxisSelfLayout: 'shrink',
+        mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
+        mainAxisLayout: param.mainAxisLayout ||  'start',
+        crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
+        crossAxisLayout: param.crossAxisLayout || 'start',
+        children: param.children
+    })
+}
+
+export function VBox(param: BoxParams) {
+    return new MVBoxElement({
+        mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
+        mainAxisLayout: param.mainAxisLayout ||  'start',
+        crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
+        crossAxisLayout: param.crossAxisLayout || 'start',
         children: param.children
     })
 }

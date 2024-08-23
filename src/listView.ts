@@ -35,25 +35,25 @@ export function ListViewItem(opts: ListViewItemParameters): GElement {
 
 export type OnSelectedChangedCallback = (i: number, e: CEvent) => void;
 
-export type ListItemRenderer = (item:string,
+export type ListItemRenderer<T> = (item:T,
                          selected:number,
                          index:number,
                          onSelectedChanged:OnSelectedChangedCallback
                          ) => GElement
 
-export type ListViewParameters = {
+export type ListViewParameters<T> = {
     key?:string,
-    data: string[]
+    data: T[]
     selected?: number
     onSelectedChanged?:OnSelectedChangedCallback
-    renderItem?:ListItemRenderer
+    renderItem?:ListItemRenderer<T>
 }
 
-const DefaultItemRenderer:ListItemRenderer = (item:string,selected:number,index:number, onSelectedChanged   ) => {
+const DefaultItemRenderer:ListItemRenderer<unknown> = (item:unknown,selected:number,index:number, onSelectedChanged   ) => {
     return ListViewItem({
         // text:item,
         children: [
-            Label({text: item, shadow: true}),
+            Label({text: (item+""), shadow: true}),
         // Label({text: opts.text, shadow: true}),
         ],
         selected: index === selected,
@@ -61,7 +61,7 @@ const DefaultItemRenderer:ListItemRenderer = (item:string,selected:number,index:
     })
 }
 
-export function ListView(opts: ListViewParameters): GElement {
+export function ListView<T>(opts: ListViewParameters<T>): GElement {
     const cache:StateCache =  MGlobals.get(STATE_CACHE);
     if(!opts.key) {
         console.warn("list view without a key")
