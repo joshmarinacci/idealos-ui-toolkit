@@ -1,4 +1,4 @@
-import {HBox, VBox} from "../layout.ts";
+import {HBox, HSpacer, VBox} from "../layout.ts";
 import {ScrollContainer} from "../scroll.ts";
 import {Point} from "josh_js_util";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
@@ -78,7 +78,7 @@ const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, inde
         children: [
             IconButton({icon: item.icon, ghost: true}),
             Label({text: item.name, shadow: true}),
-            // HSpacer(),
+            HSpacer(),
             Label({text: item.count + "", shadow: true}),
         ]
     })

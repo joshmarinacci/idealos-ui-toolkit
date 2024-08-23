@@ -2,7 +2,7 @@ import {CEvent, GElement, MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {HSeparator, Square} from "./comps2.ts";
 import {Icon, Icons} from "./icons.ts";
 import {Button, CheckBox, IconButton, RadioButton, Tag} from "./buttons.ts";
-import {HBox, MHBoxElement, MVBoxElement} from "./layout.ts";
+import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
@@ -24,14 +24,15 @@ const state = {
     selectedListItem2: 0,
     scrollOffset1: new Point(0, 0),
     scrollOffset2: new Point(0, 0),
-    textInputValue: "some \nlong text",
+    textInputValue: "some long text",
     textInputCursorPosition: new Point(5, 0)
 }
 
-function makeTree(): GElement {
-    const compsDemo = new MVBoxElement({
+function makeCompsDemo() {
+    return new MVBoxElement({
         children: [
             HBox({
+                crossAxisLayout:'center',
                 children: [
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
@@ -62,6 +63,7 @@ function makeTree(): GElement {
                 ],
             }),
             HBox({
+                crossAxisLayout:'center',
                 children: [
                     Label({text: 'toolbar'}),
                     new MHBoxElement({
@@ -77,13 +79,14 @@ function makeTree(): GElement {
                 ]
             }),
             HBox({
+                crossAxisLayout:'center',
                 children: [
                     Label({text: 'text input'}),
                     TextBox({
-                        cursorPosition: state.textInputCursorPosition,
+                        // cursorPosition: state.textInputCursorPosition,
                         inputid: "text-box-1",
                         text: state.textInputValue,
-                        multiline: true,
+                        multiline: false,
                         onChange: (v, e) => {
                             // console.log("new text input value",state.textInputValue)
                             state.textInputValue = v[0]
@@ -91,13 +94,16 @@ function makeTree(): GElement {
                             e.redraw()
                         }
                     }),
-                    Label({text:'multi\nline\ntext', multiline:true})
+                    Label({text:'text label', multiline:true})
+                    // Label({text:'multi\nline\ntext', multiline:true})
                 ]
             })
         ]
     })
+}
 
-    const listviewDemo = new MHBoxElement({
+function makeListDemo() {
+    return new MHBoxElement({
         id: "list view demo",
         fixedWidth: 200,
         children: [
@@ -132,8 +138,9 @@ function makeTree(): GElement {
             })
         ]
     })
-
-    const panelDemo = new MHBoxElement({
+}
+function makePanelDemo() {
+    return new MHBoxElement({
         children: [
             new MVBoxElement({
                 children: [
@@ -207,7 +214,11 @@ function makeTree(): GElement {
             })
         ]
     })
-
+}
+function makeTree(): GElement {
+    const compsDemo = makeCompsDemo()
+    const listviewDemo = makeListDemo()
+    const panelDemo = makePanelDemo()
     const emailDemo = EmailDemo()
 
     let tabs = TabbedBox({
@@ -229,9 +240,19 @@ function makeTree(): GElement {
             e.redraw()
         }
     })
+    return MWindow({child:tabs})
 
-    let window = MWindow({child:tabs})
-    return window
+    // const vbox = HBox({
+    //     mainAxisLayout:'start',
+    //     crossAxisLayout:'center',
+    //     children:[
+    //         Button({text:"button 1"}),
+    //         HSpacer(),
+    //         Button({text:"button 5"}),
+    //         Button({text:"button 6"}),
+    //     ]})
+    // let window = MWindow({child:vbox})
+    // return window
 }
 
 

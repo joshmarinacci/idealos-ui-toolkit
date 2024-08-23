@@ -4,7 +4,7 @@ import {
     EventHandler,
     GElement,
     GRenderNode,
-    LayoutConstraints,
+    LayoutConstraints, TRANSPARENT,
     VisualStyle,
     ZERO_INSETS,
     ZERO_POINT
@@ -373,9 +373,9 @@ export class HExpander implements GElement {
         return new GRenderNode({
             baseline: 0,
             visualStyle: {
-                background:Style.panelBackgroundColor,
+                background:TRANSPARENT,
                 textColor:'cyan',
-                borderColor:'cyan',
+                borderColor:TRANSPARENT,
             },
             borderWidth: new Insets(1, 1, 1, 1),
             children: [],
@@ -517,4 +517,8 @@ export function VBox(param: BoxParams) {
         crossAxisLayout: param.crossAxisLayout || 'start',
         children: param.children
     })
+}
+
+export function HSpacer() {
+    return new HExpander()
 }
