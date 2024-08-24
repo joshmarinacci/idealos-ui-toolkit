@@ -1,5 +1,16 @@
 import {IconElement, Icons} from "./icons.ts";
-import {EventHandler, GElement, GRenderNode, LayoutConstraints, MGlobals, TRANSPARENT, VisualStyle, ZERO_INSETS} from "./base.ts";
+import {
+    EventHandler,
+    GElement,
+    GRenderNode,
+    LayoutConstraints,
+    MGlobals,
+    StateHandler,
+    TRANSPARENT,
+    useState,
+    VisualStyle,
+    ZERO_INSETS
+} from "./base.ts";
 import {HBox, MHBoxElement, VBox} from "./layout.ts";
 import {Style} from "./style.ts";
 import {Insets} from "josh_js_util";
@@ -209,13 +220,17 @@ export function DropdownButton(props: { children: GElement[]; text: string }) {
     return new DropdownButtonElement(props)
 }
 
-export function ToggleButton(param: { text: string }) {
+
+export type ToggleButtonOptions = {
+    selected?: StateHandler<boolean>
+    text:string
+}
+
+export function ToggleButton(opts: ToggleButtonOptions) {
     const key = KEY_VENDOR.getKey()
-    const cache: StateCache = MGlobals.get(STATE_CACHE)
-    const state = cache.getState(key)
-    let [selected, setSelected] = state.useState("selected", () => false)
+    let [selected, setSelected] = useState(key,"selected",opts.selected,()=>false)
     return Button({
-        text: param.text,
+        text: opts.text,
         selected: selected,
         handleEvent: (e) => {
             if (e.type === 'mouse-down') {

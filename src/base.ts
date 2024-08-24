@@ -1,5 +1,6 @@
 import {RenderContext} from "./gfx.ts";
 import {Insets, Point, Size} from "josh_js_util";
+import {STATE_CACHE, StateCache} from "./state.ts";
 
 export type LayoutConstraints = {
     space:Size
@@ -90,3 +91,17 @@ export const TRANSPARENT = 'transparent';
 
 export const MGlobals = new Map<string,any>
 export const SYMBOL_FONT_ENABLED = 'SYMBOL_FONT_ENABLED';
+export type StateHandler<T> = {
+    get: () => T
+    set: (value: T) => void
+}
+
+export function useState<T>(key: string, prop: string, hand: StateHandler<T> | undefined, fallback: () => T): [T, (value: T) => void] {
+    if (hand) return [
+        hand.get(),
+        hand.set
+    ];
+    const cache: StateCache = MGlobals.get(STATE_CACHE)
+    const state = cache.getState(key)
+    return state.useState(prop, fallback)
+}

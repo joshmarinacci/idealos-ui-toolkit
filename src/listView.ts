@@ -1,9 +1,9 @@
-import {AxisLayout, CEvent, EventHandler, GElement, MGlobals} from "./base.ts";
+import {AxisLayout, CEvent, EventHandler, GElement, StateHandler, useState} from "./base.ts";
 import {MHBoxElement, MVBoxElement} from "./layout.ts";
 import {Style} from "./style.ts";
 import {withInsets} from "./gfx.ts";
 import {Label} from "./text.ts";
-import {STATE_CACHE, StateCache} from "./state.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 type ListViewItemParameters = {
     children:GElement[],
@@ -14,7 +14,7 @@ type ListViewItemParameters = {
 
 export function ListViewItem(opts: ListViewItemParameters): GElement {
     return new MHBoxElement({
-        id: 'ListViewItem',
+        kind: 'ListViewItem',
         mainAxisSelfLayout: 'grow',
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: opts.mainAxisLayout || 'start',
@@ -44,8 +44,7 @@ export type ListItemRenderer<T> = (item:T,
 export type ListViewParameters<T> = {
     key?:string,
     data: T[]
-    selected: number
-    onSelectedChanged?:OnSelectedChangedCallback
+    selected?: StateHandler<number>
     renderItem?:ListItemRenderer<T>
 }
 
@@ -64,14 +63,14 @@ const DefaultItemRenderer:ListItemRenderer<unknown> = (item:unknown,selected:num
 }
 
 export function ListView<T>(opts: ListViewParameters<T>): GElement {
-    // const cache:StateCache =  MGlobals.get(STATE_CACHE);
-    // cache.startElement(opts.key)
-    // const [selected, setSelected] = cache.useState("selected",()=>0)
+    const key = KEY_VENDOR.getKey()
+    let [selected, setSelected] = useState<number>(key,"selected",opts.selected,()=>0)
     const renderer = opts.renderItem || DefaultItemRenderer
-    let box = new MVBoxElement({
+    return new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
-        id: 'list-view',
+        kind: 'list-view',
+        key: key,
         visualStyle: {
             borderColor: Style.panelBorderColor,
             textColor: Style.textColor,
@@ -79,12 +78,10 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         },
         borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {
-            return renderer(item, opts.selected, index, (s,e) => {
-                // setSelected(s)
-                if(opts.onSelectedChanged) opts.onSelectedChanged(s,e)
+            return renderer(item, selected, index, (s, e) => {
+                setSelected(s)
                 e.redraw()
             })
         })
     })
-    return box
 }

@@ -6,7 +6,7 @@ import {HBox, HSpacer, MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
-import {ListView, ListViewItem} from "./listView.ts";
+import {ListView, ListViewItem, OnSelectedChangedCallback} from "./listView.ts";
 import {Point, Size} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
 import {Label, TextBox, WrappingLabel} from "./text.ts";
@@ -38,6 +38,10 @@ function makeCompsDemo() {
                     Button({text: "Button"}),
                     ToggleButton({
                         text: "toggle",
+                        selected: {
+                            get: () => state.toggle,
+                            set: (value) => state.toggle = value,
+                        }
                     }),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     HSpacer(),
@@ -129,23 +133,19 @@ function makeCompsDemo() {
 
 function makeListDemo() {
     return new MHBoxElement({
-        id: "list view demo",
+        kind: "list view demo",
         fixedWidth: 200,
         children: [
             ListView({
-                key: "first-list-view",
                 data: ["john", "Jacob", 'jingleheimer'],
-                selected: state.selectedListItem1,
-                onSelectedChanged: ((i: number, e: CEvent) => {
-                    state.selectedListItem1 = i
-                    e.redraw()
-                })
+                selected: {
+                    get:() => state.selectedListItem1,
+                    set: (value) => state.selectedListItem1 = value
+                },
             }),
             ListView({
-                key: "second-list-view",
                 data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar'],
-                selected: state.selectedListItem2,
-                renderItem: (item, selected, index, onSelectedChanged) => {
+                renderItem: (item, selected, index, os) => {
                     return ListViewItem({
                         mainAxisLayout: 'between',
                         children: [
@@ -154,14 +154,10 @@ function makeListDemo() {
                         ],
                         selected: index === selected,
                         handleEvent: (e) => {
-                            if(e.type === 'mouse-down') onSelectedChanged(index, e)
+                            os(index,e)
                         }
                     })
-                },
-                onSelectedChanged: ((i: number, e: CEvent) => {
-                    state.selectedListItem2 = i
-                    e.redraw()
-                })
+                }
             })
         ]
     })
