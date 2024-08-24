@@ -1,21 +1,19 @@
 import {CEvent, GElement, MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {HSeparator, Square} from "./comps2.ts";
 import {IconElement, Icons} from "./icons.ts";
-import {Button, CheckBox, IconButton, RadioButton, Tag} from "./buttons.ts";
-import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "./layout.ts";
+import {Button, CheckBox, DropdownButton, IconButton, RadioButton, Tag} from "./buttons.ts";
+import {HBox, HSpacer, MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
 
 import {ListView, ListViewItem} from "./listView.ts";
 import {Point, Size} from "josh_js_util";
 import {ScrollContainer} from "./scroll.ts";
-import {Label, TextBox} from "./text.ts";
+import {Label, TextBox, WrappingLabel} from "./text.ts";
 import {EmailDemo} from "./demo/email.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {setup_common_keybindings} from "./actions.ts";
 import {MWindow} from "./window.ts";
-import {PopupContainer} from "./demo/popup.ts";
-import {withInsets} from "./gfx.ts";
 
 const state = {
     toggle: false,
@@ -110,25 +108,26 @@ function makeCompsDemo() {
             }),
             HBox({
                 mainAxisSelfLayout:'shrink',
+                crossAxisLayout:'center',
                 children:[
-                    Button({text: "before"}),
-                    new PopupContainer({
-                        child: VBox({
-                            borderWidth: withInsets(10),
-                            visualStyle: {
-                                background:'red',
-                                borderColor:'green',
-                                textColor:'black',
-                            },
-                            mainAxisSelfLayout:'shrink',
-                            children:[
-                                Button({text:"popup"}),
-                                Button({text:"popup"}),
-                                Button({text:"popup"}),
-                                Button({text:"popup"}),
-                            ]}),
+                    Label({text: "popup"}),
+                    DropdownButton({
+                        text:"open popup",
+                        children: [
+                            Button({text:"popup"}),
+                            Button({text:"popup"}),
+                            Button({text:"popup"}),
+                            Button({text:"popup"}),
+                        ]
                     }),
-                    Button({text: "after"}),
+                ]
+            }),
+            HBox({
+                children:[
+                    WrappingLabel({
+                        text:"This is a long label without a newline that should be wrapped properly.",
+                        fixedWidth: 200,
+                    })
                 ]
             })
         ]
@@ -280,19 +279,6 @@ function makeTree(): GElement {
         }
     })
     return MWindow({child:tabs})
-
-    // const box = HBox({
-    //     mainAxisLayout:'start',
-    //     mainAxisSelfLayout:'grow',
-    //     crossAxisLayout:'center',
-    //     children:[
-    //         Button({text:"button 1"}),
-    //         HSpacer(),
-    //         Button({text:"button 5"}),
-    //         Button({text:"button 6"}),
-    //     ]})
-    // let window = MWindow({child:box})
-    // return window
 }
 
 

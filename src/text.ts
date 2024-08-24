@@ -22,7 +22,8 @@ type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
     text: string
     onChange?: OnChangeCallback<[string,Point]>
-    multiline?:boolean
+    multiline?:boolean,
+    fixedWidth?: number,
 }
 type TextInputRequirements = {
     text: string
@@ -31,6 +32,7 @@ type TextInputRequirements = {
     padding: Insets
     borderWidth: Insets
     multiline:boolean
+    fixedWidth?:number,
 }
 
 class TextModel {
@@ -211,6 +213,7 @@ function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[
 
 type TextElementSettings = {
     multiline?:boolean
+    fixedWidth?:number
 } & ElementSettings
 export class TextElement implements GElement {
     settings: TextElementSettings;
@@ -220,6 +223,7 @@ export class TextElement implements GElement {
     }
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        if(this.settings.fixedWidth) return this.layout_wrapping(rc,_cons)
         if(this.settings.multiline) return this.layout_multiline(rc,_cons);
         let key = KEY_VENDOR.getKey()
         rc.ctx.font = this.settings.font
@@ -256,6 +260,13 @@ export class TextElement implements GElement {
         let lines = this.settings.text.split('\n')
         let y = 0
         let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
+
+        let size = new Size(0,0)
+        size.w = metrics.width
+        size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        if(this.settings.fixedWidth) {
+            size.w = this.settings.fixedWidth
+        }
         let nodes:GRenderNode[] = lines.map(line => {
             let metrics = rc.ctx.measureText(line)
             let pos = new Point(total_insets.left, total_insets.top+ y)
@@ -280,9 +291,6 @@ export class TextElement implements GElement {
             })
         })
 
-        let size = new Size(
-            Math.floor(metrics.width),
-            Math.floor(y+metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
         size = sizeWithPadding(size,total_insets)
         return new GRenderNode({
             kind: "text-multiline-element",
@@ -300,6 +308,81 @@ export class TextElement implements GElement {
             shadow: this.settings.shadow,
         })
     }
+
+    private layout_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
+        rc.ctx.font = this.settings.font
+        let metrics = rc.ctx.measureText("Testy")
+        let baseline = metrics.fontBoundingBoxAscent
+        let lineHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        let words = this.settings.text.split(' ')
+        let x = 0
+        let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
+
+        let size = new Size(0,0)
+        size.w = this.settings.fixedWidth as number
+        size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        size.w -= (total_insets.left + total_insets.right)
+        size.h += (total_insets.top + total_insets.bottom)
+
+        let lines:string[] = []
+        let current_line = ""
+        for(let word of words) {
+            word = word + " "
+            let word_width = rc.ctx.measureText(word).width
+            if(x + word_width > size.w) {
+                lines.push(current_line)
+                current_line = word
+                x = word_width
+            } else {
+                current_line += word
+                x += word_width
+            }
+        }
+        lines.push(current_line)
+        let y = 0
+        let nodes:GRenderNode[] = lines.map(line => {
+            // let metrics = rc.ctx.measureText(line)
+            let pos = new Point(total_insets.left, total_insets.top+ y)
+            y += lineHeight
+            return new GRenderNode({
+                kind:"text-line-element",
+                text:line,
+                font: Style.font,
+                size: new Size(metrics.width,lineHeight),
+                pos: pos,
+                contentOffset: new Point(0,0),
+                baseline: baseline,
+                visualStyle: {
+                    textColor: Style.textColor,
+                    borderColor: TRANSPARENT,
+                    background: TRANSPARENT,
+                },
+                padding: ZERO_INSETS,
+                margin: ZERO_INSETS,
+                borderWidth: ZERO_INSETS,
+                children: []
+            })
+        })
+
+        size.h = y
+        size = sizeWithPadding(size,total_insets)
+        return new GRenderNode({
+            kind: "text-multiline-element",
+            text:"",
+            font: Style.font,
+            size: size,
+            pos: new Point(0, 0),
+            contentOffset: new Point(total_insets.left, total_insets.top),
+            baseline: baseline,
+            visualStyle: this.settings.visualStyle,
+            children: nodes,
+            padding: this.settings.padding,
+            margin: this.settings.margin,
+            borderWidth: this.settings.borderWidth,
+            shadow: this.settings.shadow,
+        })
+
+    }
 }
 
 class TextInputElement implements GElement {
@@ -312,6 +395,7 @@ class TextInputElement implements GElement {
             borderWidth: withInsets(1),
             margin: Style.buttonMargin,
             padding: Style.buttonPadding,
+            fixedWidth: opts.fixedWidth,
         }
     }
 
@@ -354,6 +438,9 @@ class TextInputElement implements GElement {
         cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         const size = new Size(100,100)
+        if(this.settings.fixedWidth) {
+            size.w = this.settings.fixedWidth
+        }
         size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
         const focusedStyle = {
             background: 'hsl(47,100%,79%)',
@@ -437,5 +524,23 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
         borderWidth: ZERO_INSETS,
         shadow: opts.shadow ? opts.shadow : false,
         multiline: opts.multiline ? opts.multiline : false
+    })
+}
+
+export function WrappingLabel(param: { fixedWidth: number; text: string, shadow?:boolean }) {
+    return new TextElement({
+        text: param.text,
+        multiline: true,
+        shadow: param.shadow||false,
+        padding: Style.buttonPadding,
+        margin: ZERO_INSETS,
+        borderWidth: ZERO_INSETS,
+        font: Style.font,
+        fixedWidth: param.fixedWidth,
+        visualStyle: {
+            borderColor: TRANSPARENT,
+            background: TRANSPARENT,
+            textColor: Style.textColor,
+        }
     })
 }

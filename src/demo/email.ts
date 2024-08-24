@@ -2,7 +2,7 @@ import {HBox, HSpacer, VBox} from "../layout.ts";
 import {ScrollContainer} from "../scroll.ts";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
 import {Button, DropdownButton, IconButton} from "../buttons.ts";
-import {Label, TextBox} from "../text.ts";
+import {Label, TextBox, WrappingLabel} from "../text.ts";
 import {Icon, Icons} from "../icons.ts";
 import {EmailMessage} from "rtds-core/build/test-models";
 
@@ -64,8 +64,9 @@ const EmailMessRenderer: ListItemRenderer<EmailMessage> = (item) => {
         mainAxisSelfLayout: 'shrink',
         children: [
             Label({text: item.sender, shadow: true}),
-            Label({text: item.subject, shadow: true}),
-            Label({text: item.body, multiline: true, shadow: true})
+            WrappingLabel({text: item.subject, fixedWidth: 150,
+                shadow:true}),
+            WrappingLabel({text: item.body, fixedWidth:150, shadow:true})
         ],
     })
 }
@@ -97,14 +98,16 @@ const EmailHeaderView = (mess: EmailMessage) => {
 }
 
 function EmailBody(selectedMessage: EmailMessage) {
-    let body = Label({text: selectedMessage.body, multiline: true})
+    let body = WrappingLabel({
+        text: selectedMessage.body,
+        fixedWidth: 300,
+    })
     return ScrollContainer({
-        fixedWidth: 400,
+        fixedWidth: 300,
         key: 'email-body',
-        fixedHeight: 400,
+        fixedHeight: 200,
         child: body,
     })
-    // return body
 }
 
 export function EmailDemo() {
@@ -145,11 +148,7 @@ export function EmailDemo() {
                     TextBox({
                         multiline: false,
                         text: "search",
-                        inputid: "search-box",
-                        // cursorPosition: new Point(0, 0),
-                        onChange: () => {
-
-                        }
+                        fixedWidth:150,
                     }),
                     ScrollContainer({
                         key: 'email-inbox-scroll',
@@ -186,30 +185,4 @@ export function EmailDemo() {
             }),
         ]
     })
-    // HBox({children:[
-    // ]})
-    // const lv = ListView({
-    //     data:["a","b",'C','d','e','f','g','h','i','j','k'],
-    //     key:"email-lv-1",
-    //     selected: state.selectedItem,
-    //     onSelectedChanged:(a,e) => {
-    //         state.selectedItem = a
-    //         e.redraw()
-    //     }
-    // })
-    // return HBox({
-    //     children: [
-    //         ScrollContainer({
-    //             fixedWidth:300,
-    //             fixedHeight:200,
-    //             // scrollOffset: state.scrollOffset,
-    //             child: lv,
-    //             key:'email-scroll'
-    //             // onScrollChanged: (p,e) => {
-    //             //     state.scrollOffset = p
-    //             //     e.redraw()
-    //             // }
-    //         })
-    //     ]
-    // })
 }
