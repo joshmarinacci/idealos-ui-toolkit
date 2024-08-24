@@ -1,9 +1,13 @@
 import {IconElement, Icons} from "./icons.ts";
-import {EventHandler, GElement, TRANSPARENT, VisualStyle, ZERO_INSETS} from "./base.ts";
-import {MHBoxElement} from "./layout.ts";
+import {EventHandler, GElement, GRenderNode, LayoutConstraints, MGlobals, TRANSPARENT, VisualStyle, ZERO_INSETS} from "./base.ts";
+import {HBox, MHBoxElement, VBox} from "./layout.ts";
 import {Style} from "./style.ts";
 import {Insets} from "josh_js_util";
 import {TextElement} from "./text.ts";
+import {RenderContext, withInsets} from "./gfx.ts";
+import {KEY_VENDOR} from "./keys.ts";
+import {STATE_CACHE, StateCache} from "./state.ts";
+import {PopupContainer} from "./demo/popup.ts";
 
 type ButtonParameters = {
     margin?:Insets,
@@ -143,4 +147,67 @@ export function Tag(opts: { text: string }) {
         margin: Style.buttonMargin,
         padding: Style.buttonPadding,
     })
+}
+
+class DropdownButtonElement implements GElement {
+    private props: { children: GElement[]; text: string };
+
+    constructor(props: { children: GElement[]; text: string }) {
+        this.props = props
+    }
+
+    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        let key = KEY_VENDOR.getKey()
+        const cache: StateCache = MGlobals.get(STATE_CACHE)
+        const state = cache.getState(key)
+        let [open, setOpen] = state.useState("open", () => false)
+        let button = IconButton({
+            text: this.props.text, icon: Icons.KeyboardArrowDown, handleEvent: (e) => {
+                if (e.type === 'mouse-down') {
+                    setOpen(!open)
+                    e.redraw()
+                }
+            }
+        })
+        const popup = new PopupContainer({
+            child: VBox({
+                kind: 'popup-menu',
+                mainAxisSelfLayout: 'shrink',
+                crossAxisLayout: 'center',
+                children: this.props.children,
+                borderWidth: withInsets(10),
+                visualStyle: {
+                    background: 'red',
+                    borderColor: 'green',
+                    textColor: 'black',
+                },
+            })
+        })
+        if (open) {
+            let hbox = HBox({
+                kind: 'dropdown-button',
+                mainAxisSelfLayout: 'shrink',
+                children: [button, popup]
+            })
+            let hbox_node = hbox.layout(rc, cons)
+            hbox_node.settings.key = key
+            return hbox_node
+        } else {
+            let hbox = HBox({
+                kind: 'dropdown-button',
+                mainAxisSelfLayout: 'shrink',
+                children: [button]
+            })
+            let hbox_node = hbox.layout(rc, cons)
+            hbox_node.settings.key = key
+            return hbox_node
+        }
+
+    }
+
+
+}
+
+export function DropdownButton(props: { children: GElement[]; text: string }) {
+    return new DropdownButtonElement(props)
 }

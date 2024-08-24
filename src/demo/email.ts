@@ -1,16 +1,10 @@
 import {HBox, HSpacer, VBox} from "../layout.ts";
 import {ScrollContainer} from "../scroll.ts";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
-import {Button, IconButton} from "../buttons.ts";
+import {Button, DropdownButton, IconButton} from "../buttons.ts";
 import {Label, TextBox} from "../text.ts";
 import {Icon, Icons} from "../icons.ts";
 import {EmailMessage} from "rtds-core/build/test-models";
-import {GElement, GRenderNode, LayoutConstraints, MGlobals} from "../base.ts";
-import {PopupContainer} from "./popup.ts";
-import {RenderContext, withInsets} from "../gfx.ts";
-import {KEY_VENDOR} from "../keys.ts";
-import {STATE_CACHE, StateCache} from "../state.ts";
-import {Point} from "josh_js_util";
 
 type EmailFolder = {
     name: string,
@@ -111,67 +105,6 @@ function EmailBody(selectedMessage: EmailMessage) {
         child: body,
     })
     // return body
-}
-
-class DropdownButtonElement implements GElement {
-    private props: { children: GElement[]; text: string };
-
-    constructor(props: { children: GElement[]; text: string }) {
-        this.props = props
-    }
-
-    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        let key = KEY_VENDOR.getKey()
-        const cache:StateCache = MGlobals.get(STATE_CACHE)
-        const state = cache.getState(key)
-        let [open,setOpen] = state.useState("open",() => false)
-        let button = IconButton({text: this.props.text, icon: Icons.KeyboardArrowDown, handleEvent:(e) => {
-            if(e.type === 'mouse-down') {
-                setOpen(!open)
-                e.redraw()
-            }
-            }})
-        const popup = new PopupContainer({
-            child: VBox({
-                kind:'popup-menu',
-                mainAxisSelfLayout:'shrink',
-                crossAxisLayout:'center',
-                children: this.props.children,
-                borderWidth: withInsets(10),
-                visualStyle: {
-                    background:'red',
-                    borderColor:'green',
-                    textColor:'black',
-                },
-            })
-        })
-        if(open) {
-            let hbox = HBox({
-                kind: 'dropdown-button',
-                mainAxisSelfLayout: 'shrink',
-                children: [button, popup]
-            })
-            let hbox_node = hbox.layout(rc,cons)
-            hbox_node.settings.key = key
-            return hbox_node
-        } else {
-            let hbox = HBox({
-                kind: 'dropdown-button',
-                mainAxisSelfLayout: 'shrink',
-                children: [button]
-            })
-            let hbox_node = hbox.layout(rc,cons)
-            hbox_node.settings.key = key
-            return hbox_node
-        }
-
-    }
-
-
-
-}
-function DropdownButton(props: { children: GElement[]; text: string }) {
-    return new DropdownButtonElement(props)
 }
 
 export function EmailDemo() {
