@@ -156,13 +156,13 @@ export function EmailDemo() {
                 mainAxisSelfLayout: 'shrink',
                 crossAxisSelfLayout: 'shrink',
                 children: [
-                    DropdownButton({text: "Work", children:[
-                            Button({text:"Work"}),
-                            Button({text:"Personal"}),
-                        ]}),
+                    // DropdownButton({text: "Work", children:[
+                    //         Button({text:"Work"}),
+                    //         Button({text:"Personal"}),
+                    //     ]}),
                     ScrollContainer({
                         key: 'email-folders-scroll',
-                        fixedWidth: 200,
+                        fixedWidth: 150,
                         fixedHeight: 300,
                         child: ListView({
                             key: "email-folder-list",
@@ -182,7 +182,6 @@ export function EmailDemo() {
                             Label({text: "Inbox"}),
                             Button({text: "All Mail"}),
                             Button({text: "Unread"}),
-
                         ]
                     }),
                     TextBox({
@@ -196,7 +195,7 @@ export function EmailDemo() {
                     }),
                     ScrollContainer({
                         key: 'email-inbox-scroll',
-                        fixedWidth: 200,
+                        fixedWidth: 150,
                         fixedHeight: 200,
                         child: ListView({
                             key: "email-inbox",
@@ -215,12 +214,12 @@ export function EmailDemo() {
                             IconButton({icon: Icons.DeleteForever, ghost: true}),
                             IconButton({icon: Icons.Delete, ghost: true}),
                             // HSep(),
-                            IconButton({icon: Icons.Snooze, ghost: true}),
+                            // IconButton({icon: Icons.Snooze, ghost: true}),
                             IconButton({icon: Icons.Reply, ghost: true}),
-                            IconButton({icon: Icons.ReplyAll, ghost: true}),
+                            // IconButton({icon: Icons.ReplyAll, ghost: true}),
                             IconButton({icon: Icons.Forward, ghost: true}),
                             // HSep()
-                            IconButton({icon: Icons.LeftPanelCloseIcon, ghost: true}),
+                            // IconButton({icon: Icons.LeftPanelCloseIcon, ghost: true}),
                         ]
                     }),
                     EmailHeaderView(state.selectedMessage),

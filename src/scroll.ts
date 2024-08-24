@@ -5,6 +5,7 @@ import {IconButton} from "./buttons.ts";
 import {Icons} from "./icons.ts";
 import {bdsSubInsets} from "./layout.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 export type ScrollContainerSettings = {
     key:string,
@@ -23,9 +24,11 @@ class ScrollContainerElement implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        const cache:StateCache =  MGlobals.get(STATE_CACHE);
-        cache.startLayout(this.param.key)
-        const [scrollOffset,setScrollOffset] = cache.useState("scrollOffset",() => new Point(0,0))
+        // const cache:StateCache =  MGlobals.get(STATE_CACHE);
+        let key = KEY_VENDOR.getKey()
+        // cache.startLayout(this.param.key)
+        // const [scrollOffset,setScrollOffset] = cache.useState("scrollOffset",() => new Point(0,0))
+        const scrollOffset = new Point(0,0)
 
         let borderInsets = withInsets(1)
         const fullBounds = new Bounds(0, 0, this.param.fixedWidth, this.param.fixedHeight)
@@ -36,8 +39,8 @@ class ScrollContainerElement implements GElement {
         const contentBounds = bdsSubInsets(fullBounds, borderInsets)
 
         let os = (offset:Point, e:CEvent) => {
-            console.log("new offset",offset)
-            setScrollOffset(offset)
+            // console.log("new offset",offset)
+            // setScrollOffset(offset)
             e.redraw()
         }
         ;//this.param.onScrollChanged
@@ -87,6 +90,7 @@ class ScrollContainerElement implements GElement {
 
         let node = new GRenderNode({
             kind: 'scroll',
+            key:key,
             size: fullBounds.size(),
             visualStyle: {
                 background: "magenta",
@@ -110,7 +114,7 @@ class ScrollContainerElement implements GElement {
                 }
             }
         })
-        cache.endLayout(this.param.key)
+        // cache.endLayout(this.param.key)
         return node
     }
 

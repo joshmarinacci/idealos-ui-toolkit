@@ -37,26 +37,35 @@ function makeCompsDemo() {
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
                     Button({
-                        text: "toggle", selected: state.toggle, handleEvent: (e) => {
-                            state.toggle = !state.toggle
-                            e.redraw()
+                        text: "toggle",
+                        selected: state.toggle,
+                        handleEvent: (e) => {
+                            if(e.type === 'mouse-down') {
+                                state.toggle = !state.toggle
+                                e.redraw()
+                            }
                         }
                     }),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
+                    HSpacer(),
                     CheckBox({
                         text: "Checkbox",
                         selected: state.checked,
                         handleEvent: (e) => {
-                            state.checked = !state.checked
-                            e.redraw()
+                            if(e.type === 'mouse-down') {
+                                state.checked = !state.checked
+                                e.redraw()
+                            }
                         }
                     }),
                     RadioButton({
                         text: 'radio box',
                         selected: state.radioed,
                         handleEvent: (e) => {
-                            state.radioed = !state.radioed
-                            e.redraw()
+                            if(e.type === 'mouse-down') {
+                                state.radioed = !state.radioed
+                                e.redraw()
+                            }
                         }
                     }),
                     Tag({text: 'tag'}),
@@ -68,6 +77,9 @@ function makeCompsDemo() {
                     Label({text: 'toolbar'}),
                     new MHBoxElement({
                         crossAxisLayout: "center",
+                        visualStyle:{
+                          background:'#333'
+                        },
                         children: [
                             Button({text: "Button", key:"first-button"}),
                             IconButton({text: 'IconButton', icon: Icons.Document, ghost: false, key:"second-button"}),
@@ -110,11 +122,11 @@ function makeListDemo() {
             ListView({
                 key: "first-list-view",
                 data: ["john", "Jacob", 'jingleheimer'],
-                // selected: state.selectedListItem1,
-                // onSelectedChanged: ((i: number, e: CEvent) => {
-                //     state.selectedListItem1 = i
-                //     e.redraw()
-                // })
+                selected: state.selectedListItem1,
+                onSelectedChanged: ((i: number, e: CEvent) => {
+                    state.selectedListItem1 = i
+                    e.redraw()
+                })
             }),
             ListView({
                 key: "second-list-view",
@@ -141,6 +153,9 @@ function makeListDemo() {
 }
 function makePanelDemo() {
     return new MHBoxElement({
+        mainAxisLayout:'between',
+        mainAxisSelfLayout:'grow',
+        crossAxisSelfLayout:'grow',
         children: [
             new MVBoxElement({
                 children: [
@@ -242,8 +257,9 @@ function makeTree(): GElement {
     })
     return MWindow({child:tabs})
 
-    // const vbox = HBox({
+    // const box = HBox({
     //     mainAxisLayout:'start',
+    //     mainAxisSelfLayout:'grow',
     //     crossAxisLayout:'center',
     //     children:[
     //         Button({text:"button 1"}),
@@ -251,7 +267,7 @@ function makeTree(): GElement {
     //         Button({text:"button 5"}),
     //         Button({text:"button 6"}),
     //     ]})
-    // let window = MWindow({child:vbox})
+    // let window = MWindow({child:box})
     // return window
 }
 

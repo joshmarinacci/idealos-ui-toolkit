@@ -44,7 +44,7 @@ export type ListItemRenderer<T> = (item:T,
 export type ListViewParameters<T> = {
     key?:string,
     data: T[]
-    selected?: number
+    selected: number
     onSelectedChanged?:OnSelectedChangedCallback
     renderItem?:ListItemRenderer<T>
 }
@@ -57,19 +57,21 @@ const DefaultItemRenderer:ListItemRenderer<unknown> = (item:unknown,selected:num
         // Label({text: opts.text, shadow: true}),
         ],
         selected: index === selected,
-        handleEvent: (e) => onSelectedChanged(index, e)
+        handleEvent: (e) => {
+            if(e.type === 'mouse-down') onSelectedChanged(index, e)
+        }
     })
 }
 
 export function ListView<T>(opts: ListViewParameters<T>): GElement {
-    const cache:StateCache =  MGlobals.get(STATE_CACHE);
-    if(!opts.key) {
-        console.warn("list view without a key")
-        throw new Error("list view without a key")
-    }
-    cache.startElement(opts.key)
+    // const cache:StateCache =  MGlobals.get(STATE_CACHE);
+    // if(!opts.key) {
+    //     console.warn("list view without a key")
+    //     throw new Error("list view without a key")
+    // }
+    // cache.startElement(opts.key)
 
-    const [selected, setSelected] = cache.useState("selected",()=>0)
+    // const [selected, setSelected] = cache.useState("selected",()=>0)
     const renderer = opts.renderItem || DefaultItemRenderer
     let box = new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
@@ -82,13 +84,13 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         },
         borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {
-            return renderer(item, selected, index, (s,e) => {
-                setSelected(s)
+            return renderer(item, opts.selected, index, (s,e) => {
+                // setSelected(s)
+                if(opts.onSelectedChanged) opts.onSelectedChanged(s,e)
                 e.redraw()
-                // if(opts.onSelectedChanged) opts.onSelectedChanged(s,e)
             })
         })
     })
-    cache.endElement(opts.key)
+    // cache.endElement(opts.key)
     return box
 }
