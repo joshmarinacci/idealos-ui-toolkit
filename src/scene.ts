@@ -208,7 +208,6 @@ export class Scene {
             if(found.settings.key !== this.current_hover) {
                 this.ifTarget(this.current_hover, (comp) => {
                     comp.settings.currentStyle = comp.settings.visualStyle
-                    this.redraw()
                 })
                 if(found.settings.hoverStyle)  {
                     found.settings.currentStyle = found.settings.hoverStyle
