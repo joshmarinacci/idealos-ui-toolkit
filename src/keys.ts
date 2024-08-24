@@ -49,7 +49,7 @@ export class KeyVendor {
         let last = this.stack[this.stack.length - 1]
         last.count += 1
         let key = this.stack.map(n => n.count).join(".")
-        console.log("getting key", last.name, key)
+        // console.log("getting key", last.name, key)
         return key
     }
 
@@ -65,11 +65,11 @@ export class KeyVendor {
             name: e.constructor.name,
             count: 0,
         })
-        console.log('starting',e.constructor.name, this.stack.map(n => n.count).join("."))
+        // console.log('starting',e.constructor.name, this.stack.map(n => n.count).join("."))
     }
 
     endElement(e:GElement) {
-        console.log('ending  ',e.constructor.name, this.stack.map(n => n.count).join("."))
+        // console.log('ending  ',e.constructor.name, this.stack.map(n => n.count).join("."))
         this.stack.pop()
     }
 

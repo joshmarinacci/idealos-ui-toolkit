@@ -111,6 +111,16 @@ class BoxElementBase {
     protected getTotalInsets() {
         return addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
     }
+    protected getConstraints() {
+        return {
+            mainAxisSelfLayout: this.settings.mainAxisSelfLayout,
+            mainAxisLayout: this.settings.mainAxisLayout,
+            crossAxisSelfLayout: this.settings.crossAxisSelfLayout,
+            crossAxisLayout: this.settings.crossAxisLayout,
+            fixedWidth: this.settings.fixedWidth,
+            fixedHeight: this.settings.fixedHeight,
+        }
+    }
 }
 
 export class MHBoxElement extends BoxElementBase implements GElement {
@@ -362,7 +372,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             x += node.settings.size.w
         })
 
-        console.log("doing shrink")
         let children = chs.map(ch => map.get(ch) as GRenderNode)
         return new GRenderNode({
             visualStyle: this.settings.visualStyle,
@@ -387,16 +396,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
     }
 
-    private getConstraints() {
-        return {
-            mainAxisSelfLayout: this.settings.mainAxisSelfLayout,
-            mainAxisLayout: this.settings.mainAxisLayout,
-            crossAxisSelfLayout: this.settings.crossAxisSelfLayout,
-            crossAxisLayout: this.settings.crossAxisLayout,
-            fixedWidth: this.settings.fixedWidth,
-            fixedHeight: this.settings.fixedHeight,
-        }
-    }
 
 }
 
@@ -460,7 +459,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         this.log("space = ", cons.layout, cons.space)
-
+        let key = KEY_VENDOR.getKey()
         let chs = this.settings.children
         // let map = new Map<GElement, GRenderNode>()
         // let expanders = chs.filter(ch => ch instanceof HExpander)
@@ -487,6 +486,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         contentBounds = this.subtractInsets(contentBounds)
         this.log(this.settings.id, fullBounds, contentBounds)
 
+        KEY_VENDOR.startElement(this)
         // layout children
         let children = chs.map(ch => {
             return ch.layout(rc, {
@@ -494,6 +494,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
                 layout: this.settings.mainAxisSelfLayout
             })
         })
+        KEY_VENDOR.endElement(this)
 
         // position children
         let y = contentBounds.y
@@ -525,6 +526,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
         return new GRenderNode({
             ...this.settings,
+            key:key,
             baseline: 0,
             children: children,
             contentOffset: new Point(5, 5),
@@ -533,6 +535,8 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
+        },{
+            constraints:this.getConstraints()
         })
     }
 

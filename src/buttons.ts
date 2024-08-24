@@ -29,7 +29,7 @@ export function IconButton(opts: IconButtonParameters) {
             textColor: Style.buttonTextColor,
         },
         hoverStyle: opts.hoverStyle || {
-            background: Style.buttonBackground,
+            background: Style.buttonBackgroundHoverColor,
             borderColor: Style.buttonBorderColor,
             textColor: Style.buttonTextColor,
         },
@@ -58,7 +58,6 @@ export function IconButton(opts: IconButtonParameters) {
         margin: Style.buttonMargin,
         padding: Style.buttonPadding,
         handleEvent: opts.handleEvent,
-        key: opts.key,
     })
 }
 

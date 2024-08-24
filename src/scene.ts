@@ -116,7 +116,7 @@ export class Scene {
         KEY_VENDOR.start()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
         KEY_VENDOR.end()
-        KEY_VENDOR.dump(this.renderRoot)
+        // KEY_VENDOR.dump(this.renderRoot)
         this.syncRenderMap(this.renderRoot)
     }
 

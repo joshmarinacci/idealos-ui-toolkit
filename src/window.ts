@@ -27,7 +27,6 @@ class MWindowElement implements GElement {
         const [down,setDown] = cache.useState("window-size-down",() => false)
 
 
-        console.log("layout window",size)
         const borderWidth = withInsets(5)
         let contentBounds = bdsSubInsets(Bounds.fromPointSize(new Point(0,0),size),borderWidth)
         let child = this.child.layout(rc, {
