@@ -1,13 +1,16 @@
 import {HBox, HSpacer, VBox} from "../layout.ts";
 import {ScrollContainer} from "../scroll.ts";
-import {Point, Size} from "josh_js_util";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
 import {Button, IconButton} from "../buttons.ts";
 import {Label, TextBox} from "../text.ts";
 import {Icon, Icons} from "../icons.ts";
 import {EmailMessage} from "rtds-core/build/test-models";
-import {GElement, GRenderNode, LayoutConstraints, TRANSPARENT, ZERO_INSETS} from "../base.ts";
-import {RenderContext} from "../gfx.ts";
+import {GElement, GRenderNode, LayoutConstraints, MGlobals} from "../base.ts";
+import {PopupContainer} from "./popup.ts";
+import {RenderContext, withInsets} from "../gfx.ts";
+import {KEY_VENDOR} from "../keys.ts";
+import {STATE_CACHE, StateCache} from "../state.ts";
+import {Point} from "josh_js_util";
 
 type EmailFolder = {
     name: string,
@@ -110,51 +113,65 @@ function EmailBody(selectedMessage: EmailMessage) {
     // return body
 }
 
-class PopupContainer implements GElement {
-    private child: GElement;
+class DropdownButtonElement implements GElement {
+    private props: { children: GElement[]; text: string };
 
-    constructor(param: { child: GElement }) {
-        this.child = param.child
+    constructor(props: { children: GElement[]; text: string }) {
+        this.props = props
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        let child = this.child.layout(rc, cons)
-        return new GRenderNode({
-            kind: "popup-container",
-            size: new Size(100, 200),
-            pos: new Point(100, 100),
-            margin: ZERO_INSETS,
-            padding: ZERO_INSETS,
-            borderWidth: ZERO_INSETS,
-            children: [child],
-            contentOffset: new Point(0, 0),
-
-            clip: false,
-            baseline: 0,
-            font: "",
-            text: "",
-            visualStyle: {
-                textColor: TRANSPARENT,
-                background: TRANSPARENT,
-                borderColor: TRANSPARENT,
-            },
-            popup: true,
-
+        let key = KEY_VENDOR.getKey()
+        const cache:StateCache = MGlobals.get(STATE_CACHE)
+        const state = cache.getState(key)
+        let [open,setOpen] = state.useState("open",() => false)
+        let button = IconButton({text: this.props.text, icon: Icons.KeyboardArrowDown, handleEvent:(e) => {
+            if(e.type === 'mouse-down') {
+                setOpen(!open)
+                e.redraw()
+            }
+            }})
+        const popup = new PopupContainer({
+            child: VBox({
+                kind:'popup-menu',
+                mainAxisSelfLayout:'shrink',
+                crossAxisLayout:'center',
+                children: this.props.children,
+                borderWidth: withInsets(10),
+                visualStyle: {
+                    background:'red',
+                    borderColor:'green',
+                    textColor:'black',
+                },
+            })
         })
+        if(open) {
+            let hbox = HBox({
+                kind: 'dropdown-button',
+                mainAxisSelfLayout: 'shrink',
+                children: [button, popup]
+            })
+            let hbox_node = hbox.layout(rc,cons)
+            hbox_node.settings.key = key
+            return hbox_node
+        } else {
+            let hbox = HBox({
+                kind: 'dropdown-button',
+                mainAxisSelfLayout: 'shrink',
+                children: [button]
+            })
+            let hbox_node = hbox.layout(rc,cons)
+            hbox_node.settings.key = key
+            return hbox_node
+        }
+
     }
 
-}
 
+
+}
 function DropdownButton(props: { children: GElement[]; text: string }) {
-    let button = IconButton({text: props.text, icon: Icons.KeyboardArrowDown})
-    const popup = new PopupContainer({
-        child: VBox({
-            children: props.children,
-        })
-    })
-    return HBox({
-        children: [button, popup]
-    })
+    return new DropdownButtonElement(props)
 }
 
 export function EmailDemo() {
@@ -164,10 +181,10 @@ export function EmailDemo() {
                 mainAxisSelfLayout: 'shrink',
                 crossAxisSelfLayout: 'shrink',
                 children: [
-                    // DropdownButton({text: "Work", children:[
-                    //         Button({text:"Work"}),
-                    //         Button({text:"Personal"}),
-                    //     ]}),
+                    DropdownButton({text: "Work", children:[
+                            Button({text:"Work"}),
+                            Button({text:"Personal"}),
+                        ]}),
                     ScrollContainer({
                         key: 'email-folders-scroll',
                         fixedWidth: 150,

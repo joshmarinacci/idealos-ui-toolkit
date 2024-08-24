@@ -127,7 +127,8 @@ export class Scene {
         // rc.ctx.translate(10,10)
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
-        doDraw(this.renderRoot, rc)
+        doDraw(this.renderRoot, rc,false)
+        doDraw(this.renderRoot,rc,true)
         this.drawDebugOverlay(rc)
         rc.ctx.restore()
     }
@@ -302,7 +303,8 @@ export class Scene {
             if(n.userdata.constraints) {
                 console.table(n.userdata['constraints'])
             }
-            console.log(`size ${n.settings.size}`)
+            // console.log(`size ${n.settings.size}`)
+            // console.log('border', n.settings.borderWidth)
         })
     }
 

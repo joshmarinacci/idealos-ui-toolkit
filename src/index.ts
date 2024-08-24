@@ -14,6 +14,8 @@ import {EmailDemo} from "./demo/email.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {setup_common_keybindings} from "./actions.ts";
 import {MWindow} from "./window.ts";
+import {PopupContainer} from "./demo/popup.ts";
+import {withInsets} from "./gfx.ts";
 
 const state = {
     toggle: false,
@@ -105,6 +107,29 @@ function makeCompsDemo() {
                     Label({text:'text label', multiline:true})
                     // Label({text:'multi\nline\ntext', multiline:true})
                 ]
+            }),
+            HBox({
+                mainAxisSelfLayout:'shrink',
+                children:[
+                    Button({text: "before"}),
+                    new PopupContainer({
+                        child: VBox({
+                            borderWidth: withInsets(10),
+                            visualStyle: {
+                                background:'red',
+                                borderColor:'green',
+                                textColor:'black',
+                            },
+                            mainAxisSelfLayout:'shrink',
+                            children:[
+                                Button({text:"popup"}),
+                                Button({text:"popup"}),
+                                Button({text:"popup"}),
+                                Button({text:"popup"}),
+                            ]}),
+                    }),
+                    Button({text: "after"}),
+                ]
             })
         ]
     })
@@ -169,8 +194,9 @@ function makePanelDemo() {
             }),
             new MVBoxElement({
                 children: [
-                    Label({text: 'hbox'}),
+                    Label({text: 'vbox'}),
                     new MVBoxElement({
+                        crossAxisLayout:'center',
                         children: [
                             Button({text: "one"}),
                             Button({text: "two"}),

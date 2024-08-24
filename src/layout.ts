@@ -16,7 +16,7 @@ import {addInsets, insetsHeight, insetsWidth} from "./util.ts";
 import {KEY_VENDOR} from "./keys.ts";
 
 type BoxParameters = {
-    id?: string,
+    kind?: string,
     mainAxisSelfLayout?: AxisSelfLayout,
     crossAxisSelfLayout?: AxisSelfLayout,
     mainAxisLayout?: AxisLayout,
@@ -41,6 +41,9 @@ export type BoxParams = {
     mainAxisLayout?: AxisLayout,
     crossAxisLayout?: AxisLayout,
     children: GElement[],
+    borderWidth?:Insets
+    visualStyle?: VisualStyle
+    kind?: string,
 }
 
 type BoxRequirements = {
@@ -127,7 +130,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxParameters) {
         super({
-            id: param.id || "hbox",
+            id: param.kind || "hbox",
             borderRadius: param.borderRadius || ZERO_INSETS,
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
@@ -354,8 +357,10 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         // get total child bounds
         chs.forEach(ch => {
             let node = map.get(ch) as GRenderNode
-            child_total_width += node.settings.size.w
-            max_child_height = Math.max(max_child_height, node.settings.size.h)
+            if(!node.settings.popup) {
+                child_total_width += node.settings.size.w
+                max_child_height = Math.max(max_child_height, node.settings.size.h)
+            }
         })
         contentBounds.w = child_total_width
         contentBounds.h = max_child_height
@@ -368,8 +373,10 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let x = contentBounds.x
         chs.forEach(ch => {
             let node = map.get(ch) as GRenderNode
-            node.settings.pos.x = x
-            x += node.settings.size.w
+            if(!node.settings.popup) {
+                node.settings.pos.x = x
+                x += node.settings.size.w
+            }
         })
 
         let children = chs.map(ch => map.get(ch) as GRenderNode)
@@ -433,7 +440,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxParameters) {
         super({
-            id: param.id || 'vbox',
+            id: param.kind || 'vbox',
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
@@ -535,6 +542,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
+            borderWidth: this.settings.borderWidth,
         },{
             constraints:this.getConstraints()
         })
@@ -549,6 +557,7 @@ export function HBox(param: BoxParams) {
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
         children: param.children,
+        kind: param.kind,
     })
 }
 
@@ -559,6 +568,9 @@ export function VBox(param: BoxParams) {
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
         children: param.children,
+        borderWidth: param.borderWidth,
+        visualStyle: param.visualStyle,
+        kind: param.kind,
     })
 }
 
