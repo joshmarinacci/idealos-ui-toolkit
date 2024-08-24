@@ -24,14 +24,14 @@ class ScrollContainerElement implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        // const cache:StateCache =  MGlobals.get(STATE_CACHE);
+        const cache:StateCache =  MGlobals.get(STATE_CACHE);
         let key = KEY_VENDOR.getKey()
-        // cache.startLayout(this.param.key)
-        // const [scrollOffset,setScrollOffset] = cache.useState("scrollOffset",() => new Point(0,0))
-        const scrollOffset = new Point(0,0)
+        let state = cache.getState(key)
+        const [scrollOffset,setScrollOffset] = state.useState("scrollOffset",() => new Point(0,0))
 
         let borderInsets = withInsets(1)
         const fullBounds = new Bounds(0, 0, this.param.fixedWidth, this.param.fixedHeight)
+        KEY_VENDOR.startElement(this)
         let child = this.param.child.layout(rc, {
             space: fullBounds.size(),
             layout: "grow",
@@ -39,9 +39,10 @@ class ScrollContainerElement implements GElement {
         const contentBounds = bdsSubInsets(fullBounds, borderInsets)
 
         let os = (offset:Point, e:CEvent) => {
-            // console.log("new offset",offset)
-            // setScrollOffset(offset)
-            e.redraw()
+            if(e.type === 'mouse-down' || e.type === 'wheel') {
+                setScrollOffset(offset)
+                e.redraw()
+            }
         }
         ;//this.param.onScrollChanged
         let children = [child]
@@ -49,10 +50,7 @@ class ScrollContainerElement implements GElement {
             // left button
             let button = IconButton({
                 icon: Icons.KeyboardArrowLeft, ghost: true,
-                handleEvent: (e) => {
-                    // this.param.onScrollChanged(this.addToOffset(new Point(10, 0), child.settings.size, contentBounds), e)
-                    os(this.addToOffset(scrollOffset,new Point(10,0),child.settings.size,contentBounds),e)
-                },
+                handleEvent: (e) => os(this.addToOffset(scrollOffset, new Point(10, 0), child.settings.size, contentBounds), e),
                 margin: ZERO_INSETS
             })
             let node = button.layout(rc, cons)
@@ -87,7 +85,7 @@ class ScrollContainerElement implements GElement {
         }
 
         child.settings.pos = scrollOffset.add(contentBounds.position())
-
+        KEY_VENDOR.endElement(this)
         let node = new GRenderNode({
             kind: 'scroll',
             key:key,
@@ -114,7 +112,6 @@ class ScrollContainerElement implements GElement {
                 }
             }
         })
-        // cache.endLayout(this.param.key)
         return node
     }
 
@@ -156,9 +153,5 @@ export function ScrollContainer(param: {
     child: GElement
     key: string,
 }): GElement {
-    const cache:StateCache =  MGlobals.get(STATE_CACHE);
-    cache.startElement(param.key)
-    let scroll = new ScrollContainerElement(param)
-    cache.endElement(param.key)
-    return scroll
+    return new ScrollContainerElement(param)
 }

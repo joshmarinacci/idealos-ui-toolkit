@@ -36,7 +36,9 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                         borderRadius: Style.tabButtonBorderRadius,
                         borderWidth: Style.tabButtonBorderWidth,
                         handleEvent:(e) => {
-                            opts.onSelectedChanged(i,e)
+                            if(e.type === 'mouse-down') {
+                                opts.onSelectedChanged(i, e)
+                            }
                         }
                     });
                 })),

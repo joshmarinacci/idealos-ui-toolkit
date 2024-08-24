@@ -12,19 +12,16 @@ class MWindowElement implements GElement {
     private child: GElement;
 
     constructor(param: { child: GElement }) {
-        const cache:StateCache =  MGlobals.get(STATE_CACHE);
-        cache.startElement('window')
         this.child = param.child
-        cache.endElement('window')
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         let key = KEY_VENDOR.getKey()
         KEY_VENDOR.startElement(this)
         const cache:StateCache =  MGlobals.get(STATE_CACHE);
-        cache.startLayout('window')
-        const [size,setSize] = cache.useState("window-size",() => new Size(500,300))
-        const [down,setDown] = cache.useState("window-size-down",() => false)
+        const state = cache.getState(key)
+        const [size,setSize] = state.useState("window-size",() => new Size(500,300))
+        const [down,setDown] = state.useState("window-size-down",() => false)
 
 
         const borderWidth = withInsets(5)
@@ -91,8 +88,6 @@ class MWindowElement implements GElement {
             }
 
         })
-
-        cache.endLayout('window')
         return node
     }
 

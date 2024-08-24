@@ -140,7 +140,9 @@ function makeListDemo() {
                             new IconElement({icon: Icons.DragHandle, shadow: true})
                         ],
                         selected: index === selected,
-                        handleEvent: (e) => onSelectedChanged(index, e)
+                        handleEvent: (e) => {
+                            if(e.type === 'mouse-down') onSelectedChanged(index, e)
+                        }
                     })
                 },
                 onSelectedChanged: ((i: number, e: CEvent) => {

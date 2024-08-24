@@ -65,12 +65,7 @@ const DefaultItemRenderer:ListItemRenderer<unknown> = (item:unknown,selected:num
 
 export function ListView<T>(opts: ListViewParameters<T>): GElement {
     // const cache:StateCache =  MGlobals.get(STATE_CACHE);
-    // if(!opts.key) {
-    //     console.warn("list view without a key")
-    //     throw new Error("list view without a key")
-    // }
     // cache.startElement(opts.key)
-
     // const [selected, setSelected] = cache.useState("selected",()=>0)
     const renderer = opts.renderItem || DefaultItemRenderer
     let box = new MVBoxElement({
@@ -91,6 +86,5 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
             })
         })
     })
-    // cache.endElement(opts.key)
     return box
 }

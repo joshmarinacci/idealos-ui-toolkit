@@ -34,7 +34,7 @@ type EmailMessage = {
     date: number,
     body: string,
     unread: boolean
-    tags:string[]
+    tags: string[]
 }
 
 const messages: EmailMessage[] = [
@@ -76,7 +76,11 @@ const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, inde
     return ListViewItem({
         selected: index == selected,
         mainAxisLayout: 'between',
-        handleEvent: (e) => onSelectedChanged(index, e),
+        handleEvent: (e) => {
+            if (e.type === 'mouse-down') {
+                onSelectedChanged(index, e)
+            }
+        },
         children: [
             Icon({icon: item.icon}),
             Label({text: item.name, shadow: true}),
@@ -86,19 +90,21 @@ const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, inde
     })
 }
 
-const EmailHeaderView = (mess:EmailMessage) => {
-    return HBox({children:[
-            Label({text:mess.sender}),
-            Label({text:mess.subject}),
-        ]})
+const EmailHeaderView = (mess: EmailMessage) => {
+    return HBox({
+        children: [
+            Label({text: mess.sender}),
+            Label({text: mess.subject}),
+        ]
+    })
 }
 
 function EmailBody(selectedMessage: EmailMessage) {
-    let body = Label({text:selectedMessage.body, multiline:true})
+    let body = Label({text: selectedMessage.body, multiline: true})
     return ScrollContainer({
-        fixedWidth:400,
-        key:'email-body',
-        fixedHeight:400,
+        fixedWidth: 400,
+        key: 'email-body',
+        fixedHeight: 400,
         child: body,
     })
     // return body
@@ -106,22 +112,24 @@ function EmailBody(selectedMessage: EmailMessage) {
 
 class PopupContainer implements GElement {
     private child: GElement;
+
     constructor(param: { child: GElement }) {
         this.child = param.child
     }
+
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        let child = this.child.layout(rc,cons)
+        let child = this.child.layout(rc, cons)
         return new GRenderNode({
-            kind:"popup-container",
-            size: new Size(100,200),
-            pos: new Point(100,100),
+            kind: "popup-container",
+            size: new Size(100, 200),
+            pos: new Point(100, 100),
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             borderWidth: ZERO_INSETS,
             children: [child],
-            contentOffset: new Point(0,0),
+            contentOffset: new Point(0, 0),
 
-            clip:false,
+            clip: false,
             baseline: 0,
             font: "",
             text: "",
@@ -130,7 +138,7 @@ class PopupContainer implements GElement {
                 background: TRANSPARENT,
                 borderColor: TRANSPARENT,
             },
-            popup:true,
+            popup: true,
 
         })
     }
@@ -138,14 +146,14 @@ class PopupContainer implements GElement {
 }
 
 function DropdownButton(props: { children: GElement[]; text: string }) {
-    let button = IconButton({text:props.text, icon:Icons.KeyboardArrowDown})
+    let button = IconButton({text: props.text, icon: Icons.KeyboardArrowDown})
     const popup = new PopupContainer({
         child: VBox({
             children: props.children,
         })
     })
     return HBox({
-        children:[button,popup]
+        children: [button, popup]
     })
 }
 
@@ -177,7 +185,7 @@ export function EmailDemo() {
                 crossAxisSelfLayout: 'shrink',
                 children: [
                     HBox({
-                        mainAxisSelfLayout:'shrink',
+                        mainAxisSelfLayout: 'shrink',
                         children: [
                             Label({text: "Inbox"}),
                             Button({text: "All Mail"}),
@@ -206,7 +214,7 @@ export function EmailDemo() {
                 ]
             }),
             VBox({
-                crossAxisSelfLayout:'shrink',
+                crossAxisSelfLayout: 'shrink',
                 children: [
                     HBox({
                         children: [

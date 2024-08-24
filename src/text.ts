@@ -320,10 +320,11 @@ class TextInputElement implements GElement {
     }
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        const key = KEY_VENDOR.getKey()
         // console.log("redoing layout",this.opts.text)
         const cache:StateCache = MGlobals.get(STATE_CACHE)
-        cache.startLayout(this.settings.inputid)
-        let [cursorPosition,setCursorPosition] = cache.useState("cursor",() => {
+        const state = cache.getState(key)
+        let [cursorPosition,setCursorPosition] = state.useState("cursor",() => {
             return new Point(0,0)
         })
         let text = new TextElement({
@@ -392,8 +393,6 @@ class TextInputElement implements GElement {
                 }
             }
         })
-
-        cache.endLayout(this.settings.inputid)
         return node
     }
 
@@ -422,11 +421,7 @@ class TextInputElement implements GElement {
 }
 
 export function TextBox(param: TextInputSettings): GElement {
-    const cache:StateCache =  MGlobals.get(STATE_CACHE);
-    cache.startElement(param.inputid)
-    let elem = new TextInputElement(param)
-    cache.endElement(param.inputid)
-    return elem
+    return new TextInputElement(param)
 }
 
 
