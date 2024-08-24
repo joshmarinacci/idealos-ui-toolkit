@@ -320,9 +320,8 @@ class TextInputElement implements GElement {
         // console.log("redoing layout",this.opts.text)
         const cache:StateCache = MGlobals.get(STATE_CACHE)
         const state = cache.getState(key)
-        let [cursorPosition,setCursorPosition] = state.useState("cursor",() => {
-            return new Point(0,0)
-        })
+        let [cursorPosition,setCursorPosition] = state.useState("cursor",() => new Point(0,0))
+        let [focused, setFocused] = state.useState("focused",() => false)
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
             font: Style.font,
@@ -356,19 +355,22 @@ class TextInputElement implements GElement {
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         const size = new Size(100,100)
         size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom + 20
+        const focusedStyle = {
+            background: 'hsl(47,100%,79%)',
+                borderColor: 'black'
+        }
+        const visualStyle = {
+            background: '#f0f0f0',
+            borderColor: '#ccc',
+            textColor: 'black',
+        }
         return new GRenderNode({
             kind: 'text-input-node',
             key:key,
             text: "",
-            visualStyle: {
-                background: '#f0f0f0',
-                borderColor: '#ccc',
-                textColor: 'black',
-            },
-            focusedStyle: {
-                background: 'hsl(47,100%,79%)',
-                borderColor: 'black'
-            },
+            visualStyle: visualStyle,
+            focusedStyle:focusedStyle,
+            currentStyle: focused?focusedStyle:visualStyle,
             baseline: baseline,
             borderWidth: withInsets(1),
             children: [text_node, cursor_node],
@@ -381,6 +383,7 @@ class TextInputElement implements GElement {
             clip: true,
             handleEvent: (e) => {
                 if (e.type === 'keyboard-typed') {
+                    if(!focused) setFocused(true)
                     let kbe = e as MKeyboardEvent;
                     let t2 = processText(this.settings.text, cursorPosition, kbe)
                     setCursorPosition(t2[1])
