@@ -47,7 +47,7 @@ export type BoxParams = {
 }
 
 type BoxRequirements = {
-    id: string,
+    kind: string,
     mainAxisSelfLayout: AxisSelfLayout,
     crossAxisSelfLayout: AxisSelfLayout,
     mainAxisLayout: AxisLayout,
@@ -130,7 +130,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxParameters) {
         super({
-            id: param.kind || "hbox",
+            kind: param.kind || "hbox",
             borderRadius: param.borderRadius || ZERO_INSETS,
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
@@ -209,7 +209,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
     }
 
     private do_grow_layout(rc: RenderContext, cons: LayoutConstraints) {
-        let key = KEY_VENDOR.getKey()
+        let key = this.settings.key || KEY_VENDOR.getKey()
         let fullBounds = new Bounds(0, 0, 0, 0)
         let contentBounds = new Bounds(0, 0, 0, 0)
 
@@ -327,7 +327,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
     private do_shrink_layout(rc: RenderContext, cons: LayoutConstraints) {
         let contentBounds = new Bounds(0, 0, 0, 0)
         let fullBounds = new Bounds(0, 0, 0, 0)
-        let key = KEY_VENDOR.getKey()
+        let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
         let map = new Map<GElement, GRenderNode>()
         this.log('shrinking my width')
@@ -466,7 +466,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         this.log("space = ", cons.layout, cons.space)
-        let key = KEY_VENDOR.getKey()
+        let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
         // let map = new Map<GElement, GRenderNode>()
         // let expanders = chs.filter(ch => ch instanceof HExpander)

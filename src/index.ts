@@ -1,7 +1,7 @@
 import {CEvent, GElement, MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {HSeparator, Square} from "./comps2.ts";
 import {IconElement, Icons} from "./icons.ts";
-import {Button, CheckBox, DropdownButton, IconButton, RadioButton, Tag} from "./buttons.ts";
+import {Button, CheckBox, DropdownButton, IconButton, RadioButton, Tag, ToggleButton} from "./buttons.ts";
 import {HBox, HSpacer, MHBoxElement, MVBoxElement} from "./layout.ts";
 import {TabbedBox} from "./tabbedBox.ts";
 import {Scene} from "./scene.ts";
@@ -36,15 +36,8 @@ function makeCompsDemo() {
                 children: [
                     Label({text: 'simple components'}),
                     Button({text: "Button"}),
-                    Button({
+                    ToggleButton({
                         text: "toggle",
-                        selected: state.toggle,
-                        handleEvent: (e) => {
-                            if(e.type === 'mouse-down') {
-                                state.toggle = !state.toggle
-                                e.redraw()
-                            }
-                        }
                     }),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     HSpacer(),

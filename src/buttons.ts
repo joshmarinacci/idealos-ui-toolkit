@@ -79,9 +79,10 @@ export const RadioButton = (p: ButtonParameters) => IconButton({
     ghost:true, ...p
 })
 
-export function Button(opts: ButtonParameters ):GElement {
+export const Button = (opts: ButtonParameters) => {
     return new MHBoxElement({
-        id:'button',
+        key:opts.key,
+        kind:'button',
         visualStyle: {
             background: opts.selected?Style.selectedBackgroundColor:Style.buttonBackground,
             borderColor: Style.buttonBorderColor,
@@ -114,7 +115,6 @@ export function Button(opts: ButtonParameters ):GElement {
         margin: opts.margin||Style.buttonMargin,
         padding: opts.padding || Style.buttonPadding,
         handleEvent: opts.handleEvent,
-        key:opts.key
     })
 }
 
@@ -202,12 +202,26 @@ class DropdownButtonElement implements GElement {
             hbox_node.settings.key = key
             return hbox_node
         }
-
     }
-
-
 }
 
 export function DropdownButton(props: { children: GElement[]; text: string }) {
     return new DropdownButtonElement(props)
+}
+
+export function ToggleButton(param: { text: string }) {
+    const key = KEY_VENDOR.getKey()
+    const cache: StateCache = MGlobals.get(STATE_CACHE)
+    const state = cache.getState(key)
+    let [selected, setSelected] = state.useState("selected", () => false)
+    return Button({
+        text: param.text,
+        selected: selected,
+        handleEvent: (e) => {
+            if (e.type === 'mouse-down') {
+                setSelected(!selected)
+                e.redraw()
+            }
+        }
+    })
 }
