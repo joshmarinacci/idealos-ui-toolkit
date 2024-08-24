@@ -2,6 +2,7 @@ import {GElement, GRenderNode, LayoutConstraints, MGlobals, SYMBOL_FONT_ENABLED,
 import {RenderContext} from "./gfx.ts";
 import {Style} from "./style.ts";
 import {Point, Size} from "josh_js_util";
+import {KEY_VENDOR} from "./keys.ts";
 
 export enum Icons {
     LeftPanelCloseIcon = 'left_panel_close',
@@ -64,7 +65,9 @@ export class IconElement implements GElement {
     }
 
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        let key = KEY_VENDOR.getKey()
         return new GRenderNode({
+            key:key,
             visualStyle: {
                 background: MGlobals.get(SYMBOL_FONT_ENABLED) === true ? TRANSPARENT : "red",
                 borderColor: "",
@@ -76,7 +79,7 @@ export class IconElement implements GElement {
             contentOffset: new Point(0, 0),
             // font: "24px material-symbols-outlined",
             font :`24px "Material Symbols Outlined"`,
-            id: `icon: ${this.icon}`,
+            kind: `icon: ${this.icon}`,
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: new Point(0, 0),

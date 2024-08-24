@@ -58,7 +58,7 @@ export type RenderNodeSettings = {
     size: Size;
     pos: Point;
     baseline: number;
-    id:string,
+    kind:string,
     inputid?:string,
     children:GRenderNode[],
     padding: Insets
@@ -73,9 +73,11 @@ export type RenderNodeSettings = {
     key?:string,
 }
 export class GRenderNode {
-    settings: RenderNodeSettings;
-    constructor(settings: RenderNodeSettings) {
+    settings: RenderNodeSettings
+    userdata: Record<string, any>
+    constructor(settings: RenderNodeSettings, userdata?:Record<string,any>) {
         this.settings = settings
+        this.userdata = userdata || {}
     }
 }
 

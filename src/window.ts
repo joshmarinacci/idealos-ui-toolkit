@@ -6,6 +6,7 @@ import {bdsSubInsets} from "./layout.ts";
 import {IconButton} from "./buttons.ts";
 import {Icons} from "./icons.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 class MWindowElement implements GElement {
     private child: GElement;
@@ -18,6 +19,8 @@ class MWindowElement implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        let key = KEY_VENDOR.getKey()
+        KEY_VENDOR.startElement(this)
         const cache:StateCache =  MGlobals.get(STATE_CACHE);
         cache.startLayout('window')
         const [size,setSize] = cache.useState("window-size",() => new Size(500,300))
@@ -63,9 +66,9 @@ class MWindowElement implements GElement {
                 }
             }
         }).layout(rc, cons)
-        resize.settings.key = 'window-resize'
+        resize.settings.kind = 'resize-button'
         resize.settings.pos = size.asPoint().subtract(new Point(50,50))
-
+        KEY_VENDOR.endElement(this)
         let node = new GRenderNode({
             inputid: "window",
             margin: ZERO_INSETS,
@@ -76,11 +79,12 @@ class MWindowElement implements GElement {
             // children:[],
             contentOffset: ZERO_POINT.copy(),
             font: "",
-            id: "window",
+            kind: "window",
             pos: new Point(0,0),
             size: size,
             text: "",
             clip: true,
+            key:key,
             visualStyle: {
                 background: 'magenta',
                 borderColor: 'black',

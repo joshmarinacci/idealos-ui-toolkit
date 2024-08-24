@@ -12,7 +12,7 @@ import {
 import {doDraw, RenderContext} from "./gfx.ts";
 import {makeCanvas} from "./util.ts";
 import {Bounds, Point, Size} from "josh_js_util";
-import {STATE_CACHE} from "./state.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 let NULL_VISUAL_STYLE:VisualStyle = {
     borderColor:TRANSPARENT,
@@ -69,7 +69,7 @@ export class Scene {
             let rect = e.target.getBoundingClientRect()
             let pos = new Point(e.clientX, e.clientY);
             pos = pos.subtract(new Point(rect.x, rect.y))
-            this.handleMouseDown(pos)
+            this.handleMouseDown(pos,e.shiftKey)
         })
         this.canvas.addEventListener('mouseup', (e) => {
             // @ts-ignore
@@ -108,11 +108,15 @@ export class Scene {
 
     layout() {
         if(!this.renderMap) this.renderMap = new Map()
+        KEY_VENDOR.reset()
         this.log("layout phase")
         // MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
         this.elementRoot = this.makeTree()
+        KEY_VENDOR.start()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
+        KEY_VENDOR.end()
+        KEY_VENDOR.dump(this.renderRoot)
         this.syncRenderMap(this.renderRoot)
     }
 
@@ -145,6 +149,26 @@ export class Scene {
             return node
         }
     }
+    private findTargetStack(pos: Point, node: GRenderNode): GRenderNode[]|undefined {
+        const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
+        if (bounds.contains(pos)) {
+            if (node.settings.children) {
+                // go backwards
+                for(let i=node.settings.children.length-1; i>=0; i--) {
+                    let ch = node.settings.children[i]
+                    // console.log("ch under mouse is",ch)
+                    if (ch.settings.shadow) continue
+                    let p2 = pos.subtract(bounds.top_left())
+                    let found = this.findTargetStack(p2, ch)
+                    if (found) {
+                        return [node].concat(found)
+                    }
+                }
+            }
+            return [node]
+        }
+        return undefined
+    }
     private findScrollTarget(pos: Point, node: GRenderNode):GRenderNode | undefined {
         const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
         if (bounds.contains(pos)) {
@@ -166,7 +190,6 @@ export class Scene {
     }
 
     handleMouseMove(pos: Point) {
-        // console.log("mouse at",pos,found?found.settings.id:"nothing")
         this.ifTarget(this.current_target, (comp:GRenderNode) => {
             let evt:MMouseEvent = {
                 type:'mouse-move',
@@ -176,26 +199,34 @@ export class Scene {
                 },
                 position:pos
             }
-            if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
+            if(comp.settings.handleEvent)  {
+                comp.settings.handleEvent(evt)
+            }
         })
         let found = this.findTarget(pos, this.renderRoot)
         if (found) {
-            if(found.settings.hoverStyle && found.settings.key !== this.current_hover) {
+            if(found.settings.key !== this.current_hover) {
                 this.ifTarget(this.current_hover, (comp) => {
                     comp.settings.currentStyle = comp.settings.visualStyle
+                    this.redraw()
                 })
-                found.settings.currentStyle = found.settings.hoverStyle
+                if(found.settings.hoverStyle)  {
+                    found.settings.currentStyle = found.settings.hoverStyle
+                }
                 this.current_hover = found.settings.key
                 this.redraw()
             }
         }
     }
 
-    handleMouseDown(pos: Point) {
-        let found = this.findTarget(pos, this.renderRoot)
+    handleMouseDown(pos: Point,shift:boolean) {
+        let found = this.findTargetStack(pos, this.renderRoot)
         if(found) {
-            this.current_target = found.settings.key
-            this.debugPrintTarget()
+            let last = found[found.length - 1]
+            this.current_target = last.settings.key
+            if(shift) {
+                this.debugPrintTarget(found)
+            }
             let evt:MMouseEvent = {
                 type:'mouse-down',
                 redraw: () => {
@@ -204,14 +235,7 @@ export class Scene {
                 },
                 position:pos
             }
-            if (found.settings.handleEvent) found.settings.handleEvent(evt)
-            if(found.settings.inputid) {
-                this.keyboard_target = found.settings.inputid
-                if(found.settings.focusedStyle) {
-                    found.settings.currentStyle = found.settings.focusedStyle
-                    this.redraw()
-                }
-            }
+            if (last.settings.handleEvent) last.settings.handleEvent(evt)
             this.redraw()
         }
     }
@@ -275,23 +299,14 @@ export class Scene {
         }
     }
 
-    private debugPrintTarget() {
-        this.ifTarget(this.current_target, (comp)=>{
-            console.log("target on",
-                comp.settings.id,
-                comp.settings.key,
-                comp.settings.pos.toString(),
-                comp.settings.size.toString())
-            console.log("  insets")
-            console.log('  margin', comp.settings.margin)
-            console.log('  border',comp.settings.borderWidth)
-            console.log('  padding',comp.settings.padding)
-        })
-        if(this.current_target) {
-            if(this.renderMap.has(this.current_target)) {
-                console.log("have target")
+    private debugPrintTarget(found: GRenderNode[]) {
+        console.log("CORE SAMPLE")
+        found.forEach(n => {
+            console.log(n.settings.key, n.settings.kind)
+            if(n.userdata.constraints) {
+                console.table(n.userdata['constraints'])
             }
-        }
+        })
     }
 
     private drawDebugOverlay(rc: RenderContext) {
@@ -303,7 +318,7 @@ export class Scene {
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
         this.ifTarget(this.current_target,(comp)=>{
             let t = comp.settings
-            this.debugText(rc,bounds,` id=${t.id} ${t.pos} ${t.size}`)
+            this.debugText(rc,bounds,` id=${t.kind} ${t.pos} ${t.size}`)
         })
         rc.ctx.restore()
     }

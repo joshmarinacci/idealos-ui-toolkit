@@ -139,7 +139,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext): void {
         // draw the baseline
         rc.ctx.fillStyle = 'cyan'
         rc.ctx.fillRect(n.settings.contentOffset.x, n.settings.contentOffset.y + n.settings.baseline, n.settings.size.w, 1)
-        debugText(rc, n.settings.id, new Point(5, 10))
+        debugText(rc, n.settings.kind, new Point(5, 10))
     }
     rc.ctx.restore()
 }

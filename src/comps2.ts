@@ -2,6 +2,7 @@ import {GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from 
 import {RenderContext} from "./gfx.ts";
 import {Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 
 class SquareElement implements GElement {
@@ -14,8 +15,10 @@ class SquareElement implements GElement {
     }
 
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
-        return new GRenderNode({
-            id: 'square',
+        let key = KEY_VENDOR.getKey()
+        KEY_VENDOR.startElement(this)
+        let node = new GRenderNode({
+            kind: 'square',
             text: "",
             visualStyle: {
                 background: this.fill,
@@ -31,7 +34,10 @@ class SquareElement implements GElement {
             borderWidth: ZERO_INSETS,
             padding: ZERO_INSETS,
             contentOffset:ZERO_POINT,
+            key:key
         })
+        KEY_VENDOR.endElement(this)
+        return node
     }
 
 }
@@ -53,7 +59,7 @@ export class HSeparator implements GElement {
             children: [],
             contentOffset: ZERO_POINT,
             font: "",
-            id: "",
+            kind: "",
             margin: Style.buttonMargin,
             padding: ZERO_INSETS,
             pos: ZERO_POINT,

@@ -8,6 +8,7 @@
     "prep": "cp index.html build",
     "esbuild-serve": "esbuild src/index.ts --bundle --outdir=build --watch --serve --servedir=build",
     "start": "mkdir -p build && cp index.html build && esbuild src/index.ts --bundle --watch --outdir=build --servedir=build",
+    "test": "vitest run --dir src",
     "clean": "rm -rf build",
     "tsc": "tsc"
   },
@@ -17,8 +18,12 @@
   "dependencies": {
     "esbuild": "^0.23.0",
     "josh_js_util": "^0.1.25",
+    "material-symbols": "^0.22.2",
     "rtds-core": "^0.0.19",
     "typescript": "^5.5.4",
-    "material-symbols": "^0.22.2"
+    "vitest": "^1.4.0"
+  },
+  "devDependencies": {
+    "pureimage": "^0.4.13"
   }
 }

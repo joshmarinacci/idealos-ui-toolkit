@@ -112,7 +112,7 @@ class PopupContainer implements GElement {
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         let child = this.child.layout(rc,cons)
         return new GRenderNode({
-            id:"popup-container",
+            kind:"popup-container",
             size: new Size(100,200),
             pos: new Point(100,100),
             margin: ZERO_INSETS,

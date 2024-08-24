@@ -16,6 +16,7 @@ import {Insets, Point, Size} from "josh_js_util";
 import {addInsets} from "./util.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
@@ -224,6 +225,7 @@ export class TextElement implements GElement {
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         if(this.settings.multiline) return this.layout_multiline(rc,_cons);
+        let key = KEY_VENDOR.getKey()
         rc.ctx.font = this.settings.font
         let metrics = rc.ctx.measureText(this.settings.text)
         let size = new Size(
@@ -233,7 +235,7 @@ export class TextElement implements GElement {
         size = sizeWithPadding(size, this.settings.margin)
         size = sizeWithPadding(size, this.settings.borderWidth)
         return new GRenderNode({
-            id: "text-singleline-element",
+            kind: "text-singleline-element",
             text: this.settings.text,
             font: Style.font,
             size: size,
@@ -246,6 +248,7 @@ export class TextElement implements GElement {
             margin: this.settings.margin,
             borderWidth: this.settings.borderWidth,
             shadow: this.settings.shadow,
+            key:key,
         })
     }
 
@@ -262,7 +265,7 @@ export class TextElement implements GElement {
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
-                id:"text-line-element",
+                kind:"text-line-element",
                 text:line,
                 font: Style.font,
                 size: new Size(metrics.width,lineHeight),
@@ -286,7 +289,7 @@ export class TextElement implements GElement {
             Math.floor(y+metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
         size = sizeWithPadding(size,total_insets)
         return new GRenderNode({
-            id: "text-multiline-element",
+            kind: "text-multiline-element",
             text:"",
             font: Style.font,
             size: size,
@@ -357,7 +360,7 @@ class TextInputElement implements GElement {
         const size = new Size(100,100)
         size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
         let node = new GRenderNode({
-            id: 'text-input-node',
+            kind: 'text-input-node',
             inputid: this.settings.inputid,
             text:"",
             visualStyle: {
@@ -399,7 +402,7 @@ class TextInputElement implements GElement {
             children: [],
             contentOffset: new Point(5,5),
             font: Style.font,
-            id: "",
+            kind: "",
             pos: ZERO_POINT.copy(),
             size: new Size(2,50),
             text:'hithere',

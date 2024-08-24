@@ -13,6 +13,7 @@ import {RenderContext} from "./gfx.ts";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.ts";
 import {addInsets, insetsHeight, insetsWidth} from "./util.ts";
+import {KEY_VENDOR} from "./keys.ts";
 
 type BoxParameters = {
     id?: string,
@@ -21,9 +22,9 @@ type BoxParameters = {
     mainAxisLayout?: AxisLayout,
     crossAxisLayout?: AxisLayout,
     children: GElement[],
-    visualStyle?:VisualStyle
-    hoverStyle?:VisualStyle
-    focusedStyle?:VisualStyle
+    visualStyle?: VisualStyle
+    hoverStyle?: VisualStyle
+    focusedStyle?: VisualStyle
     padding?: Insets
     margin?: Insets,
     borderWidth?: Insets,
@@ -32,7 +33,7 @@ type BoxParameters = {
 
     fixedWidth?: number
     fixedHeight?: number
-    key?:string
+    key?: string
 }
 export type BoxParams = {
     mainAxisSelfLayout?: AxisSelfLayout,
@@ -49,9 +50,9 @@ type BoxRequirements = {
     mainAxisLayout: AxisLayout,
     crossAxisLayout: AxisLayout,
     children: GElement[],
-    visualStyle:VisualStyle
-    hoverStyle?:VisualStyle
-    focusedStyle?:VisualStyle
+    visualStyle: VisualStyle
+    hoverStyle?: VisualStyle
+    focusedStyle?: VisualStyle
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
@@ -60,7 +61,7 @@ type BoxRequirements = {
 
     fixedWidth?: number
     fixedHeight?: number
-    key?:string
+    key?: string
 }
 
 export function bdsSubInsets(bds: Bounds, insets: Insets) {
@@ -143,182 +144,11 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         this.log(`space ${cons}`)
-        let chs = this.settings.children
-        let map = new Map<GElement, GRenderNode>()
-        let expanders = chs.filter(ch => ch instanceof HExpander)
-        let non_expanders = chs.filter(ch => !(ch instanceof HExpander))
-        this.log(`exp ${expanders.length} non = ${non_expanders.length}`)
-
-        let fullBounds = new Bounds(0, 0, 0, 0)
-        let contentBounds = new Bounds(0, 0, 0, 0)
-
         if (this.settings.mainAxisSelfLayout === 'grow') {
-            this.log("growing my width")
-            contentBounds.w = cons.space.w
-            fullBounds.w = cons.space.w
-
-            if (this.settings.fixedWidth) {
-                contentBounds.w = this.settings.fixedWidth
-                fullBounds.w = this.settings.fixedWidth
-            }
-
-            if (this.settings.crossAxisSelfLayout === 'grow') {
-                contentBounds.h = cons.space.h
-                fullBounds.h = cons.space.h
-            }
-
-            // account for insets
-            contentBounds = this.subtractInsets(contentBounds)
-            this.log("started content bounds", contentBounds)
-
-            // layout the non expander children
-            let non_expander_total_width = 0
-            non_expanders.map(ch => {
-                let node = ch.layout(rc, {
-                    space: contentBounds.size(),
-                    layout: this.settings.mainAxisSelfLayout,
-                })
-                non_expander_total_width += node.settings.size.w
-                map.set(ch, node)
-            })
-            this.log(`non ex-ch total width ${non_expander_total_width}`)
-            let leftover = contentBounds.w - non_expander_total_width
-            let leftover_per_child = leftover / expanders.length
-            this.log(`leftover ${leftover}`)
-            // layout the expander children
-            expanders.map(ch => {
-                let node = ch.layout(rc, {
-                    space: new Size(leftover_per_child, contentBounds.h),
-                    layout: this.settings.mainAxisSelfLayout,
-                })
-                leftover -= leftover_per_child
-                // non_expander_total_width += node.settings.size.w
-                map.set(ch, node)
-            })
-            this.log(`final leftover is ${leftover}`)
-
-            //find the max child height
-            let max_child_height = 0
-            let final_children_length = 0
-            chs.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                max_child_height = Math.max(node.settings.size.h, max_child_height)
-                final_children_length += node.settings.size.w
-            })
-
-            if (this.settings.crossAxisSelfLayout === 'shrink') {
-                contentBounds.h = max_child_height
-            }
-
-            // position all children
-            let x = contentBounds.x
-            if (this.settings.mainAxisLayout === 'start') {
-                x = contentBounds.x
-            }
-            if (this.settings.mainAxisLayout === 'center') {
-                x = contentBounds.x + leftover / 2
-            }
-            if (this.settings.mainAxisLayout === 'end') {
-                x = contentBounds.x + leftover
-            }
-            let y = contentBounds.y
-            this.log("layout children at", x, y, contentBounds)
-            this.layout_nodes_cross_axis(chs, map, contentBounds)
-            chs.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                node.settings.pos.x = x
-                x += node.settings.size.w
-            })
-            if(this.settings.mainAxisLayout === 'between' && chs.length >= 2) {
-                this.layout_between(chs,map,contentBounds)
-            }
-            let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
-            fullBounds = this.addInsets(contentBounds)
-            this.log(`content bounds ${contentBounds}`)
-            this.log(`full bounds ${fullBounds}`)
-            return new GRenderNode({
-                visualStyle: this.settings.visualStyle,
-                hoverStyle: this.settings.hoverStyle,
-                baseline: 0,
-                font: Style.font,
-                pos: new Point(0, 0),
-                size: fullBounds.size(),
-                text: "",
-                id: this.settings.id,
-                children: children,
-                padding: this.settings.padding,
-                contentOffset: contentBounds.position(),
-                margin: this.settings.margin,
-                borderWidth: this.settings.borderWidth,
-                borderRadius: this.settings.borderRadius,
-                handleEvent: this.settings.handleEvent,
-                key: this.settings.key,
-            })
+            return this.do_grow_layout(rc, cons)
         }
         if (this.settings.mainAxisSelfLayout == 'shrink') {
-            this.log('shrinking my width')
-            contentBounds.w = cons.space.w
-            fullBounds.w = cons.space.w
-            contentBounds.h = cons.space.h
-            fullBounds.h = cons.space.h
-            if (this.settings.fixedWidth) {
-                contentBounds.w = this.settings.fixedWidth
-                fullBounds.w = this.settings.fixedWidth
-            }
-            contentBounds = this.subtractInsets(contentBounds)
-            this.log("started content bounds", contentBounds)
-            // layout all children.
-            chs.forEach(ch => {
-                const node = ch.layout(rc, {
-                    space: contentBounds.size(),
-                    layout: this.settings.mainAxisSelfLayout,
-                })
-                map.set(ch, node)
-            })
-
-            let max_child_height = 0
-            let child_total_width = 0
-            // get total child bounds
-            chs.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                child_total_width += node.settings.size.w
-                max_child_height = Math.max(max_child_height, node.settings.size.h)
-            })
-            contentBounds.w = child_total_width
-            contentBounds.h = max_child_height
-            fullBounds = this.addInsets(contentBounds)
-            this.log(`content bounds ${contentBounds}`)
-            this.log(`full bounds ${fullBounds}`)
-
-            // position all children
-            this.layout_nodes_cross_axis(chs, map, contentBounds)
-            let x = contentBounds.x
-            chs.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                node.settings.pos.x = x
-                x += node.settings.size.w
-            })
-
-            let children = chs.map(ch => map.get(ch) as GRenderNode)
-            return new GRenderNode({
-                visualStyle: this.settings.visualStyle,
-                hoverStyle: this.settings.hoverStyle,
-                baseline: 0,
-                font: Style.font,
-                pos: new Point(0, 0),
-                size: fullBounds.size(),
-                text: "",
-                id: this.settings.id,
-                children: children,
-                padding: this.settings.padding,
-                contentOffset: contentBounds.position(),
-                margin: this.settings.margin,
-                borderWidth: this.settings.borderWidth,
-                borderRadius: this.settings.borderRadius,
-                handleEvent: this.settings.handleEvent,
-                key:this.settings.key,
-            })
-
+            return this.do_shrink_layout(rc, cons)
         }
         throw new Error(`unknown self layout type ${this.settings.mainAxisSelfLayout}`)
     }
@@ -355,7 +185,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             final_children_length += node.settings.size.w
         })
         let leftover = contentBounds.w - final_children_length
-        let leftover_per_child = leftover/(chs.length-1)
+        let leftover_per_child = leftover / (chs.length - 1)
         let x = contentBounds.x
         chs.forEach(ch => {
             let node = map.get(ch) as GRenderNode
@@ -364,6 +194,210 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             x += leftover_per_child
         })
     }
+
+    private do_grow_layout(rc: RenderContext, cons: LayoutConstraints) {
+        let key = KEY_VENDOR.getKey()
+        let fullBounds = new Bounds(0, 0, 0, 0)
+        let contentBounds = new Bounds(0, 0, 0, 0)
+
+        let chs = this.settings.children
+        let expanders = chs.filter(ch => ch instanceof HExpander)
+        let non_expanders = chs.filter(ch => !(ch instanceof HExpander))
+        this.log(`exp ${expanders.length} non = ${non_expanders.length}`)
+        let map = new Map<GElement, GRenderNode>()
+
+        this.log("growing my width")
+        contentBounds.w = cons.space.w
+        fullBounds.w = cons.space.w
+
+        if (this.settings.fixedWidth) {
+            contentBounds.w = this.settings.fixedWidth
+            fullBounds.w = this.settings.fixedWidth
+        }
+
+        if (this.settings.crossAxisSelfLayout === 'grow') {
+            contentBounds.h = cons.space.h
+            fullBounds.h = cons.space.h
+        }
+
+        // account for insets
+        contentBounds = this.subtractInsets(contentBounds)
+        this.log("started content bounds", contentBounds)
+
+        // layout the non expander children
+        let non_expander_total_width = 0
+        non_expanders.map(ch => {
+            let node = ch.layout(rc, {
+                space: contentBounds.size(),
+                layout: this.settings.mainAxisSelfLayout,
+            })
+            non_expander_total_width += node.settings.size.w
+            map.set(ch, node)
+        })
+        this.log(`non ex-ch total width ${non_expander_total_width}`)
+        let leftover = contentBounds.w - non_expander_total_width
+        let leftover_per_child = leftover / expanders.length
+        this.log(`leftover ${leftover}`)
+        // layout the expander children
+        expanders.map(ch => {
+            let node = ch.layout(rc, {
+                space: new Size(leftover_per_child, contentBounds.h),
+                layout: this.settings.mainAxisSelfLayout,
+            })
+            leftover -= leftover_per_child
+            // non_expander_total_width += node.settings.size.w
+            map.set(ch, node)
+        })
+        this.log(`final leftover is ${leftover}`)
+
+        //find the max child height
+        let max_child_height = 0
+        let final_children_length = 0
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            max_child_height = Math.max(node.settings.size.h, max_child_height)
+            final_children_length += node.settings.size.w
+        })
+
+        if (this.settings.crossAxisSelfLayout === 'shrink') {
+            contentBounds.h = max_child_height
+        }
+
+        // position all children
+        let x = contentBounds.x
+        if (this.settings.mainAxisLayout === 'start') {
+            x = contentBounds.x
+        }
+        if (this.settings.mainAxisLayout === 'center') {
+            x = contentBounds.x + leftover / 2
+        }
+        if (this.settings.mainAxisLayout === 'end') {
+            x = contentBounds.x + leftover
+        }
+        let y = contentBounds.y
+        this.log("layout children at", x, y, contentBounds)
+        this.layout_nodes_cross_axis(chs, map, contentBounds)
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            node.settings.pos.x = x
+            x += node.settings.size.w
+        })
+        if (this.settings.mainAxisLayout === 'between' && chs.length >= 2) {
+            this.layout_between(chs, map, contentBounds)
+        }
+        let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
+        fullBounds = this.addInsets(contentBounds)
+        this.log(`content bounds ${contentBounds}`)
+        this.log(`full bounds ${fullBounds}`)
+        return new GRenderNode({
+            visualStyle: this.settings.visualStyle,
+            hoverStyle: this.settings.hoverStyle,
+            baseline: 0,
+            font: Style.font,
+            pos: new Point(0, 0),
+            size: fullBounds.size(),
+            text: "",
+            kind: this.settings.id,
+            children: children,
+            padding: this.settings.padding,
+            contentOffset: contentBounds.position(),
+            margin: this.settings.margin,
+            borderWidth: this.settings.borderWidth,
+            borderRadius: this.settings.borderRadius,
+            handleEvent: this.settings.handleEvent,
+            key: key,
+        }, {
+            'constraints': this.getConstraints(),
+        })
+    }
+
+    private do_shrink_layout(rc: RenderContext, cons: LayoutConstraints) {
+        let contentBounds = new Bounds(0, 0, 0, 0)
+        let fullBounds = new Bounds(0, 0, 0, 0)
+        let key = KEY_VENDOR.getKey()
+        let chs = this.settings.children
+        let map = new Map<GElement, GRenderNode>()
+        this.log('shrinking my width')
+        contentBounds.w = cons.space.w
+        fullBounds.w = cons.space.w
+        contentBounds.h = cons.space.h
+        fullBounds.h = cons.space.h
+        if (this.settings.fixedWidth) {
+            contentBounds.w = this.settings.fixedWidth
+            fullBounds.w = this.settings.fixedWidth
+        }
+        contentBounds = this.subtractInsets(contentBounds)
+        this.log("started content bounds", contentBounds)
+        // layout all children.
+        KEY_VENDOR.startElement(this)
+        chs.forEach(ch => {
+            const node = ch.layout(rc, {
+                space: contentBounds.size(),
+                layout: this.settings.mainAxisSelfLayout,
+            })
+            map.set(ch, node)
+        })
+        KEY_VENDOR.endElement(this)
+
+        let max_child_height = 0
+        let child_total_width = 0
+        // get total child bounds
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            child_total_width += node.settings.size.w
+            max_child_height = Math.max(max_child_height, node.settings.size.h)
+        })
+        contentBounds.w = child_total_width
+        contentBounds.h = max_child_height
+        fullBounds = this.addInsets(contentBounds)
+        this.log(`content bounds ${contentBounds}`)
+        this.log(`full bounds ${fullBounds}`)
+
+        // position all children
+        this.layout_nodes_cross_axis(chs, map, contentBounds)
+        let x = contentBounds.x
+        chs.forEach(ch => {
+            let node = map.get(ch) as GRenderNode
+            node.settings.pos.x = x
+            x += node.settings.size.w
+        })
+
+        console.log("doing shrink")
+        let children = chs.map(ch => map.get(ch) as GRenderNode)
+        return new GRenderNode({
+            visualStyle: this.settings.visualStyle,
+            hoverStyle: this.settings.hoverStyle,
+            baseline: 0,
+            font: Style.font,
+            pos: new Point(0, 0),
+            size: fullBounds.size(),
+            text: "",
+            kind: this.settings.id,
+            children: children,
+            padding: this.settings.padding,
+            contentOffset: contentBounds.position(),
+            margin: this.settings.margin,
+            borderWidth: this.settings.borderWidth,
+            borderRadius: this.settings.borderRadius,
+            handleEvent: this.settings.handleEvent,
+            key: key,
+        }, {
+            'constraints': this.getConstraints(),
+        })
+
+    }
+
+    private getConstraints() {
+        return {
+            mainAxisSelfLayout: this.settings.mainAxisSelfLayout,
+            mainAxisLayout: this.settings.mainAxisLayout,
+            crossAxisSelfLayout: this.settings.crossAxisSelfLayout,
+            crossAxisLayout: this.settings.crossAxisLayout,
+            fixedWidth: this.settings.fixedWidth,
+            fixedHeight: this.settings.fixedHeight,
+        }
+    }
+
 }
 
 export class HExpander implements GElement {
@@ -378,14 +412,14 @@ export class HExpander implements GElement {
         return new GRenderNode({
             baseline: 0,
             visualStyle: {
-                background:TRANSPARENT,
-                textColor:'cyan',
-                borderColor:TRANSPARENT,
+                background: TRANSPARENT,
+                textColor: 'cyan',
+                borderColor: TRANSPARENT,
             },
             borderWidth: new Insets(1, 1, 1, 1),
             children: [],
             font: "",
-            id: "h-expander",
+            kind: "h-expander",
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: ZERO_POINT,
@@ -495,7 +529,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             children: children,
             contentOffset: new Point(5, 5),
             font: "",
-            id: this.settings.id,
+            kind: this.settings.id,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
@@ -504,23 +538,23 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
 }
 
-export function HBox(param:BoxParams) {
+export function HBox(param: BoxParams) {
     return new MHBoxElement({
         mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
-        mainAxisLayout: param.mainAxisLayout ||  'start',
+        mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
-        children: param.children
+        children: param.children,
     })
 }
 
 export function VBox(param: BoxParams) {
     return new MVBoxElement({
         mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
-        mainAxisLayout: param.mainAxisLayout ||  'start',
+        mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
-        children: param.children
+        children: param.children,
     })
 }
 

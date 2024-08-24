@@ -86,7 +86,7 @@ class ScrollContainerElement implements GElement {
         child.settings.pos = scrollOffset.add(contentBounds.position())
 
         let node = new GRenderNode({
-            id: 'scroll',
+            kind: 'scroll',
             size: fullBounds.size(),
             visualStyle: {
                 background: "magenta",
