@@ -21,15 +21,11 @@ import {KEY_VENDOR} from "./keys.ts";
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
     text: string
-    // cursorPosition: Point
-    inputid: string
     onChange?: OnChangeCallback<[string,Point]>
     multiline?:boolean
 }
 type TextInputRequirements = {
     text: string
-    // cursorPosition: Point
-    inputid: string
     onChange?: OnChangeCallback<[string,Point]>
     margin: Insets
     padding: Insets
@@ -359,11 +355,11 @@ class TextInputElement implements GElement {
         cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         const size = new Size(100,100)
-        size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
-        let node = new GRenderNode({
+        size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom + 20
+        return new GRenderNode({
             kind: 'text-input-node',
-            inputid: this.settings.inputid,
-            text:"",
+            key:key,
+            text: "",
             visualStyle: {
                 background: '#f0f0f0',
                 borderColor: '#ccc',
@@ -375,7 +371,7 @@ class TextInputElement implements GElement {
             },
             baseline: baseline,
             borderWidth: withInsets(1),
-            children: [text_node,cursor_node],
+            children: [text_node, cursor_node],
             contentOffset: new Point(total_insets.left, total_insets.top),
             font: Style.font,
             margin: this.settings.margin,
@@ -386,14 +382,13 @@ class TextInputElement implements GElement {
             handleEvent: (e) => {
                 if (e.type === 'keyboard-typed') {
                     let kbe = e as MKeyboardEvent;
-                    let t2 = processText(this.settings.text,cursorPosition,kbe)
+                    let t2 = processText(this.settings.text, cursorPosition, kbe)
                     setCursorPosition(t2[1])
-                    if(this.settings.onChange)this.settings.onChange(t2, e)
+                    if (this.settings.onChange) this.settings.onChange(t2, e)
                     e.redraw()
                 }
             }
         })
-        return node
     }
 
     private makeCursor() {

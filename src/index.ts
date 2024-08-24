@@ -95,14 +95,10 @@ function makeCompsDemo() {
                 children: [
                     Label({text: 'text input'}),
                     TextBox({
-                        // cursorPosition: state.textInputCursorPosition,
-                        inputid: "text-box-1",
                         text: state.textInputValue,
                         multiline: false,
                         onChange: (v, e) => {
-                            // console.log("new text input value",state.textInputValue)
                             state.textInputValue = v[0]
-                            // state.textInputCursorPosition = v[1]
                             e.redraw()
                         }
                     }),

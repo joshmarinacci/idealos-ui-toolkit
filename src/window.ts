@@ -65,30 +65,26 @@ class MWindowElement implements GElement {
         resize.settings.kind = 'resize-button'
         resize.settings.pos = size.asPoint().subtract(new Point(50,50))
         KEY_VENDOR.endElement(this)
-        let node = new GRenderNode({
-            inputid: "window",
+        return new GRenderNode({
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             baseline: 0,
             borderWidth: borderWidth,
-            children: [child,resize],
-            // children:[],
+            children: [child, resize],
             contentOffset: ZERO_POINT.copy(),
             font: "",
             kind: "window",
-            pos: new Point(0,0),
+            pos: new Point(0, 0),
             size: size,
             text: "",
             clip: true,
-            key:key,
+            key: key,
             visualStyle: {
                 background: 'magenta',
                 borderColor: 'black',
                 textColor: Style.textColor
             }
-
         })
-        return node
     }
 
 }

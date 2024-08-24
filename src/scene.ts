@@ -235,6 +235,15 @@ export class Scene {
                 position:pos
             }
             if (last.settings.handleEvent) last.settings.handleEvent(evt)
+            if(last.settings.key !== this.keyboard_target) {
+                this.ifTarget(this.keyboard_target,(comp)=>{
+                    comp.settings.currentStyle = comp.settings.visualStyle
+                })
+            }
+            if(last.settings.focusedStyle) {
+                last.settings.currentStyle = last.settings.focusedStyle
+            }
+            this.keyboard_target = last.settings.key
             this.redraw()
         }
     }
@@ -254,30 +263,18 @@ export class Scene {
     }
 
     handleKeydownEvent(e: KeyboardEvent) {
-        if(this.keyboard_target) {
-            // console.log("native event",e)
-            let target = this.findByInputId(this.keyboard_target, this.renderRoot)
-            if(target && target.settings.handleEvent) {
-                let evt: MKeyboardEvent = {
-                    type: 'keyboard-typed',
-                    redraw: () => {
-                        this.layout()
-                        this.redraw()
-                    },
-                    key: e.key,
-                    control: e.ctrlKey
-                }
-                target.settings.handleEvent(evt)
+        this.ifTarget(this.keyboard_target,(comp)=>{
+            let evt: MKeyboardEvent = {
+                type: 'keyboard-typed',
+                redraw: () => {
+                    this.layout()
+                    this.redraw()
+                },
+                key: e.key,
+                control: e.ctrlKey
             }
-        }
-    }
-
-    private findByInputId(keyboard_target: string, renderRoot: GRenderNode):GRenderNode|undefined {
-        if(renderRoot.settings.inputid === keyboard_target) return renderRoot
-        for(let ch of renderRoot.settings.children) {
-            let found = this.findByInputId(keyboard_target,ch)
-            if(found) return found
-        }
+            if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
+        })
     }
 
     private handleWheelEvent(pos: Point, e: WheelEvent) {
