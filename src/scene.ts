@@ -302,6 +302,7 @@ export class Scene {
             if(n.userdata.constraints) {
                 console.table(n.userdata['constraints'])
             }
+            console.log(`size ${n.settings.size}`)
         })
     }
 

@@ -354,7 +354,7 @@ class TextInputElement implements GElement {
         cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
         cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
         const size = new Size(100,100)
-        size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom + 20
+        size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
         const focusedStyle = {
             background: 'hsl(47,100%,79%)',
                 borderColor: 'black'
