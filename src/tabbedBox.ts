@@ -1,9 +1,10 @@
-import {MHBoxElement, MVBoxElement} from "./layout.ts";
-import {Button} from "./buttons.ts";
-import {withInsets} from "./gfx.ts";
+import {MHBoxElement, MVBoxElement} from "./layout.js";
+import {Button} from "./buttons.js";
+import {withInsets} from "./gfx.js";
 import {Insets} from "josh_js_util";
-import {CEvent, ZERO_INSETS} from "./base.ts";
-import {Style} from "./style.ts";
+import {CEvent, useState, ZERO_INSETS} from "./base.js";
+import {Style} from "./style.js";
+import {KEY_VENDOR} from "./keys.js";
 
 export type TabbedBoxOptions = {
     titles: string[],
@@ -12,14 +13,17 @@ export type TabbedBoxOptions = {
     onSelectedChanged(i: number, e:CEvent): void;
 }
 export function TabbedBox(opts: TabbedBoxOptions) {
+    let key = KEY_VENDOR.getKey()
+    let [selected, setSelected] = useState<number>(key,"selected",undefined,()=>0)
     return new MVBoxElement({
+        key:key,
         mainAxisSelfLayout: "grow",
         mainAxisLayout: "center",
         crossAxisLayout: "center",
         crossAxisSelfLayout: "grow",
         children: [
             new MHBoxElement({
-                id:'tabbed-titles',
+                kind:'tabbed-titles',
                 mainAxisSelfLayout: "grow",
                 mainAxisLayout: "start",
                 crossAxisLayout: "end",
@@ -43,7 +47,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                     });
                 })),
             }),
-            opts.children[opts.selectedTab]
+            opts.children[selected]
         ]
     })
 
