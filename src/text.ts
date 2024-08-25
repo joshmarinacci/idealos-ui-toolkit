@@ -9,14 +9,14 @@ import {
     TRANSPARENT,
     ZERO_INSETS,
     ZERO_POINT
-} from "./base.ts";
-import {RenderContext, sizeWithPadding, withInsets} from "./gfx.ts";
-import {Style} from "./style.ts";
+} from "./base.js";
+import {RenderContext, sizeWithPadding, withInsets} from "./gfx.js";
+import {Style} from "./style.js";
 import {Insets, Point, Size} from "josh_js_util";
-import {addInsets} from "./util.ts";
-import {STATE_CACHE, StateCache} from "./state.ts";
-import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.ts";
-import {KEY_VENDOR} from "./keys.ts";
+import {addInsets} from "./util.js";
+import {STATE_CACHE, StateCache} from "./state.js";
+import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.js";
+import {KEY_VENDOR} from "./keys.js";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
@@ -227,10 +227,7 @@ export class TextElement implements GElement {
         if(this.settings.multiline) return this.layout_multiline(rc,_cons);
         let key = KEY_VENDOR.getKey()
         rc.ctx.font = this.settings.font
-        let metrics = rc.ctx.measureText(this.settings.text)
-        let size = new Size(
-            Math.floor(metrics.width),
-            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        let [size,baseline] = this.calcMetrics(rc)
         size = sizeWithPadding(size, this.settings.padding)
         size = sizeWithPadding(size, this.settings.margin)
         size = sizeWithPadding(size, this.settings.borderWidth)
@@ -241,7 +238,7 @@ export class TextElement implements GElement {
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
-            baseline: metrics.fontBoundingBoxAscent,
+            baseline: baseline,
             visualStyle: this.settings.visualStyle,
             children: [],
             padding: this.settings.padding,
@@ -382,6 +379,19 @@ export class TextElement implements GElement {
             shadow: this.settings.shadow,
         })
 
+    }
+
+    private calcMetrics(rc: RenderContext):[Size,number] {
+        let metrics = rc.ctx.measureText(this.settings.text)
+        let size = new Size(
+            Math.floor(metrics.width),
+            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        let baseline = metrics.fontBoundingBoxAscent
+        if(!metrics.fontBoundingBoxAscent) {
+            size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
+            baseline = metrics.emHeightAscent
+        }
+        return [size, baseline]
     }
 }
 

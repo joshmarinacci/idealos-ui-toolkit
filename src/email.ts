@@ -1,11 +1,11 @@
-import {HBox, HSpacer, VBox} from "../layout.ts";
-import {ScrollContainer} from "../scroll.ts";
-import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
-import {Button, DropdownButton, IconButton} from "../buttons.ts";
-import {Label, TextBox, WrappingLabel} from "../text.ts";
-import {Icon, Icons} from "../icons.ts";
+import {HBox, HSpacer, VBox} from "./layout.js";
+import {ScrollContainer} from "./scroll.js";
+import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
+import {Button, DropdownButton, IconButton} from "./buttons.js";
+import {Label, TextBox, WrappingLabel} from "./text.js";
+import {Icon, Icons} from "./icons.js";
 import {ObjAtom, Schema} from "rtds-core"
-import {StateHandler} from "../base.ts";
+import {StateHandler} from "./base.js";
 
 
 const S = new Schema()
