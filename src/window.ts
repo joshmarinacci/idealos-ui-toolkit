@@ -44,7 +44,7 @@ class MWindowElement implements GElement {
                 e.redraw()
             }
         }
-        const endResize = (e: MMouseEvent) => {
+        const endResize = (_e: MMouseEvent) => {
             // console.log("ending the resize")
             setDown(false)
         }

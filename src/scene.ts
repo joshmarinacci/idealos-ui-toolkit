@@ -8,11 +8,10 @@ import {
     SYMBOL_FONT_ENABLED,
     TRANSPARENT,
     VisualStyle
-} from "./base.ts";
-import {doDraw, RenderContext} from "./gfx.ts";
-import {makeCanvas} from "./util.ts";
+} from "./base.js";
+import {doDraw, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {KEY_VENDOR} from "./keys.ts";
+import {KEY_VENDOR} from "./keys.js";
 
 let NULL_VISUAL_STYLE:VisualStyle = {
     borderColor:TRANSPARENT,
@@ -33,6 +32,8 @@ export class Scene {
     private keyboard_target: string | undefined
     private current_target: string | undefined;
     private renderMap: Map<string, GRenderNode>;
+    private size: Size;
+    private should_redraw_callback?: () => void;
 
     constructor(makeTree: () => GElement) {
         this.borderDebugEnabled = false
@@ -45,55 +46,68 @@ export class Scene {
         }
     }
 
-    async init(size:Size) {
+    private log(...layoutPhase: string[]) {
+        console.log("SCENE: ",...layoutPhase)
+    }
+    setCanvas(canvas: HTMLCanvasElement) {
+        this.canvas = canvas
+    }
+    getCanvas() {
+        return this.canvas
+    }
+    setSize(size: Size) {
+        this.size = size
+    }
+
+    async init() {
         if(MGlobals.get(SYMBOL_FONT_ENABLED) === true) {
             // const font = new FontFace('material-icons',
             //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
-            const font = new FontFace('material-icons',
-                'url(material-symbols/material-symbols-outlined.woff2)')
-            document.fonts.add(font)
-            await font.load()
+            // const font = new FontFace('material-icons',
+            //     'url(material-symbols/material-symbols-outlined.woff2)')
+            // document.fonts.add(font)
+            // await font.load()
         }
-        this.canvas = makeCanvas(size)
+        // this.canvas = makeCanvas(size)
         this.last = undefined
-        this.canvas.addEventListener('mousemove', (e) => {
-            // @ts-ignore
-            let rect = e.target.getBoundingClientRect()
-            let pos = new Point(e.clientX, e.clientY);
-            pos = pos.subtract(new Point(rect.x, rect.y))
-            this.handleMouseMove(pos)
-        })
-
-        this.canvas.addEventListener('mousedown', (e) => {
-            // @ts-ignore
-            let rect = e.target.getBoundingClientRect()
-            let pos = new Point(e.clientX, e.clientY);
-            pos = pos.subtract(new Point(rect.x, rect.y))
-            this.handleMouseDown(pos,e.shiftKey)
-        })
-        this.canvas.addEventListener('mouseup', (e) => {
-            // @ts-ignore
-            let rect = e.target.getBoundingClientRect()
-            let pos = new Point(e.clientX, e.clientY);
-            pos = pos.subtract(new Point(rect.x, rect.y))
-            this.handleMouseUp(pos)
-        })
-        window.addEventListener('keydown', (e) => {
-            this.handleKeydownEvent(e)
-        })
-        window.addEventListener('wheel', (e) => {
-            // @ts-ignore
-            let rect = e.target.getBoundingClientRect()
-            let pos = new Point(e.clientX, e.clientY);
-            pos = pos.subtract(new Point(rect.x, rect.y))
-            this.handleWheelEvent(pos,e)
-        })
+        // this.canvas.addEventListener('mousemove', (e) => {
+        //     // @ts-ignore
+        //     let rect = e.target.getBoundingClientRect()
+        //     let pos = new Point(e.clientX, e.clientY);
+        //     pos = pos.subtract(new Point(rect.x, rect.y))
+        //     this.handleMouseMove(pos)
+        // })
+        //
+        // this.canvas.addEventListener('mousedown', (e) => {
+        //     // @ts-ignore
+        //     let rect = e.target.getBoundingClientRect()
+        //     let pos = new Point(e.clientX, e.clientY);
+        //     pos = pos.subtract(new Point(rect.x, rect.y))
+        //     this.handleMouseDown(pos,e.shiftKey)
+        // })
+        // this.canvas.addEventListener('mouseup', (e) => {
+        //     // @ts-ignore
+        //     let rect = e.target.getBoundingClientRect()
+        //     let pos = new Point(e.clientX, e.clientY);
+        //     pos = pos.subtract(new Point(rect.x, rect.y))
+        //     this.handleMouseUp(pos)
+        // })
+        // window.addEventListener('keydown', (e) => {
+        //     this.handleKeydownEvent(e)
+        // })
+        // window.addEventListener('wheel', (e) => {
+        //     // @ts-ignore
+        //     let rect = e.target.getBoundingClientRect()
+        //     let pos = new Point(e.clientX, e.clientY);
+        //     pos = pos.subtract(new Point(rect.x, rect.y))
+        //     this.handleWheelEvent(pos,e)
+        // })
     }
 
-    makeRc() {
+    private makeRc() {
         const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
 
-        let sc = 1 * window.devicePixelRatio
+        let sc = 1*2// * window.devicePixelRatio
         const rc: RenderContext = {
             canvas: this.canvas,
             ctx: ctx,
@@ -128,7 +142,7 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc,false)
-        doDraw(this.renderRoot,rc,true)
+        // doDraw(this.renderRoot,rc,true)
         this.drawDebugOverlay(rc)
         rc.ctx.restore()
     }
@@ -189,14 +203,31 @@ export class Scene {
             }
         }
     }
+    private syncRenderMap(renderRoot: GRenderNode) {
+        if(renderRoot.settings.key) this.renderMap.set(renderRoot.settings.key, renderRoot)
+        renderRoot.settings.children.forEach(child => {
+            this.syncRenderMap(child)
+        })
+    }
+    private ifTarget(target: string | undefined, param2: (comp: GRenderNode) => void) {
+        if(!target) return
+        if(this.renderMap.has(target)) {
+            let comp = this.renderMap.get(target) as GRenderNode
+            param2(comp)
+        }
+    }
 
-    handleMouseMove(pos: Point) {
+    public handleMouseMove(pos: Point) {
         this.ifTarget(this.current_target, (comp:GRenderNode) => {
             let evt:MMouseEvent = {
                 type:'mouse-move',
                 redraw: () => {
-                    this.layout()
-                    this.redraw()
+                    if(this.should_redraw_callback) {
+                        this.should_redraw_callback()
+                    } else {
+                        this.layout()
+                        this.redraw()
+                    }
                 },
                 position:pos
             }
@@ -214,11 +245,15 @@ export class Scene {
                     found.settings.currentStyle = found.settings.hoverStyle
                 }
                 this.current_hover = found.settings.key
-                this.redraw()
+                    if(this.should_redraw_callback) {
+                        this.should_redraw_callback()
+                    } else {
+                        this.layout()
+                        this.redraw()
+                    }
             }
         }
     }
-
     handleMouseDown(pos: Point,shift:boolean) {
         let found = this.findTargetStack(pos, this.renderRoot)
         if(found) {
@@ -230,8 +265,12 @@ export class Scene {
             let evt:MMouseEvent = {
                 type:'mouse-down',
                 redraw: () => {
-                    this.layout()
-                    this.redraw()
+                    if(this.should_redraw_callback) {
+                        this.should_redraw_callback()
+                    } else {
+                        this.layout()
+                        this.redraw()
+                    }
                 },
                 position:pos
             }
@@ -245,7 +284,12 @@ export class Scene {
                 last.settings.currentStyle = last.settings.focusedStyle
             }
             this.keyboard_target = last.settings.key
-            this.redraw()
+            if(this.should_redraw_callback) {
+                this.should_redraw_callback()
+            } else {
+                this.layout()
+                this.redraw()
+            }
         }
     }
     handleMouseUp(pos:Point) {
@@ -253,8 +297,12 @@ export class Scene {
             let evt:MMouseEvent = {
                 type:'mouse-up',
                 redraw: () => {
-                    this.layout()
-                    this.redraw()
+                    if(this.should_redraw_callback) {
+                        this.should_redraw_callback()
+                    } else {
+                        this.layout()
+                        this.redraw()
+                    }
                 },
                 position:pos
             }
@@ -262,14 +310,17 @@ export class Scene {
         })
 
     }
-
-    handleKeydownEvent(e: KeyboardEvent) {
+    private handleKeydownEvent(e: KeyboardEvent) {
         this.ifTarget(this.keyboard_target,(comp)=>{
             let evt: MKeyboardEvent = {
                 type: 'keyboard-typed',
                 redraw: () => {
-                    this.layout()
-                    this.redraw()
+                    if(this.should_redraw_callback) {
+                        this.should_redraw_callback()
+                    } else {
+                        this.layout()
+                        this.redraw()
+                    }
                 },
                 key: e.key,
                 control: e.ctrlKey
@@ -277,7 +328,6 @@ export class Scene {
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
         })
     }
-
     private handleWheelEvent(pos: Point, e: WheelEvent) {
         let found = this.findScrollTarget(pos, this.renderRoot)
         if(found) {
@@ -287,11 +337,14 @@ export class Scene {
                 deltaX:e.deltaX,
                 deltaY:e.deltaY,
                 redraw: () => {
-                    this.layout()
-                    this.redraw()
+                    if(this.should_redraw_callback) {
+                        this.should_redraw_callback()
+                    } else {
+                        this.layout()
+                        this.redraw()
+                    }
                 },
             }
-            // console.log(evt.type,evt.deltaX,evt.deltaY)
             if(found.settings.handleEvent) found.settings.handleEvent(evt)
         }
     }
@@ -307,7 +360,6 @@ export class Scene {
             // console.log('border', n.settings.borderWidth)
         })
     }
-
     private drawDebugOverlay(rc: RenderContext) {
         rc.ctx.save()
         rc.ctx.translate(0, rc.size.h-100)
@@ -321,39 +373,22 @@ export class Scene {
         })
         rc.ctx.restore()
     }
-
     private debugStrokeBounds(rc: RenderContext, bounds: Bounds, fill: string, thickness: number) {
         rc.ctx.strokeStyle = fill
         rc.ctx.lineWidth = thickness
         rc.ctx.strokeRect(bounds.x,bounds.y,bounds.w,bounds.h)
     }
-
     private debugFillBounds(rc: RenderContext, bounds: Bounds, fill: string) {
         rc.ctx.fillStyle = fill
         rc.ctx.fillRect(bounds.x,bounds.y,bounds.w,bounds.h)
     }
-
     private debugText(rc: RenderContext, bounds: Bounds, s: string) {
         rc.ctx.fillStyle = 'black'
         rc.ctx.fillText(s,bounds.x,bounds.y+20)
     }
 
-    private log(...layoutPhase: string[]) {
-        console.log("SCENE: ",...layoutPhase)
-    }
 
-    private syncRenderMap(renderRoot: GRenderNode) {
-        if(renderRoot.settings.key) this.renderMap.set(renderRoot.settings.key, renderRoot)
-        renderRoot.settings.children.forEach(child => {
-            this.syncRenderMap(child)
-        })
-    }
-
-    private ifTarget(target: string | undefined, param2: (comp: GRenderNode) => void) {
-        if(!target) return
-        if(this.renderMap.has(target)) {
-            let comp = this.renderMap.get(target) as GRenderNode
-            param2(comp)
-        }
+    onShouldRedraw(cb: () => void) {
+        this.should_redraw_callback = cb
     }
 }

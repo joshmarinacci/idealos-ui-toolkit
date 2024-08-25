@@ -5,7 +5,7 @@ import {IconElement, Icons} from "./icons.js";
 import {HSeparator, Square} from "./comps2.js";
 import {ListView, ListViewItem} from "./listView.js";
 import {ScrollContainer} from "./scroll.js";
-import {CEvent, GElement} from "./base.js";
+import {GElement} from "./base.js";
 import {EmailDemo} from "./email.js";
 import {TabbedBox} from "./tabbedBox.js";
 import {MWindow} from "./window.js";
@@ -246,11 +246,6 @@ export function makeTabs(): GElement {
             panelDemo,
             emailDemo,
         ],
-        // selectedTab: state.selectedTab,
-        // onSelectedChanged(i: number, e: CEvent) {
-        //     state.selectedTab = i;
-        //     e.redraw()
-        // }
     })
     return MWindow({child: tabs})
 }

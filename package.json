@@ -4,10 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "node build.js",
+    "build": "esbuild src/*.ts --outdir=build",
     "prep": "cp index.html build",
     "esbuild-serve": "esbuild src/index.ts --bundle --outdir=build --watch --serve --servedir=build",
     "start": "mkdir -p build && cp index.html build && esbuild src/index.ts --bundle --watch --outdir=build --servedir=build",
+    "sdl-test": "npm run clean && mkdir -p build && esbuild src/*.ts --outdir=build && node build/sdltest.js",
     "test": "vitest run --dir src",
     "clean": "rm -rf build",
     "tsc": "tsc"
@@ -16,6 +17,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@kmamal/sdl": "^0.10.7",
+    "canvas": "^2.11.2",
     "esbuild": "^0.23.0",
     "josh_js_util": "^0.1.25",
     "material-symbols": "^0.22.2",
