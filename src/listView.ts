@@ -4,6 +4,7 @@ import {Style} from "./style.ts";
 import {withInsets} from "./gfx.ts";
 import {Label} from "./text.ts";
 import {KEY_VENDOR} from "./keys.ts";
+import {ObjList} from "rtds-core";
 
 type ListViewItemParameters = {
     children:GElement[],
@@ -43,7 +44,7 @@ export type ListItemRenderer<T> = (item:T,
 
 export type ListViewParameters<T> = {
     key?:string,
-    data: T[]
+    data: T[] | ObjList<T>
     selected?: StateHandler<number>
     renderItem?:ListItemRenderer<T>
 }

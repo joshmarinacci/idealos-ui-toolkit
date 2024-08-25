@@ -34,6 +34,7 @@ type BoxParameters = {
     fixedWidth?: number
     fixedHeight?: number
     key?: string
+    shadow?:boolean
 }
 export type BoxParams = {
     mainAxisSelfLayout?: AxisSelfLayout,
@@ -44,6 +45,7 @@ export type BoxParams = {
     borderWidth?:Insets
     visualStyle?: VisualStyle
     kind?: string,
+    shadow?:boolean
 }
 
 type BoxRequirements = {
@@ -65,6 +67,7 @@ type BoxRequirements = {
     fixedWidth?: number
     fixedHeight?: number
     key?: string
+    shadow?:boolean
 }
 
 export function bdsSubInsets(bds: Bounds, insets: Insets) {
@@ -440,7 +443,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxParameters) {
         super({
-            id: param.kind || 'vbox',
+            kind: param.kind || 'vbox',
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
@@ -461,6 +464,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             handleEvent: param.handleEvent,
             fixedWidth: param.fixedWidth,
             fixedHeight: param.fixedHeight,
+            shadow: param.shadow
         })
     }
 
@@ -491,7 +495,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         }
         let contentBounds = fullBounds.copy()
         contentBounds = this.subtractInsets(contentBounds)
-        this.log(this.settings.id, fullBounds, contentBounds)
+        this.log(this.settings.kind, fullBounds, contentBounds)
 
         KEY_VENDOR.startElement(this)
         // layout children
@@ -538,11 +542,12 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             children: children,
             contentOffset: new Point(5, 5),
             font: "",
-            kind: this.settings.id,
+            kind: this.settings.kind,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
             borderWidth: this.settings.borderWidth,
+            shadow: this.settings.shadow
         },{
             constraints:this.getConstraints()
         })
@@ -571,6 +576,7 @@ export function VBox(param: BoxParams) {
         borderWidth: param.borderWidth,
         visualStyle: param.visualStyle,
         kind: param.kind,
+        shadow:param.shadow
     })
 }
 

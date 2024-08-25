@@ -4,14 +4,22 @@ import {ListItemRenderer, ListView, ListViewItem} from "../listView.ts";
 import {Button, DropdownButton, IconButton} from "../buttons.ts";
 import {Label, TextBox, WrappingLabel} from "../text.ts";
 import {Icon, Icons} from "../icons.ts";
-import {EmailMessage} from "rtds-core/build/test-models";
+import {ObjAtom, Schema} from "rtds-core"
+import {StateHandler} from "../base.ts";
 
-type EmailFolder = {
-    name: string,
-    icon: Icons,
-    count: number
-}
-const email_folders: EmailFolder[] = [
+
+const S = new Schema()
+
+const EmailAccount = S.enum(['Work', 'home'], 'home')
+const emailAccount = EmailAccount.cloneWith('Work')
+const Folder = S.map({
+    name: S.string(),
+    count: S.number(),
+    icon: S.string(),
+}, {typeName: "Folder"})
+type EmailFolder = typeof Folder
+const Folders = S.list(Folder)
+const email_folders = Folders.cloneWith([
     {name: "Inbox", count: 128, icon: Icons.Inbox},
     {name: 'Drafts', count: 9, icon: Icons.Draft},
     {name: 'Sent', count: -1, icon: Icons.Send},
@@ -22,19 +30,17 @@ const email_folders: EmailFolder[] = [
     {name: 'Updates', count: 342, icon: Icons.Info},
     {name: 'Forums', count: 128, icon: Icons.Forum},
     {name: 'Shopping', count: 8, icon: Icons.ShoppingCart},
-]
-
-
-type EmailMessage = {
-    sender: string,
-    subject: string,
-    date: number,
-    body: string,
-    unread: boolean
-    tags: string[]
-}
-
-const messages: EmailMessage[] = [
+])
+const EmailMessage = S.map({
+    sender: S.string(),
+    subject: S.string(),
+    date: S.jsobj(Date),
+    body: S.string(),
+    tags: S.list(S.string()),
+    unread: S.boolean()
+})
+const Messages = S.list(EmailMessage)
+const messages = Messages.cloneWith([
     {
         sender: "Emily Davis",
         subject: "Re: Question about Budget",
@@ -51,22 +57,43 @@ const messages: EmailMessage[] = [
         unread: true,
         tags: ['meeting', 'work', 'important'],
     }
-]
+])
+const InboxFilter = S.enum(["All mail", "Unread"], "Unread")
+const filter = InboxFilter.cloneWith("Unread")
 
 
-const state = {
+const AppState = S.map({
     email_folders: email_folders,
-    selectedFolder: 2,
-    selectedMessage: messages[0]
-}
-const EmailMessRenderer: ListItemRenderer<EmailMessage> = (item) => {
-    return VBox({
-        mainAxisSelfLayout: 'shrink',
+    selectedFolder: S.number(),
+    messages: messages,
+    selectedMessage: S.number()
+})
+
+const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected, index, onSelectedChanged) => {
+    return ListViewItem({
+        selected: index === selected,
+        mainAxisLayout: 'center',
+        handleEvent: (e) => {
+            if (e.type === 'mouse-down') {
+                onSelectedChanged(index, e)
+            }
+        },
         children: [
-            Label({text: item.sender, shadow: true}),
-            WrappingLabel({text: item.subject, fixedWidth: 150,
-                shadow:true}),
-            WrappingLabel({text: item.body, fixedWidth:150, shadow:true})
+            VBox({
+                shadow:true,
+                mainAxisSelfLayout: 'shrink',
+                visualStyle: {
+                    background: index==selected?'orange':'white',
+                },
+                children: [
+                    Label({text: item.get('sender').get(), shadow: true}),
+                    WrappingLabel({
+                        text: item.get('subject').get(), fixedWidth: 150,
+                        shadow: true
+                    }),
+                    WrappingLabel({text: item.get('body').get().substring(0,30)+'...', fixedWidth: 150, shadow: true})
+                ]
+            }),
         ],
     })
 }
@@ -80,26 +107,26 @@ const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, inde
             }
         },
         children: [
-            Icon({icon: item.icon}),
-            Label({text: item.name, shadow: true}),
+            Icon({icon: item.get('icon').get() as Icons}),
+            Label({text: item.get('name').get(), shadow: true}),
             HSpacer(),
-            Label({text: item.count + "", shadow: true}),
+            Label({text: item.get('count').get() + "", shadow: true}),
         ]
     })
 }
 
-const EmailHeaderView = (mess: EmailMessage) => {
+const EmailHeaderView = (mess: typeof EmailMessage) => {
     return HBox({
         children: [
-            Label({text: mess.sender}),
-            Label({text: mess.subject}),
+            Label({text: mess.get('sender').get()}),
+            Label({text: mess.get('subject').get()}),
         ]
     })
 }
 
-function EmailBody(selectedMessage: EmailMessage) {
+function EmailBody(selectedMessage: typeof EmailMessage) {
     let body = WrappingLabel({
-        text: selectedMessage.body,
+        text: selectedMessage.get('body').get(),
         fixedWidth: 300,
     })
     return ScrollContainer({
@@ -110,6 +137,14 @@ function EmailBody(selectedMessage: EmailMessage) {
     })
 }
 
+function atomAsStateHandler<T>(atom:ObjAtom<T>) {
+    const hand:StateHandler<T> = {
+        get:() => atom.get(),
+        set:(v:T) => atom.set(v)
+    }
+    return hand
+}
+
 export function EmailDemo() {
     return HBox({
         children: [
@@ -117,17 +152,20 @@ export function EmailDemo() {
                 mainAxisSelfLayout: 'shrink',
                 crossAxisSelfLayout: 'shrink',
                 children: [
-                    DropdownButton({text: "Work", children:[
-                            Button({text:"Work"}),
-                            Button({text:"Personal"}),
-                        ]}),
+                    DropdownButton({
+                        text: "Work", children: [
+                            Button({text: "Work"}),
+                            Button({text: "Personal"}),
+                        ]
+                    }),
                     ScrollContainer({
                         key: 'email-folders-scroll',
                         fixedWidth: 150,
                         fixedHeight: 300,
                         child: ListView({
                             key: "email-folder-list",
-                            data: state.email_folders,
+                            data: AppState.get('email_folders'),
+                            selected: atomAsStateHandler(AppState.get('selectedFolder')),
                             renderItem: EmailFolderRenderer,
                         })
                     })
@@ -148,7 +186,7 @@ export function EmailDemo() {
                     TextBox({
                         multiline: false,
                         text: "search",
-                        fixedWidth:150,
+                        fixedWidth: 150,
                     }),
                     ScrollContainer({
                         key: 'email-inbox-scroll',
@@ -157,6 +195,7 @@ export function EmailDemo() {
                         child: ListView({
                             key: "email-inbox",
                             data: messages,
+                            selected:atomAsStateHandler(AppState.get('selectedMessage')),
                             renderItem: EmailMessRenderer,
                         })
                     })
@@ -179,8 +218,8 @@ export function EmailDemo() {
                             // IconButton({icon: Icons.LeftPanelCloseIcon, ghost: true}),
                         ]
                     }),
-                    EmailHeaderView(state.selectedMessage),
-                    EmailBody(state.selectedMessage),
+                    EmailHeaderView(AppState.get('messages').get(AppState.get('selectedMessage').get())),
+                    EmailBody(AppState.get('messages').get(AppState.get('selectedMessage').get())),
                 ]
             }),
         ]
