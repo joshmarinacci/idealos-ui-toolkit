@@ -34,16 +34,19 @@ export class Scene {
     private renderMap: Map<string, GRenderNode>;
     private size: Size;
     private should_redraw_callback?: () => void;
+    private devicePixelRatio: number;
 
     constructor(makeTree: () => GElement) {
         this.borderDebugEnabled = false
         this.makeTree = makeTree
         this.lastStyle = NULL_VISUAL_STYLE
+        this.last = undefined
         this.debugStyle = {
             borderColor: "red",
             textColor: 'black',
             background:'white',
         }
+        this.devicePixelRatio = 1
     }
 
     private log(...layoutPhase: string[]) {
@@ -69,45 +72,13 @@ export class Scene {
             // await font.load()
         }
         // this.canvas = makeCanvas(size)
-        this.last = undefined
-        // this.canvas.addEventListener('mousemove', (e) => {
-        //     // @ts-ignore
-        //     let rect = e.target.getBoundingClientRect()
-        //     let pos = new Point(e.clientX, e.clientY);
-        //     pos = pos.subtract(new Point(rect.x, rect.y))
-        //     this.handleMouseMove(pos)
-        // })
-        //
-        // this.canvas.addEventListener('mousedown', (e) => {
-        //     // @ts-ignore
-        //     let rect = e.target.getBoundingClientRect()
-        //     let pos = new Point(e.clientX, e.clientY);
-        //     pos = pos.subtract(new Point(rect.x, rect.y))
-        //     this.handleMouseDown(pos,e.shiftKey)
-        // })
-        // this.canvas.addEventListener('mouseup', (e) => {
-        //     // @ts-ignore
-        //     let rect = e.target.getBoundingClientRect()
-        //     let pos = new Point(e.clientX, e.clientY);
-        //     pos = pos.subtract(new Point(rect.x, rect.y))
-        //     this.handleMouseUp(pos)
-        // })
-        // window.addEventListener('keydown', (e) => {
-        //     this.handleKeydownEvent(e)
-        // })
-        // window.addEventListener('wheel', (e) => {
-        //     // @ts-ignore
-        //     let rect = e.target.getBoundingClientRect()
-        //     let pos = new Point(e.clientX, e.clientY);
-        //     pos = pos.subtract(new Point(rect.x, rect.y))
-        //     this.handleWheelEvent(pos,e)
-        // })
+        // this.last = undefined
     }
 
     private makeRc() {
         const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
 
-        let sc = 1*2// * window.devicePixelRatio
+        let sc = 1* this.devicePixelRatio
         const rc: RenderContext = {
             canvas: this.canvas,
             ctx: ctx,
@@ -310,7 +281,7 @@ export class Scene {
         })
 
     }
-    private handleKeydownEvent(e: KeyboardEvent) {
+    handleKeydownEvent(e: KeyboardEvent) {
         this.ifTarget(this.keyboard_target,(comp)=>{
             let evt: MKeyboardEvent = {
                 type: 'keyboard-typed',
@@ -328,7 +299,7 @@ export class Scene {
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
         })
     }
-    private handleWheelEvent(pos: Point, e: WheelEvent) {
+    handleWheelEvent(pos: Point, e: WheelEvent) {
         let found = this.findScrollTarget(pos, this.renderRoot)
         if(found) {
             // console.log("scroll target",found)
@@ -390,5 +361,9 @@ export class Scene {
 
     onShouldRedraw(cb: () => void) {
         this.should_redraw_callback = cb
+    }
+
+    setDPI(devicePixelRatio: number) {
+        this.devicePixelRatio = devicePixelRatio
     }
 }
