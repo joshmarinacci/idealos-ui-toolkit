@@ -1,8 +1,8 @@
-import {GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from "./base.ts";
-import {RenderContext} from "./gfx.ts";
+import {GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from "./base.js";
+import {RenderContext} from "./gfx.js";
 import {Point, Size} from "josh_js_util";
-import {Style} from "./style.ts";
-import {KEY_VENDOR} from "./keys.ts";
+import {Style} from "./style.js";
+import {KEY_VENDOR} from "./keys.js";
 
 
 class SquareElement implements GElement {

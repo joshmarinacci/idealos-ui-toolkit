@@ -1,8 +1,8 @@
-import {GElement, GRenderNode, LayoutConstraints, MGlobals, SYMBOL_FONT_ENABLED, TRANSPARENT, ZERO_INSETS} from "./base.ts";
-import {RenderContext} from "./gfx.ts";
-import {Style} from "./style.ts";
+import {GElement, GRenderNode, LayoutConstraints, MGlobals, SYMBOL_FONT_ENABLED, TRANSPARENT, ZERO_INSETS} from "./base.js";
+import {RenderContext} from "./gfx.js";
+import {Style} from "./style.js";
 import {Point, Size} from "josh_js_util";
-import {KEY_VENDOR} from "./keys.ts";
+import {KEY_VENDOR} from "./keys.js";
 
 export enum Icons {
     LeftPanelCloseIcon = 'left_panel_close',

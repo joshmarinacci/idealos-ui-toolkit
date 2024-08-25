@@ -1,11 +1,11 @@
-import {CEvent, GElement, GRenderNode, LayoutConstraints, MGlobals, ZERO_INSETS, ZERO_POINT} from "./base.ts";
+import {CEvent, GElement, GRenderNode, LayoutConstraints, MGlobals, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {RenderContext, withInsets} from "./gfx.ts";
-import {IconButton} from "./buttons.ts";
-import {Icons} from "./icons.ts";
-import {bdsSubInsets} from "./layout.ts";
-import {STATE_CACHE, StateCache} from "./state.ts";
-import {KEY_VENDOR} from "./keys.ts";
+import {RenderContext, withInsets} from "./gfx.js";
+import {IconButton} from "./buttons.js";
+import {Icons} from "./icons.js";
+import {bdsSubInsets} from "./layout.js";
+import {STATE_CACHE, StateCache} from "./state.js";
+import {KEY_VENDOR} from "./keys.js";
 
 export type ScrollContainerSettings = {
     key:string,

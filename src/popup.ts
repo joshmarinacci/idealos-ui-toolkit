@@ -1,7 +1,7 @@
-import {GElement, GRenderNode, LayoutConstraints, TRANSPARENT, ZERO_INSETS} from "../base.ts";
-import {RenderContext} from "../gfx.ts";
+import {GElement, GRenderNode, LayoutConstraints, TRANSPARENT, ZERO_INSETS} from "./base.js";
+import {RenderContext} from "./gfx.js";
 import {Point, Size} from "josh_js_util";
-import {KEY_VENDOR} from "../keys.ts";
+import {KEY_VENDOR} from "./keys.js";
 
 export class PopupContainer implements GElement {
     private child: GElement;

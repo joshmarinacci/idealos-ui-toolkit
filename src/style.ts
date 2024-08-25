@@ -1,4 +1,4 @@
-import {withInsets} from "./gfx.ts";
+import {withInsets} from "./gfx.js";
 import {Insets} from "josh_js_util";
 const LightStyle = {
     panelBackgroundColor: 'white',
@@ -14,8 +14,8 @@ const DarkStyle = {
 }
 
 const BaseStyle = {
-    fontSize: '16px',
-    font: '16px sans-serif',
+    fontSize: '24px',
+    font: '24px sans-serif',
 
     textColor: 'black',
     borderRadius: withInsets(0),

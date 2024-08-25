@@ -1,12 +1,12 @@
-import {GElement, GRenderNode, LayoutConstraints, MGlobals, MMouseEvent, ZERO_INSETS, ZERO_POINT} from "./base.ts";
-import {RenderContext, withInsets} from "./gfx.ts";
+import {GElement, GRenderNode, LayoutConstraints, MGlobals, MMouseEvent, ZERO_INSETS, ZERO_POINT} from "./base.js";
+import {RenderContext, withInsets} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {Style} from "./style.ts";
-import {bdsSubInsets} from "./layout.ts";
-import {IconButton} from "./buttons.ts";
-import {Icons} from "./icons.ts";
-import {STATE_CACHE, StateCache} from "./state.ts";
-import {KEY_VENDOR} from "./keys.ts";
+import {Style} from "./style.js";
+import {bdsSubInsets} from "./layout.js";
+import {IconButton} from "./buttons.js";
+import {Icons} from "./icons.js";
+import {STATE_CACHE, StateCache} from "./state.js";
+import {KEY_VENDOR} from "./keys.js";
 
 class MWindowElement implements GElement {
     private child: GElement;

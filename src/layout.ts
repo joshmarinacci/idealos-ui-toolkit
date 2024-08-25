@@ -8,12 +8,12 @@ import {
     VisualStyle,
     ZERO_INSETS,
     ZERO_POINT
-} from "./base.ts";
-import {RenderContext} from "./gfx.ts";
+} from "./base.js";
+import {RenderContext} from "./gfx.js";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {Style} from "./style.ts";
-import {addInsets, insetsHeight, insetsWidth} from "./util.ts";
-import {KEY_VENDOR} from "./keys.ts";
+import {Style} from "./style.js";
+import {addInsets, insetsHeight, insetsWidth} from "./util.js";
+import {KEY_VENDOR} from "./keys.js";
 
 type BoxParameters = {
     kind?: string,
@@ -159,7 +159,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        this.log(`space ${cons}`)
+        this.log(`space`,cons)
         if (this.settings.mainAxisSelfLayout === 'grow') {
             return this.do_grow_layout(rc, cons)
         }

@@ -1,6 +1,6 @@
-import {RenderContext} from "./gfx.ts";
+import {RenderContext} from "./gfx.js";
 import {Insets, Point, Size} from "josh_js_util";
-import {STATE_CACHE, StateCache} from "./state.ts";
+import {STATE_CACHE, StateCache} from "./state.js";
 
 export type LayoutConstraints = {
     space:Size

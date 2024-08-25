@@ -1,6 +1,6 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {GRenderNode} from "./base.ts";
-import {bdsSubInsets} from "./layout.ts";
+import {GRenderNode} from "./base.js";
+import {bdsSubInsets} from "./layout.js";
 
 export type RenderContext = {
     size: Size;
@@ -78,6 +78,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     if(!popups && n.settings.popup) {
         draw_node = false
     }
+    // console.log('drawing',n.settings.pos)
     rc.ctx.save()
     rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
 
@@ -112,15 +113,17 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     // draw text
     if (draw_node && n.settings.text && n.settings.text.trim().length > 0) {
+        // console.log("drawing text",n.settings.text)
         rc.ctx.fillStyle = n.settings.currentStyle.textColor || "black"
         rc.ctx.font = n.settings.font
-        rc.ctx.textRendering = 'optimizeLegibility'
-        rc.ctx.textAlign = 'start'
-        rc.ctx.textBaseline = 'alphabetic'
+        // rc.ctx.textRendering = 'optimizeLegibility'
+        // rc.ctx.textAlign = 'start'
+        // rc.ctx.textBaseline = 'alphabetic'
         // console.log("font",rc.ctx.font)
         // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
         let x = n.settings.contentOffset.x
         let y = n.settings.contentOffset.y + n.settings.baseline
+        console.log("text",n.settings.text,"baseline",y)
         rc.ctx.fillText(n.settings.text,x,y)
     }
 

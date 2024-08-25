@@ -1,4 +1,4 @@
-import {IconElement, Icons} from "./icons.ts";
+import {IconElement, Icons} from "./icons.js";
 import {
     EventHandler,
     GElement,
@@ -10,15 +10,15 @@ import {
     useState,
     VisualStyle,
     ZERO_INSETS
-} from "./base.ts";
-import {HBox, MHBoxElement, VBox} from "./layout.ts";
-import {Style} from "./style.ts";
+} from "./base.js";
+import {HBox, MHBoxElement, VBox} from "./layout.js";
+import {Style} from "./style.js";
 import {Insets} from "josh_js_util";
-import {TextElement} from "./text.ts";
-import {RenderContext, withInsets} from "./gfx.ts";
-import {KEY_VENDOR} from "./keys.ts";
-import {STATE_CACHE, StateCache} from "./state.ts";
-import {PopupContainer} from "./demo/popup.ts";
+import {TextElement} from "./text.js";
+import {RenderContext, withInsets} from "./gfx.js";
+import {KEY_VENDOR} from "./keys.js";
+import {STATE_CACHE, StateCache} from "./state.js";
+import {PopupContainer} from "./popup.js";
 
 type ButtonParameters = {
     margin?:Insets,

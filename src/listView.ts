@@ -1,9 +1,9 @@
-import {AxisLayout, CEvent, EventHandler, GElement, StateHandler, useState} from "./base.ts";
-import {MHBoxElement, MVBoxElement} from "./layout.ts";
-import {Style} from "./style.ts";
-import {withInsets} from "./gfx.ts";
-import {Label} from "./text.ts";
-import {KEY_VENDOR} from "./keys.ts";
+import {AxisLayout, CEvent, EventHandler, GElement, StateHandler, useState} from "./base.js";
+import {MHBoxElement, MVBoxElement} from "./layout.js";
+import {Style} from "./style.js";
+import {withInsets} from "./gfx.js";
+import {Label} from "./text.js";
+import {KEY_VENDOR} from "./keys.js";
 import {ObjList} from "rtds-core";
 
 type ListViewItemParameters = {
