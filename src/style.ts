@@ -1,7 +1,15 @@
 import {withInsets} from "./gfx.js";
 import {Insets} from "josh_js_util";
-import {ZERO_INSETS} from "./base.js";
+import {TRANSPARENT, ZERO_INSETS} from "./base.js";
 // @ts-ignore
+
+const Colors = {
+    lightBackground:'#fff',
+    darkBackground: '#222',
+    darkTextColor:'#fff',
+    lightTextColor:'#000',
+}
+
 const DarkStyle = {
     panelBackgroundColor: '#222',
     buttonBorderColor: '#666',
@@ -53,12 +61,6 @@ export type ComponentStyle = {
     borderRadius: Insets
     hoverBackgroundColor:string
 }
-// export const Style = {...BaseStyle,...DarkStyle};
-// export type CompleteStyle = {
-//     textColor:string,
-//     backgroundColor:string,
-// }
-// export const Style = {...BaseStyle,...LightStyle};
 
 const lightBaseComponentStyle:ComponentStyle = {
     backgroundColor: "white",
@@ -71,8 +73,20 @@ const lightBaseComponentStyle:ComponentStyle = {
     textColor: 'black',
     hoverBackgroundColor:'white'
 }
+const darkBaseComponentStyle:ComponentStyle = {
+    backgroundColor: "black",
+    borderColor: 'white',
+    borderRadius: withInsets(0),
+    borderWidth: withInsets(0),
+    font: '24px sans-serif',
+    margin: ZERO_INSETS,
+    padding: ZERO_INSETS,
+    textColor: 'white',
+    hoverBackgroundColor:'black'
+}
+
 const lightButtonStyle:ComponentStyle = {
-    backgroundColor: "white",
+    backgroundColor: Colors.lightBackground,
     borderColor: 'black',
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
@@ -82,6 +96,41 @@ const lightButtonStyle:ComponentStyle = {
     textColor: 'black',
     hoverBackgroundColor: '#ccc',
 }
+const darkButtonStyle:ComponentStyle = {
+    backgroundColor: Colors.darkBackground,
+    borderColor: 'white',
+    borderRadius: withInsets(4),
+    borderWidth: withInsets(1),
+    font: '24px sans-serif',
+    margin: withInsets(4),
+    padding: withInsets(7),
+    textColor: 'white',
+    hoverBackgroundColor: '#ccc',
+}
+
+const lightPanelStyle:ComponentStyle = {
+    backgroundColor: Colors.lightBackground,
+    borderColor: TRANSPARENT,
+    borderRadius: withInsets(4),
+    borderWidth: withInsets(0),
+    font: '24px sans-serif',
+    margin: withInsets(0),
+    padding: withInsets(0),
+    textColor: 'black',
+    hoverBackgroundColor: '#ccc',
+}
+const darkPanelStyle:ComponentStyle = {
+    backgroundColor: Colors.darkBackground,
+    borderColor: TRANSPARENT,
+    borderRadius: withInsets(4),
+    borderWidth: withInsets(0),
+    font: '24px sans-serif',
+    margin: withInsets(0),
+    padding: withInsets(0),
+    textColor: 'white',
+    hoverBackgroundColor: '#ccc',
+}
+
 const lightSelectedButtonStyle:ComponentStyle = {
     backgroundColor: 'hsl(35,100%,50%)',
     hoverBackgroundColor: 'hsl(35,100%,70%)',
@@ -95,20 +144,36 @@ const lightSelectedButtonStyle:ComponentStyle = {
 }
 
 class GlobalStyle {
+    private _base: ComponentStyle;
+    private _button: ComponentStyle;
+    private _panel: ComponentStyle;
+    constructor() {
+        this._base = lightBaseComponentStyle
+        this._button = lightButtonStyle
+        this._panel = lightPanelStyle
+    }
     base():ComponentStyle {
-        return lightBaseComponentStyle
+        return this._base
     }
     button():ComponentStyle {
-        return lightButtonStyle
+        return this._button
     }
     selectedButton():ComponentStyle {
         return lightSelectedButtonStyle
     }
     panel():ComponentStyle {
-        return lightBaseComponentStyle
+        return this._panel
     }
     toggle() {
-
+        if(this._base === lightBaseComponentStyle) {
+            this._base = darkBaseComponentStyle
+            this._button = darkButtonStyle
+            this._panel = darkPanelStyle
+        } else {
+            this._base = lightBaseComponentStyle
+            this._button = lightButtonStyle
+            this._panel = lightPanelStyle
+        }
     }
 }
 

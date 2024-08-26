@@ -8,6 +8,7 @@ import {Point, Size} from "josh_js_util";
 import {makeTabs} from "./demo.js";
 // @ts-ignore
 import * as process from "node:process";
+import {Style} from "./style.js";
 
 Canvas.registerFont('MaterialIcons-Regular.ttf',{
     family:'material-icons'
@@ -63,6 +64,8 @@ scene.init().then(() => {
         }
         if(e.key === 'f' && e.super && e.shift) {
             console.log("swapping the style")
+            Style.toggle()
+            redraw()
         }
     })
     scene.onShouldRedraw(() => redraw())

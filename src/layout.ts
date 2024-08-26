@@ -143,7 +143,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
             visualStyle: param.visualStyle || {
                 background: Style.panel().backgroundColor,
-                textColor: Style.base().textColor,
+                textColor: Style.panel().textColor,
                 borderColor: Style.panel().borderColor,
             },
             hoverStyle: param.hoverStyle || {},
@@ -309,7 +309,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             visualStyle: this.settings.visualStyle,
             hoverStyle: this.settings.hoverStyle,
             baseline: 0,
-            font: Style.base().font,
+            font: Style.panel().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",

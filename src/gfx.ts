@@ -1,5 +1,5 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {GRenderNode} from "./base.js";
+import {GRenderNode, TRANSPARENT} from "./base.js";
 import {bdsSubInsets} from "./layout.js";
 
 export type RenderContext = {
@@ -67,9 +67,9 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
 export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void {
     // console.log("drawing", n.settings.kind, n.settings.key)
     if(!n.settings.visualStyle) throw new Error("no visual style found")
-    if(!n.settings.currentStyle) n.settings.currentStyle = n.settings.visualStyle
-    if(!n.settings.currentStyle.background) n.settings.currentStyle.background = n.settings.currentStyle.background = n.settings.visualStyle.background
-    if(!n.settings.currentStyle.borderColor) n.settings.currentStyle.borderColor = n.settings.currentStyle.borderColor = n.settings.visualStyle.borderColor
+    // if(!n.settings.currentStyle) n.settings.currentStyle = n.settings.visualStyle
+    // if(!n.settings.currentStyle.background) n.settings.currentStyle.background = n.settings.currentStyle.background = n.settings.visualStyle.background
+    // if(!n.settings.currentStyle.borderColor) n.settings.currentStyle.borderColor = n.settings.currentStyle.borderColor = n.settings.visualStyle.borderColor
     // console.log("border is",n.settings.borderWidth,"border color is", n.settings.currentStyle.borderColor)
     let draw_node = true
     if(popups && !n.settings.popup) {
@@ -92,21 +92,21 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     bounds = bdsSubInsets(bounds,n.settings.margin)
 
     // fill background inside padding  + border area
-    if (draw_node && n.settings.currentStyle.background) {
+    if (draw_node && n.settings.visualStyle.background) {
         if(n.settings.borderRadius) {
-            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.currentStyle.background)
+            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.visualStyle.background)
         } else {
-            fillRect(rc.ctx, bounds, n.settings.currentStyle.background)
+            fillRect(rc.ctx, bounds, n.settings.visualStyle.background)
         }
     }
 
     // draw / fill border
-    if (draw_node && n.settings.currentStyle.borderColor) {
+    if (draw_node && n.settings.visualStyle.borderColor && n.settings.visualStyle.borderColor !== TRANSPARENT) {
         if(n.settings.borderRadius) {
-            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.currentStyle.borderColor, n.settings.borderWidth)
+            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.visualStyle.borderColor, n.settings.borderWidth)
             // rc.ctx.clip()
         } else {
-            drawBorder(rc.ctx, bounds, n.settings.currentStyle.borderColor, n.settings.borderWidth)
+            drawBorder(rc.ctx, bounds, n.settings.visualStyle.borderColor, n.settings.borderWidth)
         }
     }
     // account for the border
@@ -118,7 +118,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     // draw text
     if (draw_node && n.settings.text && n.settings.text.trim().length > 0) {
         // console.log("drawing text",n.settings.text)
-        rc.ctx.fillStyle = n.settings.currentStyle.textColor || "black"
+        rc.ctx.fillStyle = n.settings.visualStyle.textColor || "black"
         rc.ctx.font = n.settings.font
         // rc.ctx.textRendering = 'optimizeLegibility'
         // rc.ctx.textAlign = 'start'
