@@ -84,6 +84,10 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     let bounds = Bounds.fromPointSize(new Point(0,0,),n.settings.size)
 
+    if(!n.settings.margin) {
+        console.log(n.settings)
+        throw new Error(`missing margin on ${n.settings.kind}`)
+    }
     // account for margin
     bounds = bdsSubInsets(bounds,n.settings.margin)
 

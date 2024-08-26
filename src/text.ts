@@ -234,7 +234,7 @@ export class TextElement implements GElement {
         return new GRenderNode({
             kind: "text-singleline-element",
             text: this.settings.text,
-            font: Style.font,
+            font: Style.base().font,
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
@@ -271,13 +271,13 @@ export class TextElement implements GElement {
             return new GRenderNode({
                 kind:"text-line-element",
                 text:line,
-                font: Style.font,
+                font: Style.base().font,
                 size: new Size(metrics.width,lineHeight),
                 pos: pos,
                 contentOffset: new Point(0,0),
                 baseline: baseline,
                 visualStyle: {
-                    textColor: Style.textColor,
+                    textColor: Style.base().textColor,
                     borderColor: TRANSPARENT,
                     background: TRANSPARENT,
                 },
@@ -292,7 +292,7 @@ export class TextElement implements GElement {
         return new GRenderNode({
             kind: "text-multiline-element",
             text:"",
-            font: Style.font,
+            font: Style.base().font,
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(total_insets.left, total_insets.top),
@@ -344,13 +344,13 @@ export class TextElement implements GElement {
             return new GRenderNode({
                 kind:"text-line-element",
                 text:line,
-                font: Style.font,
+                font: Style.base().font,
                 size: new Size(metrics.width,lineHeight),
                 pos: pos,
                 contentOffset: new Point(0,0),
                 baseline: baseline,
                 visualStyle: {
-                    textColor: Style.textColor,
+                    textColor: Style.base().textColor,
                     borderColor: TRANSPARENT,
                     background: TRANSPARENT,
                 },
@@ -366,7 +366,7 @@ export class TextElement implements GElement {
         return new GRenderNode({
             kind: "text-multiline-element",
             text:"",
-            font: Style.font,
+            font: Style.base().font,
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(total_insets.left, total_insets.top),
@@ -403,8 +403,8 @@ class TextInputElement implements GElement {
             ...opts,
             multiline: opts.multiline?opts.multiline:false,
             borderWidth: withInsets(1),
-            margin: Style.buttonMargin,
-            padding: Style.buttonPadding,
+            margin: Style.button().margin,
+            padding: Style.button().padding,
             fixedWidth: opts.fixedWidth,
         }
     }
@@ -418,12 +418,12 @@ class TextInputElement implements GElement {
         let [focused, setFocused] = state.useState("focused",() => false)
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
-            font: Style.font,
+            font: Style.base().font,
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             shadow: true,
             visualStyle: {
-                textColor: Style.textColor,
+                textColor: Style.base().textColor,
                 background: TRANSPARENT,
                 borderColor: TRANSPARENT,
             },
@@ -433,7 +433,7 @@ class TextInputElement implements GElement {
         let text_node = text.layout(rc,_cons)
         const cursor_node = this.makeCursor()
 
-        rc.ctx.font = Style.font
+        rc.ctx.font = Style.base().font
         let lines = this.settings.text.split("\n")
         let line = lines[cursorPosition.y]
         let text_before = line.substring(0,cursorPosition.x)
@@ -472,7 +472,7 @@ class TextInputElement implements GElement {
             borderWidth: withInsets(1),
             children: [text_node, cursor_node],
             contentOffset: new Point(total_insets.left, total_insets.top),
-            font: Style.font,
+            font: Style.base().font,
             margin: this.settings.margin,
             padding: this.settings.padding,
             pos: new Point(0, 0),
@@ -495,7 +495,7 @@ class TextInputElement implements GElement {
         return new GRenderNode({
             children: [],
             contentOffset: new Point(5,5),
-            font: Style.font,
+            font: Style.base().font,
             kind: "",
             pos: ZERO_POINT.copy(),
             size: new Size(2,50),
@@ -524,12 +524,12 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
     return new TextElement({
         text: opts.text,
         visualStyle: {
-            textColor: Style.textColor,
+            textColor: Style.base().textColor,
             borderColor: TRANSPARENT,
             background: TRANSPARENT,
         },
         padding: withInsets(5),
-        font: Style.font,
+        font: Style.base().font,
         margin: withInsets(5),
         borderWidth: ZERO_INSETS,
         shadow: opts.shadow ? opts.shadow : false,
@@ -542,15 +542,15 @@ export function WrappingLabel(param: { fixedWidth: number; text: string, shadow?
         text: param.text,
         multiline: true,
         shadow: param.shadow||false,
-        padding: Style.buttonPadding,
+        padding: Style.button().padding,
         margin: ZERO_INSETS,
         borderWidth: ZERO_INSETS,
-        font: Style.font,
+        font: Style.base().font,
         fixedWidth: param.fixedWidth,
         visualStyle: {
             borderColor: TRANSPARENT,
             background: TRANSPARENT,
-            textColor: Style.textColor,
+            textColor: Style.base().textColor,
         }
     })
 }

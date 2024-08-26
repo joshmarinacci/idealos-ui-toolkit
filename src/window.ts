@@ -82,7 +82,7 @@ class MWindowElement implements GElement {
             visualStyle: {
                 background: 'magenta',
                 borderColor: 'black',
-                textColor: Style.textColor
+                textColor: Style.base().textColor
             }
         })
     }

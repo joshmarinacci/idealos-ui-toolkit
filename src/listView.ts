@@ -21,12 +21,12 @@ export function ListViewItem(opts: ListViewItemParameters): GElement {
         mainAxisLayout: opts.mainAxisLayout || 'start',
         crossAxisLayout: 'center',
         visualStyle:{
-            background: opts.selected ? Style.selectedBackgroundColor : Style.panelBackgroundColor,
-            textColor: Style.textColor,
-            borderColor: Style.panelBorderColor,
+            background: opts.selected ? Style.selectedButton().backgroundColor : Style.panel().backgroundColor,
+            textColor: Style.base().textColor,
+            borderColor: Style.panel().borderColor,
         },
         hoverStyle: {
-            background: opts.selected ? Style.selectedBackgroundHoverColor : Style.selectedBackgroundHoverColor,
+            background: opts.selected ? Style.selectedButton().hoverBackgroundColor : Style.button().hoverBackgroundColor
         },
         children: opts.children,
         handleEvent: opts.handleEvent,
@@ -44,6 +44,7 @@ export type ListItemRenderer<T> = (item:T,
 
 export type ListViewParameters<T> = {
     key?:string,
+    // @ts-ignore
     data: T[] | ObjList<T>
     selected?: StateHandler<number>
     renderItem?:ListItemRenderer<T>
@@ -73,9 +74,9 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         kind: 'list-view',
         key: key,
         visualStyle: {
-            borderColor: Style.panelBorderColor,
-            textColor: Style.textColor,
-            background: Style.panelBackgroundColor
+            borderColor: Style.panel().borderColor,
+            textColor: Style.base().textColor,
+            background: Style.panel().backgroundColor
         },
         borderWidth: withInsets(1),
         children: opts.data.map((item, index) => {

@@ -39,27 +39,27 @@ type IconButtonParameters = {
 export function IconButton(opts: IconButtonParameters) {
     return new MHBoxElement({
         visualStyle: {
-            borderColor:opts.ghost ? TRANSPARENT : Style.buttonBorderColor,
-            background: opts.ghost ? TRANSPARENT : Style.buttonBackground,
-            textColor: Style.buttonTextColor,
+            borderColor:opts.ghost ? TRANSPARENT : Style.button().borderColor,
+            background: opts.ghost ? TRANSPARENT : Style.button().backgroundColor,
+            textColor: Style.button().textColor,
         },
         hoverStyle: opts.hoverStyle || {
-            background: Style.buttonBackgroundHoverColor,
-            borderColor: Style.buttonBorderColor,
-            textColor: Style.buttonTextColor,
+            background: Style.button().hoverBackgroundColor,
+            borderColor: Style.button().borderColor,
+            textColor: Style.button().textColor,
         },
-        borderWidth: opts.ghost ? Style.buttonBorderWidth : opts.borderWidth || Style.buttonBorderWidth,
-        borderRadius: opts.borderRadius || Style.buttonBorderRadius,
+        borderWidth: opts.ghost ? Style.button().borderWidth : opts.borderWidth || Style.button().borderWidth,
+        borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [
             new IconElement({icon: opts.icon, shadow:true}),
             new TextElement({
                 padding: ZERO_INSETS,
-                font: Style.font,
+                font: Style.button().font,
                 margin: ZERO_INSETS,
                 visualStyle:{
                     borderColor: TRANSPARENT,
                     background: TRANSPARENT,
-                    textColor: Style.buttonTextColor,
+                    textColor: Style.button().textColor
                 },
                 borderWidth: ZERO_INSETS,
                 text: opts.text || "",
@@ -70,8 +70,8 @@ export function IconButton(opts: IconButtonParameters) {
         crossAxisSelfLayout: "shrink",
         mainAxisLayout: "center",
         mainAxisSelfLayout: "shrink",
-        margin: Style.buttonMargin,
-        padding: Style.buttonPadding,
+        margin: Style.button().margin,
+        padding: Style.button().padding,
         handleEvent: opts.handleEvent,
     })
 }
@@ -95,25 +95,25 @@ export const Button = (opts: ButtonParameters) => {
         key:opts.key,
         kind:'button',
         visualStyle: {
-            background: opts.selected?Style.selectedBackgroundColor:Style.buttonBackground,
-            borderColor: Style.buttonBorderColor,
-            textColor: Style.buttonTextColor,
+            background: opts.selected?Style.selectedButton().backgroundColor:Style.button().backgroundColor,
+            borderColor: Style.button().borderColor,
+            textColor: Style.button().textColor,
         },
         hoverStyle: {
-            background:opts.selected?Style.selectedBackgroundHoverColor:Style.buttonBackgroundHoverColor,
-            borderColor: Style.buttonBorderColor,
-            textColor: Style.buttonTextColor,
+            background:opts.selected?Style.selectedButton().hoverBackgroundColor:Style.button().hoverBackgroundColor,
+            borderColor: Style.button().borderColor,
+            textColor: Style.button().textColor,
         },
-        borderWidth: opts.borderWidth || Style.buttonBorderWidth,
-        borderRadius: opts.borderRadius || Style.buttonBorderRadius,
+        borderWidth: opts.borderWidth || Style.button().borderWidth,
+        borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
-            font: Style.font,
+            font: Style.button().font,
             margin: ZERO_INSETS,
             visualStyle:{
                 borderColor: TRANSPARENT,
                 background: TRANSPARENT,
-                textColor: Style.buttonTextColor,
+                textColor: Style.button().textColor,
             },
             borderWidth: ZERO_INSETS,
             text: opts.text || "",
@@ -123,8 +123,8 @@ export const Button = (opts: ButtonParameters) => {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: 'center',
         mainAxisSelfLayout: 'shrink',
-        margin: opts.margin||Style.buttonMargin,
-        padding: opts.padding || Style.buttonPadding,
+        margin: opts.margin||Style.button().margin,
+        padding: opts.padding || Style.button().padding,
         handleEvent: opts.handleEvent,
     })
 }
@@ -133,19 +133,19 @@ export function Tag(opts: { text: string }) {
     return new MHBoxElement({
         visualStyle: {
             background: 'blue',
-            borderColor: Style.buttonBorderColor,
-            textColor: Style.textColor,
+            borderColor: Style.button().borderColor,
+            textColor: Style.button().textColor,
         },
-        borderWidth: Style.buttonBorderWidth,
-        borderRadius: Style.tagBorderRadius,
+        borderWidth: Style.button().borderWidth,
+        borderRadius: Style.button().borderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
-            font: Style.font,
+            font: Style.button().font,
             margin: ZERO_INSETS,
             visualStyle: {
                 borderColor: 'transparent',
                 background: TRANSPARENT,
-                textColor: Style.buttonTextColor,
+                textColor: Style.button().textColor,
             },
             borderWidth: ZERO_INSETS,
             text: opts.text,
@@ -155,8 +155,8 @@ export function Tag(opts: { text: string }) {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: 'center',
         mainAxisSelfLayout: 'shrink',
-        margin: Style.buttonMargin,
-        padding: Style.buttonPadding,
+        margin: Style.button().margin,
+        padding: Style.button().padding,
     })
 }
 

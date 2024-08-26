@@ -142,14 +142,14 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             children: param.children,
 
             visualStyle: param.visualStyle || {
-                background: Style.panelBackgroundColor,
-                textColor: Style.textColor,
-                borderColor: Style.panelBorderColor
+                background: Style.panel().backgroundColor,
+                textColor: Style.base().textColor,
+                borderColor: Style.panel().borderColor,
             },
             hoverStyle: param.hoverStyle || {},
-            margin: withFallback(param.margin, Style.panelMargin),
-            padding: withFallback(param.padding, Style.panelPadding),
-            borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
+            margin: withFallback(param.margin, Style.panel().margin),
+            padding: withFallback(param.padding, Style.panel().padding),
+            borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),
             handleEvent: param.handleEvent,
 
             fixedWidth: param.fixedWidth,
@@ -309,11 +309,11 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             visualStyle: this.settings.visualStyle,
             hoverStyle: this.settings.hoverStyle,
             baseline: 0,
-            font: Style.font,
+            font: Style.base().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            kind: this.settings.id,
+            kind: this.settings.kind,
             children: children,
             padding: this.settings.padding,
             contentOffset: contentBounds.position(),
@@ -387,11 +387,11 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             visualStyle: this.settings.visualStyle,
             hoverStyle: this.settings.hoverStyle,
             baseline: 0,
-            font: Style.font,
+            font: Style.base().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            kind: this.settings.id,
+            kind: this.settings.kind,
             children: children,
             padding: this.settings.padding,
             contentOffset: contentBounds.position(),
@@ -451,15 +451,15 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             children: param.children,
 
             visualStyle: param.visualStyle || {
-                background: Style.panelBackgroundColor,
-                textColor: Style.textColor,
-                borderColor: Style.panelBorderColor
+                background: Style.panel().backgroundColor,
+                textColor: Style.base().textColor,
+                borderColor: Style.panel().borderColor
             },
-            margin: withFallback(param.margin, Style.panelMargin),
-            padding: withFallback(param.padding, Style.panelPadding),
+            margin: withFallback(param.margin, Style.panel().margin),
+            padding: withFallback(param.padding, Style.panel().padding),
 
             borderRadius: withFallback(param.borderRadius, ZERO_INSETS),
-            borderWidth: withFallback(param.borderWidth, Style.panelBorderWidth),
+            borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),
 
             handleEvent: param.handleEvent,
             fixedWidth: param.fixedWidth,

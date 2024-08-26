@@ -6,6 +6,7 @@ import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Point, Size} from "josh_js_util";
 import {makeTabs} from "./demo.js";
+// @ts-ignore
 import * as process from "node:process";
 
 Canvas.registerFont('MaterialIcons-Regular.ttf',{
@@ -30,6 +31,7 @@ const redraw = () => {
     const { pixelWidth: width, pixelHeight: height } = window
     scene.layout()
     scene.redraw()
+    // @ts-ignore
     const buffer = scene.getCanvas().toBuffer('raw')
     window.render(width, height, width * 4, 'bgra32', buffer)
 }
@@ -58,6 +60,9 @@ scene.init().then(() => {
         if(e.key === 'q' && e.super) {
             console.log('quitting')
             process.exit(0)
+        }
+        if(e.key === 'f' && e.super && e.shift) {
+            console.log("swapping the style")
         }
     })
     scene.onShouldRedraw(() => redraw())

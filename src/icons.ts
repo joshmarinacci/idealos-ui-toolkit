@@ -71,7 +71,7 @@ export class IconElement implements GElement {
             visualStyle: {
                 background: MGlobals.get(SYMBOL_FONT_ENABLED) === true ? TRANSPARENT : "red",
                 borderColor: "",
-                textColor: Style.textColor,
+                textColor: Style.base().textColor,
             },
             baseline: 24,
             borderWidth: ZERO_INSETS,
