@@ -36,7 +36,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                         text: title,
                         selected: selected == i,
                         margin: new Insets(0,2,0,2),
-                        borderRadius: Style.button().borderRadius,
+                        borderRadius: new Insets(5,5,0,0),
                         borderWidth: Style.button().borderWidth,
                         handleEvent:(e) => {
                             if(e.type === 'mouse-down') {

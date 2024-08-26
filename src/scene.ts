@@ -27,7 +27,6 @@ export class Scene {
     private lastStyle: VisualStyle
     private debugStyle: VisualStyle
     private makeTree: () => GElement;
-    private borderDebugEnabled: boolean;
     private current_hover: string | undefined;
     private keyboard_target: string | undefined
     private current_target: string | undefined;
@@ -37,7 +36,6 @@ export class Scene {
     private devicePixelRatio: number;
 
     constructor(makeTree: () => GElement) {
-        this.borderDebugEnabled = false
         this.makeTree = makeTree
         this.lastStyle = NULL_VISUAL_STYLE
         this.last = undefined
@@ -94,7 +92,7 @@ export class Scene {
     layout() {
         if(!this.renderMap) this.renderMap = new Map()
         KEY_VENDOR.reset()
-        this.log("layout phase")
+        // this.log("layout phase")
         // MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
         KEY_VENDOR.start()
