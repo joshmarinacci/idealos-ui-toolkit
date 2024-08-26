@@ -8,7 +8,12 @@ import {Point, Size} from "josh_js_util";
 import {makeTabs} from "./demo.js";
 import * as process from "node:process";
 
+Canvas.registerFont('MaterialIcons-Regular.ttf',{
+    family:'material-icons'
+})
+
 const window = sdl.video.createWindow({ resizable: true, width:800, height:600 })
+
 function makeTree() {
     return makeTabs()
 }
@@ -17,7 +22,7 @@ setup_common_keybindings()
 const scene = new Scene(makeTree)
 scene.setDPI(2)
 MGlobals.set(Scene.name, scene)
-MGlobals.set(SYMBOL_FONT_ENABLED, false)
+MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 
 

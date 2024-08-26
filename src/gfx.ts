@@ -123,7 +123,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
         // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
         let x = n.settings.contentOffset.x
         let y = n.settings.contentOffset.y + n.settings.baseline
-        // console.log("text",n.settings.text,"baseline",y)
+        // console.log("text",n.settings.text, n.settings.font, "baseline",y)
         rc.ctx.fillText(n.settings.text,x,y)
     }
 
