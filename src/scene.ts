@@ -299,14 +299,14 @@ export class Scene {
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
         })
     }
-    handleWheelEvent(pos: Point, e: WheelEvent) {
+    public handleWheelEvent(pos: Point, delta:Point) {
         let found = this.findScrollTarget(pos, this.renderRoot)
         if(found) {
             // console.log("scroll target",found)
             const evt:MWheelEvent = {
                 type: 'wheel',
-                deltaX:e.deltaX,
-                deltaY:e.deltaY,
+                deltaX:delta.x,
+                deltaY:delta.y,
                 redraw: () => {
                     if(this.should_redraw_callback) {
                         this.should_redraw_callback()

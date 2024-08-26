@@ -6,9 +6,9 @@ import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Point, Size} from "josh_js_util";
 import {makeTabs} from "./demo.js";
+import * as process from "node:process";
 
-const window = sdl.video.createWindow({ resizable: true })
-
+const window = sdl.video.createWindow({ resizable: true, width:800, height:600 })
 function makeTree() {
     return makeTabs()
 }
@@ -45,8 +45,15 @@ scene.init().then(() => {
     window.on('mouseButtonUp', (e)=>{
         scene.handleMouseUp(new Point(e.x,e.y))
     })
+    window.on('mouseWheel', (e) => {
+        scene.handleWheelEvent(new Point(e.x,e.y),new Point(e.dx,e.dy))
+    })
     window.on('keyDown',e => {
-        console.log("keydown",e)
+        // console.log("keydown",e)
+        if(e.key === 'q' && e.super) {
+            console.log('quitting')
+            process.exit(0)
+        }
     })
     scene.onShouldRedraw(() => redraw())
 

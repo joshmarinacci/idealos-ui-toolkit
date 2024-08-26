@@ -59,7 +59,7 @@ scene.init().then(() => {
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleWheelEvent(pos,e)
+        scene.handleWheelEvent(pos,new Point(e.deltaX, e.deltaY))
     })
 
     scene.setCanvas(canvas)
