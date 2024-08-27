@@ -65,19 +65,30 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
 }
 
 function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
+    let bg = n.settings.visualStyle.background || "magenta"
+    if(n.hover && n.settings.hoverStyle && n.settings.hoverStyle.background) {
+        bg = n.settings.hoverStyle.background
+    }
+    if(n.focused && n.settings.focusedStyle && n.settings.focusedStyle.background) {
+        bg = n.settings.focusedStyle.background
+    }
     if(n.settings.borderRadius) {
-        fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.visualStyle.background)
+        fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, bg)
     } else {
-        fillRect(rc.ctx, bounds, n.settings.visualStyle.background)
+        fillRect(rc.ctx, bounds, bg)
     }
 }
 
 function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
+    let color = n.settings.visualStyle.borderColor || "black"
+    if(n.focused && n.settings.focusedStyle?.borderColor) {
+        color = n.settings.focusedStyle.borderColor
+    }
     if(n.settings.borderRadius) {
-        strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.visualStyle.borderColor, n.settings.borderWidth)
+        strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,color, n.settings.borderWidth)
         // rc.ctx.clip()
     } else {
-        drawBorder(rc.ctx, bounds, n.settings.visualStyle.borderColor, n.settings.borderWidth)
+        drawBorder(rc.ctx, bounds, color, n.settings.borderWidth)
     }
 }
 

@@ -249,6 +249,7 @@ export class TextElement implements GElement {
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
+                shadow:true,
                 kind:"text-line-element",
                 text:line,
                 font: Style.base().font,
@@ -325,6 +326,7 @@ export class TextElement implements GElement {
             y += lineHeight
             return new GRenderNode({
                 kind:"text-line-element",
+                shadow:true,
                 text:line,
                 font: Style.base().font,
                 size: new Size(metrics.width,lineHeight),
@@ -470,7 +472,7 @@ class TextInputElement implements GElement {
         size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
         const focusedStyle = {
             background: 'hsl(47,100%,79%)',
-                borderColor: 'black'
+            borderColor: 'black'
         }
         const visualStyle = {
             background: '#f0f0f0',

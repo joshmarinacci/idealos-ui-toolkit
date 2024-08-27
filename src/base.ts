@@ -80,10 +80,14 @@ export class GRenderNode {
     settings: RenderNodeSettings
     userdata: Record<string, any>
     debug: boolean;
+    hover: boolean;
+    focused: boolean;
     constructor(settings: RenderNodeSettings, userdata?:Record<string,any>) {
         this.settings = settings
         this.userdata = userdata || {}
         this.debug = false
+        this.hover = false
+        this.focused = false
     }
 }
 

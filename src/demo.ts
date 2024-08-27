@@ -97,20 +97,20 @@ export function makeCompsDemo() {
             //         }),
             //     ]
             // }),
-            // HBox({
-            //     children: [
-            //         Label({ text:'inputs'}),
-            //         TextBox({
-            //             text:'hello there'
-            //             // text: state.textInputValue,
-            //             // multiline: false,
-            //             // onChange: (v, e) => {
-            //             //     state.textInputValue = v[0]
-            //             //     e.redraw()
-            //             // }
-            //         }),
-            //     ]
-            // })
+            HBox({
+                children: [
+                    Label({ text:'inputs'}),
+                    TextBox({
+                        text:'hello there'
+                        // text: state.textInputValue,
+                        // multiline: false,
+                        // onChange: (v, e) => {
+                        //     state.textInputValue = v[0]
+                        //     e.redraw()
+                        // }
+                    }),
+                ]
+            })
         ]
     })
 }
