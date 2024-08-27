@@ -251,16 +251,15 @@ export class TextElement implements GElement {
 
     private layout_multiline(rc: RenderContext, _cons: LayoutConstraints) {
         rc.ctx.font = this.settings.font
-        let metrics = rc.ctx.measureText("Testy")
-        let baseline = metrics.fontBoundingBoxAscent
-        let lineHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        let [textsize,baseline] = this.calcMetrics(rc)
+        let lineHeight = textsize.h
         let lines = this.settings.text.split('\n')
         let y = 0
         let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
 
         let size = new Size(0,0)
-        size.w = metrics.width
-        size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        size.w = textsize.w
+        size.h = textsize.h
         if(this.settings.fixedWidth) {
             size.w = this.settings.fixedWidth
         }
@@ -308,16 +307,15 @@ export class TextElement implements GElement {
 
     private layout_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
         rc.ctx.font = this.settings.font
-        let metrics = rc.ctx.measureText("Testy")
-        let baseline = metrics.fontBoundingBoxAscent
-        let lineHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        let [textsize, baseline] = this.calcMetrics(rc)
+        let lineHeight = textsize.h
         let words = this.settings.text.split(' ')
         let x = 0
         let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
 
         let size = new Size(0,0)
         size.w = this.settings.fixedWidth as number
-        size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        size.h = textsize.h
         size.w -= (total_insets.left + total_insets.right)
         size.h += (total_insets.top + total_insets.bottom)
 
@@ -338,7 +336,7 @@ export class TextElement implements GElement {
         lines.push(current_line)
         let y = 0
         let nodes:GRenderNode[] = lines.map(line => {
-            // let metrics = rc.ctx.measureText(line)
+            let metrics = rc.ctx.measureText(line)
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
