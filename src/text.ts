@@ -4,9 +4,8 @@ import {
     GElement,
     GRenderNode,
     LayoutConstraints,
-    MGlobals,
-    MKeyboardEvent,
-    TRANSPARENT,
+    MKeyboardEvent, StateHandler,
+    TRANSPARENT, useState,
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.js";
@@ -14,19 +13,17 @@ import {RenderContext, sizeWithPadding, withInsets} from "./gfx.js";
 import {Style} from "./style.js";
 import {Insets, Point, Size} from "josh_js_util";
 import {addInsets} from "./util.js";
-import {STATE_CACHE, StateCache} from "./state.js";
 import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.js";
 import {KEY_VENDOR} from "./keys.js";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 type TextInputSettings = {
-    text: string
-    onChange?: OnChangeCallback<[string,Point]>
+    text?: StateHandler<string>
     multiline?:boolean,
     fixedWidth?: number,
 }
 type TextInputRequirements = {
-    text: string
+    text?: StateHandler<string>
     onChange?: OnChangeCallback<[string,Point]>
     margin: Insets
     padding: Insets
@@ -448,11 +445,9 @@ class TextInputElement implements GElement {
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         const key = KEY_VENDOR.getKey()
-        // console.log("redoing layout",this.opts.text)
-        const cache:StateCache = MGlobals.get(STATE_CACHE)
-        const state = cache.getState(key)
-        let [cursorPosition,setCursorPosition] = state.useState("cursor",() => new Point(0,0))
-        let [focused, setFocused] = state.useState("focused",() => false)
+        let [textString, setText] = useState(key,"text",this.settings.text,()=>"")
+        let [cursorPosition, setCursorPosition]= useState(key,"cursor",undefined,()=>new Point(0,0))
+        let [focused, setFocused] = useState(key,"focused",undefined,()=>false)
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
             font: Style.base().font,
@@ -466,14 +461,14 @@ class TextInputElement implements GElement {
                 background: TRANSPARENT,
                 borderColor: TRANSPARENT,
             },
-            text:this.settings.text,
+            text:textString,
             multiline: this.settings.multiline,
         })
         let text_node = text.layout(rc,_cons)
         const cursor_node = this.makeCursor()
 
         rc.ctx.font = Style.base().font
-        let lines = this.settings.text.split("\n")
+        let lines = textString.split("\n")
         let line = lines[cursorPosition.y]
         let text_before = line.substring(0,cursorPosition.x)
         // console.log("text before is",text_before, this.opts.cursorPosition)
@@ -519,9 +514,9 @@ class TextInputElement implements GElement {
                 if (e.type === 'keyboard-typed') {
                     if(!focused) setFocused(true)
                     let kbe = e as MKeyboardEvent;
-                    let t2 = processText(this.settings.text, cursorPosition, kbe)
+                    let t2 = processText(textString, cursorPosition, kbe)
+                    setText(t2[0])
                     setCursorPosition(t2[1])
-                    if (this.settings.onChange) this.settings.onChange(t2, e)
                     e.redraw()
                 }
             }

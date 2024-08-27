@@ -12,7 +12,8 @@ import {MWindow} from "./window.js";
 
 
 const state = {
-    textInputValue: "yo"
+    textInputValue: "yo",
+    toggle:false
 }
 export function makeCompsDemo() {
     return new MVBoxElement({
@@ -24,10 +25,10 @@ export function makeCompsDemo() {
                     Button({text: "Button"}),
                     ToggleButton({
                         text: "toggle",
-                        // selected: {
-                        //     get: () => state.toggle,
-                        //     set: (value) => state.toggle = value,
-                        // }
+                        selected: {
+                            get: () => state.toggle,
+                            set: (value) => state.toggle = value,
+                        }
                     }),
                     IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
                     HSpacer(),
@@ -105,13 +106,15 @@ export function makeCompsDemo() {
                 children: [
                     Label({ text:'inputs'}),
                     TextBox({
-                        // text:'hello there',
-                        text: state.textInputValue,
+                        text: {
+                            get: () => state.textInputValue,
+                            set: (value) => state.textInputValue= value,
+                        },
                         multiline:false,
-                        onChange: (v, e) => {
-                            state.textInputValue = v[0]
-                            e.redraw()
-                        }
+                    }),
+                    TextBox({
+                        // text:'multi-line text area',
+                        multiline:true,
                     }),
                 ]
             })
