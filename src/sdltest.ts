@@ -22,7 +22,7 @@ function makeTree() {
 
 setup_common_keybindings()
 const scene = new Scene(makeTree)
-scene.setDPI(2)
+scene.setDPI(1)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())

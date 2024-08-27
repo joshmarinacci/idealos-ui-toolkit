@@ -423,6 +423,8 @@ class TextInputElement implements GElement {
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
             font: Style.base().font,
+            fontSize: Style.base().fontSize,
+            fontWeight: Style.base().fontWeight,
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             shadow: true,

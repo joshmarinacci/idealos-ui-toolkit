@@ -72,44 +72,45 @@ export function makeCompsDemo() {
             HBox({
                 crossAxisLayout: 'center',
                 children: [
-                    Label({text: 'text input'}),
-                    TextBox({
-                        text:'hello there'
-                        // text: state.textInputValue,
-                        // multiline: false,
-                        // onChange: (v, e) => {
-                        //     state.textInputValue = v[0]
-                        //     e.redraw()
-                        // }
-                    }),
-                    Label({text: 'text label', multiline: true})
-                    // Label({text:'multi\nline\ntext', multiline:true})
-                ]
-            }),
-            HBox({
-                mainAxisSelfLayout: 'shrink',
-                crossAxisLayout: 'center',
-                children: [
-                    Label({text: "popup"}),
-                    DropdownButton({
-                        text: "open popup",
-                        children: [
-                            Button({text: "popup"}),
-                            Button({text: "popup"}),
-                            Button({text: "popup"}),
-                            Button({text: "popup"}),
-                        ]
-                    }),
-                ]
-            }),
-            HBox({
-                children: [
+                    Label({text: 'labels'}),
+                    Label({text: 'bold', bold:true}),
+                    Label({text: 'line with\n newlines', multiline: true}),
                     WrappingLabel({
                         text: "This is a long label without a newline that should be wrapped properly.",
                         fixedWidth: 200,
                     })
                 ]
-            })
+            }),
+            // HBox({
+            //     mainAxisSelfLayout: 'shrink',
+            //     crossAxisLayout: 'center',
+            //     children: [
+            //         Label({text: "popup"}),
+            //         DropdownButton({
+            //             text: "open popup",
+            //             children: [
+            //                 Button({text: "popup"}),
+            //                 Button({text: "popup"}),
+            //                 Button({text: "popup"}),
+            //                 Button({text: "popup"}),
+            //             ]
+            //         }),
+            //     ]
+            // }),
+            // HBox({
+            //     children: [
+            //         Label({ text:'inputs'}),
+            //         TextBox({
+            //             text:'hello there'
+            //             // text: state.textInputValue,
+            //             // multiline: false,
+            //             // onChange: (v, e) => {
+            //             //     state.textInputValue = v[0]
+            //             //     e.redraw()
+            //             // }
+            //         }),
+            //     ]
+            // })
         ]
     })
 }
