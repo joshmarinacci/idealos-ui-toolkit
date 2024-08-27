@@ -214,6 +214,7 @@ function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[
 type TextElementSettings = {
     multiline?:boolean
     fixedWidth?:number
+    bold?:boolean
 } & ElementSettings
 export class TextElement implements GElement {
     settings: TextElementSettings;
@@ -235,6 +236,8 @@ export class TextElement implements GElement {
             kind: "text-singleline-element",
             text: this.settings.text,
             font: Style.base().font,
+            fontSize: this.settings.fontSize || Style.base().fontSize,
+            fontWeight: this.settings.bold?"bold":Style.base().fontWeight,
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
@@ -380,6 +383,9 @@ export class TextElement implements GElement {
     }
 
     private calcMetrics(rc: RenderContext):[Size,number] {
+        let fontStr = `${this.settings.fontWeight} ${this.settings.fontSize}px ${this.settings.font}`
+        // let fontStr = `${this.settings.fontSize}px ${this.settings.fontWeight} ${this.settings.font}`
+        rc.ctx.font = fontStr
         let metrics = rc.ctx.measureText(this.settings.text)
         let size = new Size(
             Math.floor(metrics.width),
@@ -518,7 +524,7 @@ export function TextBox(param: TextInputSettings): GElement {
 }
 
 
-export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean }) {
+export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean, bold?:boolean }) {
     return new TextElement({
         text: opts.text,
         visualStyle: {
@@ -528,10 +534,13 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
         },
         padding: withInsets(5),
         font: Style.base().font,
+        fontSize: Style.base().fontSize,
+        fontWeight: Style.base().fontWeight,
         margin: withInsets(5),
         borderWidth: ZERO_INSETS,
         shadow: opts.shadow ? opts.shadow : false,
-        multiline: opts.multiline ? opts.multiline : false
+        multiline: opts.multiline ? opts.multiline : false,
+        bold: opts.bold
     })
 }
 
@@ -544,6 +553,8 @@ export function WrappingLabel(param: { fixedWidth: number; text: string, shadow?
         margin: ZERO_INSETS,
         borderWidth: ZERO_INSETS,
         font: Style.base().font,
+        fontSize: Style.base().fontSize,
+        fontWeight:  Style.base().fontWeight,
         fixedWidth: param.fixedWidth,
         visualStyle: {
             borderColor: TRANSPARENT,

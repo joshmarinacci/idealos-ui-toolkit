@@ -64,6 +64,23 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
     ctx.stroke()
 }
 
+function doDrawText(rc: RenderContext, n: GRenderNode) {
+    // console.log("drawing text",n.settings.text)
+    rc.ctx.fillStyle = n.settings.visualStyle.textColor || "black"
+    let fontStr = `${n.settings.fontWeight} ${n.settings.fontSize}px ${n.settings.font}`
+    // console.log("text",n.settings.text, fontStr)//, "baseline",y)
+    rc.ctx.font = fontStr
+    // rc.ctx.textRendering = 'optimizeLegibility'
+    // rc.ctx.textAlign = 'start'
+    // rc.ctx.textBaseline = 'alphabetic'
+    // console.log("font",rc.ctx.font)
+    // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
+    let x = n.settings.contentOffset.x
+    let y = n.settings.contentOffset.y + n.settings.baseline
+    rc.ctx.fillText(n.settings.text,x,y)
+
+}
+
 export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void {
     // console.log("drawing", n.settings.kind, n.settings.key)
     if(!n.settings.visualStyle) throw new Error("no visual style found")
@@ -117,18 +134,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     // draw text
     if (draw_node && n.settings.text && n.settings.text.trim().length > 0) {
-        // console.log("drawing text",n.settings.text)
-        rc.ctx.fillStyle = n.settings.visualStyle.textColor || "black"
-        rc.ctx.font = n.settings.font
-        // rc.ctx.textRendering = 'optimizeLegibility'
-        // rc.ctx.textAlign = 'start'
-        // rc.ctx.textBaseline = 'alphabetic'
-        // console.log("font",rc.ctx.font)
-        // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
-        let x = n.settings.contentOffset.x
-        let y = n.settings.contentOffset.y + n.settings.baseline
-        // console.log("text",n.settings.text, n.settings.font, "baseline",y)
-        rc.ctx.fillText(n.settings.text,x,y)
+        doDrawText(rc,n)
     }
 
     if(n.settings.clip) {

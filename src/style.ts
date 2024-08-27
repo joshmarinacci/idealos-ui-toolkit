@@ -10,6 +10,12 @@ const Colors = {
     lightTextColor:'#000',
 }
 
+const FontInfo = {
+    size: 14,
+    weight:'plain',
+    family:'sans-serif',
+}
+
 const DarkStyle = {
     panelBackgroundColor: '#222',
     buttonBorderColor: '#666',
@@ -18,43 +24,14 @@ const DarkStyle = {
     buttonBackground: "#333",
     buttonTextColor: '#fff',
 }
-//
-// const BaseStyle = {
-//     fontSize: '24px',
-//     font: '24px sans-serif',
-//
-//     textColor: 'black',
-//     borderRadius: withInsets(0),
-//
-//     panelMargin: withInsets(0),
-//     panelBorderColor: 'black',
-//     panelBorderWidth: withInsets(0),
-//     panelPadding: withInsets(0),
-//     panelBackgroundColor: 'white',
-//     panelBorderRadius: withInsets(4),
-//
-//     buttonBackground: "white",
-//     buttonTextColor: 'black',
-//
-//     buttonMargin: withInsets(4),
-//     buttonBorderColor: 'black',
-//     buttonBorderWidth: withInsets(1),
-//     buttonPadding: withInsets(7),
-//     buttonBorderRadius: withInsets(4),
-//     buttonBackgroundHoverColor: '#ccc',
-//
-//     tagBorderRadius: withInsets(16),
-//     tabButtonBorderRadius: new Insets(5,5,0,0),
-//     tabButtonBorderWidth: new Insets(1,1,0,1),
-//
-//     selectedBackgroundColor: 'hsl(35,100%,50%)',
-//     selectedBackgroundHoverColor: 'hsl(35,100%,70%)',
-// }
+
 export type ComponentStyle = {
     backgroundColor:string,
     borderColor:string,
     textColor:string,
     font:string
+    fontSize:number
+    fontWeight:string
     margin:Insets
     padding:Insets
     borderWidth:Insets
@@ -67,7 +44,9 @@ const lightBaseComponentStyle:ComponentStyle = {
     borderColor: 'black',
     borderRadius: withInsets(0),
     borderWidth: withInsets(0),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: ZERO_INSETS,
     padding: ZERO_INSETS,
     textColor: 'black',
@@ -78,7 +57,9 @@ const darkBaseComponentStyle:ComponentStyle = {
     borderColor: 'white',
     borderRadius: withInsets(0),
     borderWidth: withInsets(0),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: ZERO_INSETS,
     padding: ZERO_INSETS,
     textColor: 'white',
@@ -90,7 +71,9 @@ const lightButtonStyle:ComponentStyle = {
     borderColor: 'black',
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: withInsets(4),
     padding: withInsets(7),
     textColor: 'black',
@@ -101,7 +84,9 @@ const darkButtonStyle:ComponentStyle = {
     borderColor: 'white',
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: withInsets(4),
     padding: withInsets(7),
     textColor: 'white',
@@ -113,7 +98,9 @@ const lightPanelStyle:ComponentStyle = {
     borderColor: TRANSPARENT,
     borderRadius: withInsets(4),
     borderWidth: withInsets(0),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: withInsets(0),
     padding: withInsets(0),
     textColor: 'black',
@@ -124,7 +111,9 @@ const darkPanelStyle:ComponentStyle = {
     borderColor: TRANSPARENT,
     borderRadius: withInsets(4),
     borderWidth: withInsets(0),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: withInsets(0),
     padding: withInsets(0),
     textColor: 'white',
@@ -137,7 +126,9 @@ const lightSelectedButtonStyle:ComponentStyle = {
     borderColor: 'black',
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
-    font: '24px sans-serif',
+    font: FontInfo.family,
+    fontSize: FontInfo.size,
+    fontWeight: FontInfo.weight,
     margin: withInsets(4),
     padding: withInsets(7),
     textColor: 'black',

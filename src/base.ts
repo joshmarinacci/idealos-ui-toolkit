@@ -24,6 +24,8 @@ export type ElementSettings = {
     visualStyle:VisualStyle
     borderWidth: Insets
     font: string
+    fontWeight: string
+    fontSize: number
     shadow: boolean
 }
 
@@ -56,6 +58,8 @@ export type RenderNodeSettings = {
     focusedStyle?:VisualStyle
     contentOffset: Point,
     font: string;
+    fontSize?: number,
+    fontWeight?:string
     size: Size;
     pos: Point;
     baseline: number;
