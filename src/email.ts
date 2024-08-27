@@ -86,7 +86,7 @@ const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected
                     background: index==selected?'orange':'white',
                 },
                 children: [
-                    Label({text: item.get('sender').get(), shadow: true}),
+                    Label({text: item.get('sender').get(), shadow: true, bold:true  }),
                     WrappingLabel({
                         text: item.get('subject').get(), fixedWidth: 150,
                         shadow: true
@@ -185,7 +185,12 @@ export function EmailDemo() {
                     }),
                     TextBox({
                         multiline: false,
-                        text: "search",
+                        text: {
+                            get:()=> 'search',
+                            set:() => {
+
+                            }
+                        },
                         fixedWidth: 150,
                     }),
                     ScrollContainer({
