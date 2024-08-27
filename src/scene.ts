@@ -1,35 +1,23 @@
 import {
     GElement,
     GRenderNode,
-    MGlobals,
     MKeyboardEvent,
     MMouseEvent,
     MWheelEvent,
-    SYMBOL_FONT_ENABLED,
-    TRANSPARENT,
-    VisualStyle
 } from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 
-let NULL_VISUAL_STYLE:VisualStyle = {
-    borderColor:TRANSPARENT,
-    background:TRANSPARENT,
-    textColor:TRANSPARENT,
-};
-
 export class Scene {
     private elementRoot!: GElement;
     renderRoot!: GRenderNode;
     canvas!: HTMLCanvasElement;
-    private last: GRenderNode | undefined
-    private lastStyle: VisualStyle
-    private debugStyle: VisualStyle
     private makeTree: () => GElement;
     private current_hover: string | undefined;
     private keyboard_target: string | undefined
-    private current_target: string | undefined;
+    private current_mouse_target: string | undefined;
+    private debug_target: string | undefined
     private renderMap: Map<string, GRenderNode>;
     private size: Size;
     private should_redraw_callback?: () => void;
@@ -38,13 +26,6 @@ export class Scene {
 
     constructor(makeTree: () => GElement) {
         this.makeTree = makeTree
-        this.lastStyle = NULL_VISUAL_STYLE
-        this.last = undefined
-        this.debugStyle = {
-            borderColor: "red",
-            textColor: 'black',
-            background:'white',
-        }
         this.devicePixelRatio = 1
     }
 
@@ -185,17 +166,17 @@ export class Scene {
             redraw: () => this.request_layout_and_redraw(),
             position:pos
         }
-        this.ifTarget(this.current_target, (comp:GRenderNode) => {
+        this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
         })
         let found = this.findTarget(pos, this.renderRoot)
         if (found) {
             // debug overlay
-            if(found.settings.key !== this.current_target) {
-                // console.log("swap",found.settings.key, this.current_target)
-                this.ifTarget(this.current_target,(comp) => comp.debug = false)
+            if(found.settings.key !== this.debug_target) {
+                // console.log("swap",found.settings.key, this.debug_target)
+                this.ifTarget(this.debug_target,(comp) => comp.debug = false)
                 found.debug = true
-                this.current_target = found.settings.key
+                this.debug_target = found.settings.key
                 this.request_just_redraw()
             }
 
@@ -217,7 +198,7 @@ export class Scene {
         let found = this.findTargetStack(pos, this.renderRoot)
         if(found) {
             let last = found[found.length - 1]
-            this.current_target = last.settings.key
+            this.current_mouse_target = last.settings.key
             if(shift) {
                 this.debugPrintTarget(found)
             }
@@ -243,7 +224,7 @@ export class Scene {
             redraw: () => this.request_layout_and_redraw(),
             position:pos
         }
-        this.ifTarget(this.current_target, (comp:GRenderNode) => {
+        this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
             if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
         })
     }
@@ -299,7 +280,7 @@ export class Scene {
         const bounds = new Bounds(0,0,rc.canvas.width,rc.size.h-100)
         this.debugStrokeBounds(rc,bounds,'red',1)
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
-        this.ifTarget(this.current_target,(comp)=>{
+        this.ifTarget(this.current_mouse_target,(comp)=>{
             let t = comp.settings
             this.debugText(rc,bounds,` id=${t.kind} ${t.pos} ${t.size}`)
             this.debugText(rc,bounds.add(new Point(5,15)),` focused=${comp.focused}`)
