@@ -27,6 +27,13 @@ MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 
+const SDL_TO_CANVAS_MAP = new Map<string,string>
+SDL_TO_CANVAS_MAP.set('left','ArrowLeft')
+SDL_TO_CANVAS_MAP.set('right','ArrowRight')
+SDL_TO_CANVAS_MAP.set('up','ArrowUp')
+SDL_TO_CANVAS_MAP.set('down','ArrowDown')
+SDL_TO_CANVAS_MAP.set('backspace','Backspace')
+SDL_TO_CANVAS_MAP.set('return','Enter')
 
 const redraw = (skipLayout:boolean) => {
     const { pixelWidth: width, pixelHeight: height } = window
@@ -70,6 +77,15 @@ scene.init().then(() => {
             Style.toggle()
             redraw(false)
         }
+        if(!e.key) return
+        let key = e.key
+        if(key === 'ctrl') {
+            return
+        }
+        if(SDL_TO_CANVAS_MAP.has(key)) {
+            key = SDL_TO_CANVAS_MAP.get(key)
+        }
+        scene.handleKeydownEvent(key, e.ctrl, e.shift)
     })
     scene.onShouldRedraw(() => redraw(false))
     scene.onShouldJustRedraw(() => redraw(true))

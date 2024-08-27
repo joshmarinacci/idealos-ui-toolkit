@@ -49,7 +49,6 @@ export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key:'ArrowUp'},'cursor-previous-line')
     ACTION_MAP.registerKeystroke({key:'ArrowDown'},'cursor-next-line')
     ACTION_MAP.registerKeystroke({key:'Enter'},'insert-newline')
-
     ACTION_MAP.registerKeystroke({key:'Backspace'},'delete-backward')
     ACTION_MAP.registerKeystroke({key:'d', control:true},'delete-forward')
 }

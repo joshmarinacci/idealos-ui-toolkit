@@ -9,7 +9,7 @@ import {
     TRANSPARENT,
     VisualStyle
 } from "./base.js";
-import {doDraw, RenderContext} from "./gfx.js";
+import {doDraw, drawDebug, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 
@@ -34,6 +34,7 @@ export class Scene {
     private size: Size;
     private should_redraw_callback?: () => void;
     private devicePixelRatio: number;
+    private should_just_redraw_callback?: () => void;
 
     constructor(makeTree: () => GElement) {
         this.makeTree = makeTree
@@ -47,8 +48,8 @@ export class Scene {
         this.devicePixelRatio = 1
     }
 
-    private log(...layoutPhase: string[]) {
-        console.log("SCENE: ",...layoutPhase)
+    private log(...text: any[]) {
+        console.log("SCENE: ",...text)
     }
     setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas
@@ -61,16 +62,6 @@ export class Scene {
     }
 
     async init() {
-        if(MGlobals.get(SYMBOL_FONT_ENABLED) === true) {
-            // const font = new FontFace('material-icons',
-            //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
-            // const font = new FontFace('material-icons',
-            //     'url(material-symbols/material-symbols-outlined.woff2)')
-            // document.fonts.add(font)
-            // await font.load()
-        }
-        // this.canvas = makeCanvas(size)
-        // this.last = undefined
     }
 
     private makeRc() {
@@ -111,6 +102,7 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc,false)
+        drawDebug(this.renderRoot, rc)
         // doDraw(this.renderRoot,rc,true)
         this.drawDebugOverlay(rc)
         rc.ctx.restore()
@@ -187,43 +179,41 @@ export class Scene {
     }
 
     public handleMouseMove(pos: Point) {
+        // dispatch old mouse move
+        let evt:MMouseEvent = {
+            type:'mouse-move',
+            redraw: () => this.request_layout_and_redraw(),
+            position:pos
+        }
         this.ifTarget(this.current_target, (comp:GRenderNode) => {
-            let evt:MMouseEvent = {
-                type:'mouse-move',
-                redraw: () => {
-                    if(this.should_redraw_callback) {
-                        this.should_redraw_callback()
-                    } else {
-                        this.layout()
-                        this.redraw()
-                    }
-                },
-                position:pos
-            }
-            if(comp.settings.handleEvent)  {
-                comp.settings.handleEvent(evt)
-            }
+            if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
         })
         let found = this.findTarget(pos, this.renderRoot)
         if (found) {
+            // debug overlay
+            if(found.settings.key !== this.current_target) {
+                // console.log("swap",found.settings.key, this.current_target)
+                this.ifTarget(this.current_target,(comp) => comp.debug = false)
+                found.debug = true
+                this.current_target = found.settings.key
+                this.request_just_redraw()
+            }
+
+            // hover effect
             if(found.settings.key !== this.current_hover) {
-                this.ifTarget(this.current_hover, (comp) => {
-                    comp.settings.currentStyle = comp.settings.visualStyle
-                })
-                if(found.settings.hoverStyle)  {
-                    found.settings.currentStyle = found.settings.hoverStyle
-                }
+                this.ifTarget(this.current_hover, (comp) => comp.hover = false)
+                found.hover = true
                 this.current_hover = found.settings.key
-                    if(this.should_redraw_callback) {
-                        this.should_redraw_callback()
-                    } else {
-                        this.layout()
-                        this.redraw()
-                    }
+                this.request_just_redraw()
             }
         }
     }
     handleMouseDown(pos: Point,shift:boolean) {
+        let evt:MMouseEvent = {
+            type:'mouse-down',
+            redraw: () => this.request_layout_and_redraw(),
+            position:pos
+        }
         let found = this.findTargetStack(pos, this.renderRoot)
         if(found) {
             let last = found[found.length - 1]
@@ -231,68 +221,41 @@ export class Scene {
             if(shift) {
                 this.debugPrintTarget(found)
             }
-            let evt:MMouseEvent = {
-                type:'mouse-down',
-                redraw: () => {
-                    if(this.should_redraw_callback) {
-                        this.should_redraw_callback()
-                    } else {
-                        this.layout()
-                        this.redraw()
-                    }
-                },
-                position:pos
-            }
             if (last.settings.handleEvent) last.settings.handleEvent(evt)
             if(last.settings.key !== this.keyboard_target) {
-                this.ifTarget(this.keyboard_target,(comp)=>{
-                    comp.settings.currentStyle = comp.settings.visualStyle
-                })
+                // this.ifTarget(this.keyboard_target,(comp)=>{
+                    // comp.settings.currentStyle = comp.settings.visualStyle
+                // })
             }
-            if(last.settings.focusedStyle) {
-                last.settings.currentStyle = last.settings.focusedStyle
-            }
+            // if(last.settings.focusedStyle) {
+            //     // last.settings.currentStyle = last.settings.focusedStyle
+            // }
+            this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
+            last.focused = true
             this.keyboard_target = last.settings.key
-            if(this.should_redraw_callback) {
-                this.should_redraw_callback()
-            } else {
-                this.layout()
-                this.redraw()
-            }
+            console.log("set focused",last)
+            this.request_just_redraw()
         }
     }
     handleMouseUp(pos:Point) {
+        let evt:MMouseEvent = {
+            type:'mouse-up',
+            redraw: () => this.request_layout_and_redraw(),
+            position:pos
+        }
         this.ifTarget(this.current_target, (comp:GRenderNode) => {
-            let evt:MMouseEvent = {
-                type:'mouse-up',
-                redraw: () => {
-                    if(this.should_redraw_callback) {
-                        this.should_redraw_callback()
-                    } else {
-                        this.layout()
-                        this.redraw()
-                    }
-                },
-                position:pos
-            }
             if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
         })
-
     }
-    handleKeydownEvent(e: KeyboardEvent) {
+    handleKeydownEvent(key:string, control:boolean, shift:boolean) {
+        // this.log("kbd ",key,'to',this.keyboard_target)
         this.ifTarget(this.keyboard_target,(comp)=>{
             let evt: MKeyboardEvent = {
                 type: 'keyboard-typed',
-                redraw: () => {
-                    if(this.should_redraw_callback) {
-                        this.should_redraw_callback()
-                    } else {
-                        this.layout()
-                        this.redraw()
-                    }
-                },
-                key: e.key,
-                control: e.ctrlKey
+                redraw: () => this.request_layout_and_redraw(),
+                key: key,
+                control: control,
+                shift:shift,
             }
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
         })
@@ -339,6 +302,7 @@ export class Scene {
         this.ifTarget(this.current_target,(comp)=>{
             let t = comp.settings
             this.debugText(rc,bounds,` id=${t.kind} ${t.pos} ${t.size}`)
+            this.debugText(rc,bounds.add(new Point(5,15)),` focused=${comp.focused}`)
         })
         rc.ctx.restore()
     }
@@ -360,8 +324,24 @@ export class Scene {
     onShouldRedraw(cb: () => void) {
         this.should_redraw_callback = cb
     }
+    onShouldJustRedraw(cb: () => void) {
+        this.should_just_redraw_callback = cb
+    }
 
     setDPI(devicePixelRatio: number) {
         this.devicePixelRatio = devicePixelRatio
+    }
+
+    private request_just_redraw() {
+        if(this.should_just_redraw_callback) this.should_just_redraw_callback()
+    }
+
+    private request_layout_and_redraw() {
+        if(this.should_redraw_callback) {
+            this.should_redraw_callback()
+        } else {
+            this.layout()
+            this.redraw()
+        }
     }
 }

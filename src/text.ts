@@ -33,6 +33,9 @@ type TextInputRequirements = {
     borderWidth: Insets
     multiline:boolean
     fixedWidth?:number,
+    font: string
+    fontWeight: string
+    fontSize: number
 }
 
 class TextModel {
@@ -422,7 +425,25 @@ class TextInputElement implements GElement {
             margin: Style.button().margin,
             padding: Style.button().padding,
             fixedWidth: opts.fixedWidth,
+            font: Style.base().font,
+            fontSize: Style.base().fontSize,
+            fontWeight: Style.base().fontWeight,
         }
+    }
+
+    private calcMetrics(rc: RenderContext, text:string):[Size,number] {
+        let fontStr = `${this.settings.fontWeight} ${this.settings.fontSize}px ${this.settings.font}`
+        rc.ctx.font = fontStr
+        let metrics = rc.ctx.measureText(text)
+        let size = new Size(
+            Math.floor(metrics.width),
+            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        let baseline = metrics.fontBoundingBoxAscent
+        if(!metrics.fontBoundingBoxAscent) {
+            size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
+            baseline = metrics.emHeightAscent
+        }
+        return [size, baseline]
     }
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
@@ -456,15 +477,14 @@ class TextInputElement implements GElement {
         let line = lines[cursorPosition.y]
         let text_before = line.substring(0,cursorPosition.x)
         // console.log("text before is",text_before, this.opts.cursorPosition)
-        let metrics = rc.ctx.measureText(text_before)
-        let baseline = metrics.fontBoundingBoxAscent
+        let [metrics, baseline] = this.calcMetrics(rc, text_before)
         let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
         text_node.settings.pos.x = total_insets.left
         text_node.settings.pos.y = total_insets.top
 
-        cursor_node.settings.pos.x = total_insets.left + metrics.width
+        cursor_node.settings.pos.x = total_insets.left + metrics.w
         cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
-        cursor_node.settings.size.h = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+        cursor_node.settings.size.h = metrics.h
         const size = new Size(100,100)
         if(this.settings.fixedWidth) {
             size.w = this.settings.fixedWidth

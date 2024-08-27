@@ -38,6 +38,7 @@ export type MKeyboardEvent = {
     type: 'keyboard-typed'
     key:string,
     control:boolean,
+    shift:boolean,
     redraw:()=>void
 }
 export type MWheelEvent = {

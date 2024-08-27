@@ -10,6 +10,10 @@ import {EmailDemo} from "./email.js";
 import {TabbedBox} from "./tabbedBox.js";
 import {MWindow} from "./window.js";
 
+
+const state = {
+    textInputValue: "yo"
+}
 export function makeCompsDemo() {
     return new MVBoxElement({
         children: [
@@ -101,13 +105,13 @@ export function makeCompsDemo() {
                 children: [
                     Label({ text:'inputs'}),
                     TextBox({
-                        text:'hello there'
-                        // text: state.textInputValue,
-                        // multiline: false,
-                        // onChange: (v, e) => {
-                        //     state.textInputValue = v[0]
-                        //     e.redraw()
-                        // }
+                        // text:'hello there',
+                        text: state.textInputValue,
+                        multiline:false,
+                        onChange: (v, e) => {
+                            state.textInputValue = v[0]
+                            e.redraw()
+                        }
                     }),
                 ]
             })
