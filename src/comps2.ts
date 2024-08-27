@@ -47,8 +47,12 @@ export function Square(number: number, fill: string): GElement {
 }
 
 export class HSeparator implements GElement {
+    constructor() {
+    }
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        let key = KEY_VENDOR.getKey()
         return new GRenderNode({
+            key:key,
             visualStyle:{
                 background: "#aaa",
                 borderColor: "",
@@ -59,7 +63,7 @@ export class HSeparator implements GElement {
             children: [],
             contentOffset: ZERO_POINT,
             font: "",
-            kind: "",
+            kind: "separator",
             margin: Style.button().margin,
             padding: ZERO_INSETS,
             pos: ZERO_POINT,

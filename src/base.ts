@@ -52,7 +52,6 @@ export type EventHandler = (event: CEvent) => void
 
 export type RenderNodeSettings = {
     text: string;
-    currentStyle?:VisualStyle
     visualStyle:VisualStyle
     hoverStyle?:VisualStyle
     focusedStyle?:VisualStyle
@@ -75,14 +74,16 @@ export type RenderNodeSettings = {
     clip?:boolean
     canScroll?:boolean
     popup?:boolean
-    key?:string,
+    key:string,
 }
 export class GRenderNode {
     settings: RenderNodeSettings
     userdata: Record<string, any>
+    debug: boolean;
     constructor(settings: RenderNodeSettings, userdata?:Record<string,any>) {
         this.settings = settings
         this.userdata = userdata || {}
+        this.debug = false
     }
 }
 

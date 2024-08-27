@@ -223,37 +223,15 @@ export class TextElement implements GElement {
         this.settings = settings
     }
 
-    layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
-        if(this.settings.fixedWidth) return this.layout_wrapping(rc,_cons)
-        if(this.settings.multiline) return this.layout_multiline(rc,_cons);
-        let key = KEY_VENDOR.getKey()
-        rc.ctx.font = this.settings.font
-        let [size,baseline] = this.calcMetrics(rc)
-        size = sizeWithPadding(size, this.settings.padding)
-        size = sizeWithPadding(size, this.settings.margin)
-        size = sizeWithPadding(size, this.settings.borderWidth)
-        return new GRenderNode({
-            kind: "text-singleline-element",
-            text: this.settings.text,
-            font: Style.base().font,
-            fontSize: this.settings.fontSize || Style.base().fontSize,
-            fontWeight: this.settings.bold?"bold":Style.base().fontWeight,
-            size: size,
-            pos: new Point(0, 0),
-            contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
-            baseline: baseline,
-            visualStyle: this.settings.visualStyle,
-            children: [],
-            padding: this.settings.padding,
-            margin: this.settings.margin,
-            borderWidth: this.settings.borderWidth,
-            shadow: this.settings.shadow,
-            key:key,
-        })
+    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        if(this.settings.fixedWidth) return this.layout_wrapping(rc,cons)
+        if(this.settings.multiline) return this.layout_multiline(rc,cons);
+        return this.layout_single_line_no_wrapping(rc,cons)
     }
 
     private layout_multiline(rc: RenderContext, _cons: LayoutConstraints) {
         rc.ctx.font = this.settings.font
+        let key = KEY_VENDOR.getKey()
         let [textsize,baseline] = this.calcMetrics(rc)
         let lineHeight = textsize.h
         let lines = this.settings.text.split('\n')
@@ -292,6 +270,7 @@ export class TextElement implements GElement {
 
         size = sizeWithPadding(size,total_insets)
         return new GRenderNode({
+            key:key,
             kind: "text-multiline-element",
             text:"",
             font: Style.base().font,
@@ -309,6 +288,8 @@ export class TextElement implements GElement {
     }
 
     private layout_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
+        let key = KEY_VENDOR.getKey()
+
         rc.ctx.font = this.settings.font
         let [textsize, baseline] = this.calcMetrics(rc)
         let lineHeight = textsize.h
@@ -365,6 +346,7 @@ export class TextElement implements GElement {
         size.h = y
         size = sizeWithPadding(size,total_insets)
         return new GRenderNode({
+            key:key,
             kind: "text-multiline-element",
             text:"",
             font: Style.base().font,
@@ -396,6 +378,34 @@ export class TextElement implements GElement {
             baseline = metrics.emHeightAscent
         }
         return [size, baseline]
+    }
+
+    private layout_single_line_no_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
+        let key = KEY_VENDOR.getKey()
+        rc.ctx.font = this.settings.font
+        let [size,baseline] = this.calcMetrics(rc)
+        size = sizeWithPadding(size, this.settings.padding)
+        size = sizeWithPadding(size, this.settings.margin)
+        size = sizeWithPadding(size, this.settings.borderWidth)
+        return new GRenderNode({
+            kind: "text-singleline-element",
+            text: this.settings.text,
+            font: Style.base().font,
+            fontSize: this.settings.fontSize || Style.base().fontSize,
+            fontWeight: this.settings.bold?"bold":Style.base().fontWeight,
+            size: size,
+            pos: new Point(0, 0),
+            contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
+            baseline: baseline,
+            visualStyle: this.settings.visualStyle,
+            children: [],
+            padding: this.settings.padding,
+            margin: this.settings.margin,
+            borderWidth: this.settings.borderWidth,
+            shadow: this.settings.shadow,
+            key:key,
+        })
+
     }
 }
 
@@ -473,7 +483,6 @@ class TextInputElement implements GElement {
             text: "",
             visualStyle: visualStyle,
             focusedStyle:focusedStyle,
-            currentStyle: focused?focusedStyle:visualStyle,
             baseline: baseline,
             borderWidth: withInsets(1),
             children: [text_node, cursor_node],
@@ -498,7 +507,9 @@ class TextInputElement implements GElement {
     }
 
     private makeCursor() {
+        const key = KEY_VENDOR.getKey()
         return new GRenderNode({
+            key:key,
             children: [],
             contentOffset: new Point(5,5),
             font: Style.base().font,

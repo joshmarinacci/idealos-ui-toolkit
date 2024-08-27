@@ -28,9 +28,12 @@ MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 
 
-const redraw = () => {
+const redraw = (skipLayout:boolean) => {
     const { pixelWidth: width, pixelHeight: height } = window
-    scene.layout()
+    // console.log("redraw", skipLayout,width,height)
+    if(!skipLayout) {
+        scene.layout()
+    }
     scene.redraw()
     // @ts-ignore
     const buffer = scene.getCanvas().toBuffer('raw')
@@ -38,11 +41,11 @@ const redraw = () => {
 }
 
 scene.init().then(() => {
-    window.on('expose', redraw)
+    window.on('expose', () => redraw(false))
     window.on('resize', ({ pixelWidth: width, pixelHeight: height }) => {
         scene.setCanvas(Canvas.createCanvas(width, height) as unknown as HTMLCanvasElement)
         scene.setSize(new Size(width, height))
-        redraw()
+        redraw(false)
     })
     window.on('mouseMove', (e)=>{
         scene.handleMouseMove(new Point(e.x,e.y))
@@ -65,10 +68,11 @@ scene.init().then(() => {
         if(e.key === 'f' && e.super && e.shift) {
             console.log("swapping the style")
             Style.toggle()
-            redraw()
+            redraw(false)
         }
     })
-    scene.onShouldRedraw(() => redraw())
+    scene.onShouldRedraw(() => redraw(false))
+    scene.onShouldJustRedraw(() => redraw(true))
 
 })
 

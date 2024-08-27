@@ -64,6 +64,23 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
     ctx.stroke()
 }
 
+function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
+    if(n.settings.borderRadius) {
+        fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.visualStyle.background)
+    } else {
+        fillRect(rc.ctx, bounds, n.settings.visualStyle.background)
+    }
+}
+
+function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
+    if(n.settings.borderRadius) {
+        strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.visualStyle.borderColor, n.settings.borderWidth)
+        // rc.ctx.clip()
+    } else {
+        drawBorder(rc.ctx, bounds, n.settings.visualStyle.borderColor, n.settings.borderWidth)
+    }
+}
+
 function doDrawText(rc: RenderContext, n: GRenderNode) {
     // console.log("drawing text",n.settings.text)
     rc.ctx.fillStyle = n.settings.visualStyle.textColor || "black"
@@ -81,13 +98,24 @@ function doDrawText(rc: RenderContext, n: GRenderNode) {
 
 }
 
+function validateNode(n: GRenderNode) {
+    if(!n.settings.margin) {
+        console.log(n.settings)
+        throw new Error(`missing margin on ${n.settings.kind}`)
+    }
+    if(!n.settings.padding) {
+        console.log(n.settings)
+        throw new Error(`missing padding on ${n.settings.kind}`)
+    }
+}
+
+export function withInsets(number: number) {
+    return new Insets(number, number, number, number)
+}
+
 export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void {
-    // console.log("drawing", n.settings.kind, n.settings.key)
     if(!n.settings.visualStyle) throw new Error("no visual style found")
-    // if(!n.settings.currentStyle) n.settings.currentStyle = n.settings.visualStyle
-    // if(!n.settings.currentStyle.background) n.settings.currentStyle.background = n.settings.currentStyle.background = n.settings.visualStyle.background
-    // if(!n.settings.currentStyle.borderColor) n.settings.currentStyle.borderColor = n.settings.currentStyle.borderColor = n.settings.visualStyle.borderColor
-    // console.log("border is",n.settings.borderWidth,"border color is", n.settings.currentStyle.borderColor)
+    validateNode(n)
     let draw_node = true
     if(popups && !n.settings.popup) {
         draw_node = false
@@ -101,34 +129,21 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     let bounds = Bounds.fromPointSize(new Point(0,0,),n.settings.size)
 
-    if(!n.settings.margin) {
-        console.log(n.settings)
-        throw new Error(`missing margin on ${n.settings.kind}`)
-    }
     // account for margin
     bounds = bdsSubInsets(bounds,n.settings.margin)
 
     // fill background inside padding  + border area
     if (draw_node && n.settings.visualStyle.background) {
-        if(n.settings.borderRadius) {
-            fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, n.settings.visualStyle.background)
-        } else {
-            fillRect(rc.ctx, bounds, n.settings.visualStyle.background)
-        }
+        doDrawBackground(rc,n,bounds)
     }
 
     // draw / fill border
     if (draw_node && n.settings.visualStyle.borderColor && n.settings.visualStyle.borderColor !== TRANSPARENT) {
-        if(n.settings.borderRadius) {
-            strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,n.settings.visualStyle.borderColor, n.settings.borderWidth)
-            // rc.ctx.clip()
-        } else {
-            drawBorder(rc.ctx, bounds, n.settings.visualStyle.borderColor, n.settings.borderWidth)
-        }
+        doDrawBorder(rc,n,bounds)
     }
+
     // account for the border
     bounds = bdsSubInsets(bounds, n.settings.borderWidth)
-
     // account for the padding
     bounds = bdsSubInsets(bounds,n.settings.padding)
 
@@ -173,6 +188,14 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     rc.ctx.restore()
 }
 
-export function withInsets(number: number) {
-    return new Insets(number, number, number, number)
+export function drawDebug(n: GRenderNode, rc: RenderContext) {
+    rc.ctx.save()
+    if(n.debug === true) {
+        rc.ctx.strokeStyle = 'red'
+        rc.ctx.lineWidth = 1
+        strokeBounds(rc, Bounds.fromPointSize(n.settings.pos.floor(), n.settings.size), 'red')
+    }
+    rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
+    n.settings.children.forEach(ch => drawDebug(ch, rc))
+    rc.ctx.restore()
 }
