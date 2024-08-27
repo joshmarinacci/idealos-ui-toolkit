@@ -19,14 +19,25 @@ import {Point, Size} from "josh_js_util";
 //     textInputCursorPosition: new Point(5, 0)
 // }
 
+async function loadFont() {
+    // const font = new FontFace('material-icons',
+    //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
+    const font = new FontFace('material-icons',
+        'url(material-symbols/material-symbols-outlined.woff2)');
+    document.fonts.add(font)
+    await font.load()
+}
+
 
 setup_common_keybindings()
 const scene = new Scene(makeTabs)
 MGlobals.set(Scene.name, scene)
-MGlobals.set(SYMBOL_FONT_ENABLED, false)
+MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
-scene.init().then(() => {
-    const size =new Size(800,600)
+loadFont().then(() => {
+    return scene.init()
+}).then(() => {
+    const size =new Size(1024,768)
     const canvas = makeCanvas(size)
     scene.setDPI(window.devicePixelRatio)
     canvas.addEventListener('mousemove', (e) => {
