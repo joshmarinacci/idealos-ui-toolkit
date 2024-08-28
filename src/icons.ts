@@ -1,6 +1,6 @@
 import {GElement, GRenderNode, LayoutConstraints, MGlobals, SYMBOL_FONT_ENABLED, TRANSPARENT, ZERO_INSETS} from "./base.js";
 import {RenderContext} from "./gfx.js";
-import {Style} from "./style.js";
+import {IconFontSize, Style} from "./style.js";
 import {Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 
@@ -58,10 +58,12 @@ export enum Icons {
 export class IconElement implements GElement {
     private icon: Icons;
     private shadow: boolean;
+    private fontSize: number;
 
-    constructor(opts: { icon: Icons, shadow?: boolean }) {
+    constructor(opts: { icon: Icons, shadow?: boolean, fontSize?:number }) {
         this.icon = opts.icon
         this.shadow = opts.shadow || false
+        this.fontSize = opts.fontSize || IconFontSize
     }
 
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
@@ -78,7 +80,7 @@ export class IconElement implements GElement {
             children: [],
             contentOffset: new Point(0, 0),
             font: 'material-icons',
-            fontSize: 20,
+            fontSize: this.fontSize,
             fontWeight: Style.base().fontWeight,
             kind: `icon: ${this.icon}`,
             margin: ZERO_INSETS,

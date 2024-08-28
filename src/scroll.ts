@@ -43,7 +43,9 @@ class ScrollContainerElement implements GElement {
         {
             // left button
             let button = IconButton({
-                icon: Icons.KeyboardArrowLeft, ghost: true,
+                icon: Icons.KeyboardArrowLeft,
+                fontSize: 14,
+                ghost: true,
                 handleEvent: (e) => os(this.addToOffset(scrollOffset, new Point(10, 0), child.settings.size, contentBounds), e),
                 margin: ZERO_INSETS
             })

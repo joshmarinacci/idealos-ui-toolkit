@@ -36,6 +36,7 @@ type IconButtonParameters = {
     icon: Icons
     ghost?: boolean
     hoverStyle?:VisualStyle
+    fontSize?:number
 } & ButtonParameters;
 
 export function IconButton(opts: IconButtonParameters) {
@@ -53,7 +54,7 @@ export function IconButton(opts: IconButtonParameters) {
         borderWidth: opts.ghost ? Style.button().borderWidth : opts.borderWidth || Style.button().borderWidth,
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [
-            new IconElement({icon: opts.icon, shadow:true}),
+            new IconElement({icon: opts.icon, shadow:true, fontSize:opts.fontSize,}),
             new TextElement({
                 padding: ZERO_INSETS,
                 font: Style.button().font,

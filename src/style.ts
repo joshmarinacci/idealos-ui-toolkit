@@ -16,6 +16,8 @@ const FontInfo = {
     font:'sans-serif',
 }
 
+export const IconFontSize = 20
+
 // const DarkStyle = {
 //     panelBackgroundColor: '#222',
 //     buttonBorderColor: '#666',
