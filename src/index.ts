@@ -37,7 +37,7 @@ MGlobals.set(STATE_CACHE, new StateCache())
 loadFont().then(() => {
     return scene.init()
 }).then(() => {
-    const size =new Size(1024,768)
+    const size =new Size(800,600)
     const canvas = makeCanvas(size)
     scene.setDPI(window.devicePixelRatio)
     canvas.addEventListener('mousemove', (e) => {
@@ -71,6 +71,10 @@ loadFont().then(() => {
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
         scene.handleWheelEvent(pos,new Point(e.deltaX, e.deltaY))
+    })
+
+    scene.onShouldJustRedraw(() => {
+        scene.redraw()
     })
 
     scene.setCanvas(canvas)

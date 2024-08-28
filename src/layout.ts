@@ -28,6 +28,7 @@ type BoxParameters = {
     padding?: Insets
     margin?: Insets,
     borderWidth?: Insets,
+    borderColor?: string,
     borderRadius?: Insets,
     handleEvent?: EventHandler,
 
@@ -43,6 +44,7 @@ export type BoxParams = {
     crossAxisLayout?: AxisLayout,
     children: GElement[],
     borderWidth?:Insets
+    borderColor?:string
     visualStyle?: VisualStyle
     kind?: string,
     shadow?:boolean
@@ -144,7 +146,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             visualStyle: param.visualStyle || {
                 background: Style.panel().backgroundColor,
                 textColor: Style.panel().textColor,
-                borderColor: Style.panel().borderColor,
+                borderColor:  param.borderColor || Style.panel().borderColor,
             },
             hoverStyle: param.hoverStyle || {},
             margin: withFallback(param.margin, Style.panel().margin),
@@ -563,6 +565,8 @@ export function HBox(param: BoxParams) {
         crossAxisLayout: param.crossAxisLayout || 'start',
         children: param.children,
         kind: param.kind,
+        borderColor:param.borderColor,
+        borderWidth: param.borderWidth,
     })
 }
 

@@ -19,10 +19,12 @@ import {RenderContext, withInsets} from "./gfx.js";
 import {KEY_VENDOR} from "./keys.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {PopupContainer} from "./popup.js";
+import {ObjList} from "rtds-core";
 
 type ButtonParameters = {
     margin?:Insets,
     borderWidth?: Insets
+    borderColor?: string
     padding?:Insets,
     text?:string,
     selected?:boolean
@@ -96,7 +98,7 @@ export const Button = (opts: ButtonParameters) => {
         kind:'button',
         visualStyle: {
             background: opts.selected?Style.selectedButton().backgroundColor:Style.button().backgroundColor,
-            borderColor: Style.button().borderColor,
+            borderColor: opts.borderColor || Style.button().borderColor,
             textColor: Style.button().textColor,
         },
         hoverStyle: {
@@ -109,6 +111,8 @@ export const Button = (opts: ButtonParameters) => {
         children: [new TextElement({
             padding: ZERO_INSETS,
             font: Style.button().font,
+            fontSize: Style.button().fontSize,
+            fontWeight: Style.button().fontWeight,
             margin: ZERO_INSETS,
             visualStyle:{
                 borderColor: TRANSPARENT,
@@ -238,5 +242,35 @@ export function ToggleButton(opts: ToggleButtonOptions) {
                 e.redraw()
             }
         }
+    })
+}
+
+export type ToggleGroupParameters<T> = {
+    key?: string,
+    // @ts-ignore
+    data: T[] | ObjList<T>
+    selected?: StateHandler<number>
+}
+
+export function ToggleGroup<T>(opts: ToggleGroupParameters<T>) {
+    const key = KEY_VENDOR.getKey()
+    let [selected, setSelected] = useState(key, "selected", opts.selected, () => 0)
+    return HBox({
+        borderWidth: withInsets(1),
+        mainAxisSelfLayout: 'shrink',
+        borderColor: Style.base().borderColor,
+        children: opts.data.map((ch, i) => {
+            let bdr = new Insets(0, 0, 0, 1)
+            return Button({
+                text: ch + "", borderWidth: bdr, borderRadius: ZERO_INSETS, margin: ZERO_INSETS,
+                selected: i === selected,
+                handleEvent: (e) => {
+                    if (e.type === 'mouse-down') {
+                        setSelected(i)
+                        e.redraw()
+                    }
+                }
+            })
+        })
     })
 }

@@ -1,6 +1,6 @@
 import {HBox, HSpacer, MHBoxElement, MVBoxElement} from "./layout.js";
 import {Label, TextBox, WrappingLabel} from "./text.js";
-import {Button, CheckBox, DropdownButton, IconButton, RadioButton, Tag, ToggleButton} from "./buttons.js";
+import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "./buttons.js";
 import {IconElement, Icons} from "./icons.js";
 import {HSeparator, Square} from "./comps2.js";
 import {ListView, ListViewItem} from "./listView.js";
@@ -15,6 +15,7 @@ const state = {
     textInputValue: "yo",
     toggle:false
 }
+
 export function makeCompsDemo() {
     return new MVBoxElement({
         children: [
@@ -58,7 +59,7 @@ export function makeCompsDemo() {
             HBox({
                 crossAxisLayout: 'center',
                 children: [
-                    Label({text: 'toolbar'}),
+                    Label({text: 'grouped'}),
                     new MHBoxElement({
                         crossAxisLayout: "center",
                         visualStyle: {
@@ -72,6 +73,9 @@ export function makeCompsDemo() {
                             IconButton({icon: Icons.Document, text: "", ghost: false}),
                         ]
                     }),
+                    ToggleGroup({
+                        data:["Good","Evil", "Neutral"],
+                    })
                 ]
             }),
             HBox({

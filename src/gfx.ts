@@ -81,10 +81,11 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
 
 function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     let color = n.settings.visualStyle.borderColor || "black"
+    if(n.settings.borderWidth.left === 0) return
     if(n.focused && n.settings.focusedStyle?.borderColor) {
         color = n.settings.focusedStyle.borderColor
     }
-    if(n.settings.borderRadius) {
+    if(n.settings.borderRadius && n.settings.borderRadius.left > 0) {
         strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,color, n.settings.borderWidth)
         // rc.ctx.clip()
     } else {
