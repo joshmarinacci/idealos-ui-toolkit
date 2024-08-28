@@ -83,17 +83,6 @@ export function IconButton(opts: IconButtonParameters) {
 const NULL_HOVER:VisualStyle = {
     borderColor:TRANSPARENT,
 }
-export const CheckBox = (p: ButtonParameters) => IconButton({
-    icon: p.selected?Icons.CheckboxChecked:Icons.CheckboxUnchecked,
-    hoverStyle: NULL_HOVER,
-    ghost:true, ...p
-})
-export const RadioButton = (p: ButtonParameters) => IconButton({
-    icon: p.selected?Icons.RadioButtonUnchecked:Icons.RadioButtonChecked,
-    hoverStyle: NULL_HOVER,
-    ghost:true, ...p
-})
-
 export const Button = (opts: ButtonParameters) => {
     return new MHBoxElement({
         key:opts.key,
@@ -147,6 +136,8 @@ export function Tag(opts: { text: string }) {
         children: [new TextElement({
             padding: ZERO_INSETS,
             font: Style.button().font,
+            fontSize: Style.button().fontSize,
+            fontWeight: Style.button().fontWeight,
             margin: ZERO_INSETS,
             visualStyle: {
                 borderColor: 'transparent',
@@ -244,6 +235,43 @@ export function ToggleButton(opts: ToggleButtonOptions) {
                 e.redraw()
             }
         }
+    })
+}
+
+export type ToggleIconButtonOptions = {
+    selectedIcon:Icons,
+    unselectedIcon:Icons
+} & ToggleButtonOptions
+
+export function ToggleIconButton(opts: ToggleIconButtonOptions) {
+    const key = KEY_VENDOR.getKey()
+    let [selected, setSelected] = useState(key,"selected",opts.selected,()=>false)
+    return IconButton({
+        icon: selected?opts.selectedIcon:opts.unselectedIcon,
+        hoverStyle: NULL_HOVER,
+        text: opts.text,
+        ghost:true,
+        handleEvent: (e) => {
+            if (e.type === 'mouse-down') {
+                setSelected(!selected)
+                e.redraw()
+            }
+        }
+    })
+}
+
+export const CheckBox = (opts: ToggleButtonOptions) => {
+    return ToggleIconButton({
+        ...opts,
+        unselectedIcon: Icons.CheckboxUnchecked,
+        selectedIcon: Icons.CheckboxChecked
+    })
+}
+export const RadioButton = (opts: ToggleButtonOptions) => {
+    return ToggleIconButton({
+        ...opts,
+        unselectedIcon: Icons.RadioButtonUnchecked,
+        selectedIcon: Icons.RadioButtonChecked,
     })
 }
 
