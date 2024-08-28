@@ -99,6 +99,8 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
 }
 
 function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
+    if(!n.settings.visualStyle.borderColor) return
+    if(n.settings.visualStyle.borderColor === TRANSPARENT) return
     let color = n.settings.visualStyle.borderColor || "black"
     if(isInsetsEmpty(n.settings.borderWidth)) return
     if(n.focused && n.settings.focusedStyle?.borderColor) {
@@ -170,7 +172,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     }
 
     // draw / fill border
-    if (draw_node && n.settings.visualStyle.borderColor && n.settings.visualStyle.borderColor !== TRANSPARENT) {
+    if (draw_node) {
         doDrawBorder(rc,n,bounds)
     }
 

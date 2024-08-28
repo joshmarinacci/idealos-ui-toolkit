@@ -5,6 +5,7 @@ import {withInsets} from "./gfx.js";
 import {Label} from "./text.js";
 import {KEY_VENDOR} from "./keys.js";
 import {ObjList} from "rtds-core";
+import {Insets} from "josh_js_util";
 
 type ListViewItemParameters = {
     children:GElement[],
@@ -20,10 +21,11 @@ export function ListViewItem(opts: ListViewItemParameters): GElement {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: opts.mainAxisLayout || 'start',
         crossAxisLayout: 'center',
+        borderWidth: new Insets(0,0,1,0),
         visualStyle:{
             background: opts.selected ? Style.selectedButton().backgroundColor : Style.panel().backgroundColor,
             textColor: Style.base().textColor,
-            borderColor: Style.panel().borderColor,
+            borderColor:'black'
         },
         hoverStyle: {
             background: opts.selected ? Style.selectedButton().hoverBackgroundColor : Style.button().hoverBackgroundColor
