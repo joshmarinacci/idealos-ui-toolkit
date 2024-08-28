@@ -21,6 +21,7 @@ type TextInputSettings = {
     text?: StateHandler<string>
     multiline?:boolean,
     fixedWidth?: number,
+    fixedHeight?: number,
 }
 type TextInputRequirements = {
     text?: StateHandler<string>
@@ -30,6 +31,7 @@ type TextInputRequirements = {
     borderWidth: Insets
     multiline:boolean
     fixedWidth?:number,
+    fixedHeight?:number,
     font: string
     fontWeight: string
     fontSize: number
@@ -421,7 +423,6 @@ class TextInputElement implements GElement {
             borderWidth: withInsets(1),
             margin: Style.button().margin,
             padding: Style.button().padding,
-            fixedWidth: opts.fixedWidth,
             font: Style.base().font,
             fontSize: Style.base().fontSize,
             fontWeight: Style.base().fontWeight,
@@ -484,7 +485,11 @@ class TextInputElement implements GElement {
         if(this.settings.fixedWidth) {
             size.w = this.settings.fixedWidth
         }
-        size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
+        if(this.settings.fixedHeight) {
+            size.h = this.settings.fixedHeight
+        } else {
+            size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
+        }
         const focusedStyle = {
             background: 'hsl(47,100%,79%)',
             borderColor: 'black'

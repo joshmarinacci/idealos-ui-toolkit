@@ -119,6 +119,8 @@ export function makeCompsDemo() {
                     TextBox({
                         // text:'multi-line text area',
                         multiline:true,
+                        fixedWidth: 200,
+                        fixedHeight: 80,
                     }),
                 ]
             })
