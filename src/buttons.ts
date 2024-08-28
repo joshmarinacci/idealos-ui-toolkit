@@ -29,7 +29,7 @@ type ButtonParameters = {
     text?:string,
     selected?:boolean
     handleEvent?: EventHandler
-    borderRadius?: Insets
+    borderRadius?: Insets | number
     key?: string
 }
 type IconButtonParameters = {
@@ -262,7 +262,9 @@ export function ToggleGroup<T>(opts: ToggleGroupParameters<T>) {
         children: opts.data.map((ch, i) => {
             let bdr = new Insets(0, 0, 0, 1)
             return Button({
-                text: ch + "", borderWidth: bdr, borderRadius: ZERO_INSETS, margin: ZERO_INSETS,
+                text: ch + "", borderWidth: bdr,
+                borderRadius: ZERO_INSETS,
+                margin: ZERO_INSETS,
                 selected: i === selected,
                 handleEvent: (e) => {
                     if (e.type === 'mouse-down') {

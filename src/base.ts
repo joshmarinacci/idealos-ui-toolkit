@@ -69,7 +69,7 @@ export type RenderNodeSettings = {
     padding: Insets
     margin: Insets
     borderWidth: Insets
-    borderRadius?: Insets
+    borderRadius?: Insets | number
     shadow?:boolean
     handleEvent?:EventHandler,
     clip?:boolean

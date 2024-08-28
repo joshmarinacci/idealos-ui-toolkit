@@ -1,5 +1,5 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {GRenderNode, TRANSPARENT} from "./base.js";
+import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
 import {bdsSubInsets} from "./layout.js";
 
 export type RenderContext = {
@@ -64,6 +64,24 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
     ctx.stroke()
 }
 
+function isInsetsEmpty(insets: Insets) {
+    return insets.left <= 0 && insets.right <= 0 && insets.top <= 0 && insets.bottom <= 0
+}
+
+function calculateBorderRadius(settings: RenderNodeSettings) {
+    if(!settings.borderRadius) return undefined
+    if(typeof settings.borderRadius === 'number') {
+        let num = settings.borderRadius as number
+        if(num === 0) return undefined
+        return withInsets(num)
+    }
+    let insets = settings.borderRadius as Insets
+    if(isInsetsEmpty(insets)) {
+        return undefined
+    }
+    return insets
+}
+
 function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     let bg = n.settings.visualStyle.background || "magenta"
     if(n.hover && n.settings.hoverStyle && n.settings.hoverStyle.background) {
@@ -72,8 +90,9 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     if(n.focused && n.settings.focusedStyle && n.settings.focusedStyle.background) {
         bg = n.settings.focusedStyle.background
     }
-    if(n.settings.borderRadius) {
-        fillRoundRect(rc.ctx,bounds, n.settings.borderRadius, bg)
+    let rad = calculateBorderRadius(n.settings)
+    if(rad) {
+        fillRoundRect(rc.ctx,bounds, rad, bg)
     } else {
         fillRect(rc.ctx, bounds, bg)
     }
@@ -81,12 +100,13 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
 
 function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     let color = n.settings.visualStyle.borderColor || "black"
-    if(n.settings.borderWidth.left === 0) return
+    if(isInsetsEmpty(n.settings.borderWidth)) return
     if(n.focused && n.settings.focusedStyle?.borderColor) {
         color = n.settings.focusedStyle.borderColor
     }
-    if(n.settings.borderRadius && n.settings.borderRadius.left > 0) {
-        strokeRoundRect(rc.ctx, bounds, n.settings.borderRadius,color, n.settings.borderWidth)
+    let rad = calculateBorderRadius(n.settings)
+    if(rad) {
+        strokeRoundRect(rc.ctx, bounds, rad,color, n.settings.borderWidth)
         // rc.ctx.clip()
     } else {
         drawBorder(rc.ctx, bounds, color, n.settings.borderWidth)

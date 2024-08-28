@@ -29,7 +29,7 @@ type BoxParameters = {
     margin?: Insets,
     borderWidth?: Insets,
     borderColor?: string,
-    borderRadius?: Insets,
+    borderRadius?: Insets | number,
     handleEvent?: EventHandler,
 
     fixedWidth?: number
