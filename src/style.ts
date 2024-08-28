@@ -89,7 +89,7 @@ const lightPanelStyle:ComponentStyle = {
     backgroundColor: Colors.lightBackground,
     borderColor: TRANSPARENT,
     borderRadius: withInsets(4),
-    borderWidth: withInsets(0),
+    borderWidth: withInsets(1),
     ...FontInfo,
     margin: withInsets(0),
     padding: withInsets(0),

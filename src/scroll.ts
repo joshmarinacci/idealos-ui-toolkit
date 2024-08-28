@@ -1,19 +1,16 @@
-import {CEvent, GElement, GRenderNode, LayoutConstraints, MGlobals, ZERO_INSETS, ZERO_POINT} from "./base.js";
+import {CEvent, GElement, GRenderNode, LayoutConstraints, useState, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {RenderContext, withInsets} from "./gfx.js";
+import {RenderContext} from "./gfx.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 import {bdsSubInsets} from "./layout.js";
-import {STATE_CACHE, StateCache} from "./state.js";
 import {KEY_VENDOR} from "./keys.js";
+import {Style} from "./style.js";
 
 export type ScrollContainerSettings = {
-    key:string,
     fixedWidth: number,
     fixedHeight: number,
     child: GElement,
-    // scrollOffset: Point,
-    // onScrollChanged: (newOffset: Point, e: CEvent) => void
 }
 
 class ScrollContainerElement implements GElement {
@@ -24,12 +21,9 @@ class ScrollContainerElement implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        const cache:StateCache =  MGlobals.get(STATE_CACHE);
         let key = KEY_VENDOR.getKey()
-        let state = cache.getState(key)
-        const [scrollOffset,setScrollOffset] = state.useState("scrollOffset",() => new Point(0,0))
-
-        let borderInsets = withInsets(1)
+        const [scrollOffset, setScrollOffset] = useState(key,"scrollOffset",undefined, () => new Point(0,0))
+        let borderInsets = Style.panel().borderWidth
         const fullBounds = new Bounds(0, 0, this.param.fixedWidth, this.param.fixedHeight)
         KEY_VENDOR.startElement(this)
         let child = this.param.child.layout(rc, {
@@ -91,12 +85,13 @@ class ScrollContainerElement implements GElement {
             key:key,
             size: fullBounds.size(),
             visualStyle: {
-                background: "magenta",
-                borderColor: "yellow",
-                textColor: "white",
+                background: Style.panel().backgroundColor,
+                borderColor: Style.button().borderColor,
+                textColor: Style.panel().textColor,
             },
             baseline: 0,
             borderWidth: borderInsets,
+            borderRadius: undefined,
             children: children,
             contentOffset: ZERO_POINT,
             font: "",
@@ -147,11 +142,8 @@ class ScrollContainerElement implements GElement {
 
 export function ScrollContainer(param: {
     fixedWidth: number;
-    // onScrollChanged: (newOffset: Point, e: CEvent) => void;
-    // scrollOffset: Point;
     fixedHeight: number;
     child: GElement
-    key: string,
 }): GElement {
     return new ScrollContainerElement(param)
 }
