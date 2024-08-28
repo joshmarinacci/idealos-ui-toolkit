@@ -1,5 +1,5 @@
-import {CEvent, GElement, GRenderNode, LayoutConstraints, useState, ZERO_INSETS, ZERO_POINT} from "./base.js";
-import {Bounds, Point, Size} from "josh_js_util";
+import {CEvent, GElement, GRenderNode, LayoutConstraints, TRANSPARENT, useState, ZERO_INSETS, ZERO_POINT} from "./base.js";
+import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {RenderContext} from "./gfx.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
@@ -26,11 +26,15 @@ class ScrollContainerElement implements GElement {
         let borderInsets = Style.panel().borderWidth
         const fullBounds = new Bounds(0, 0, this.param.fixedWidth, this.param.fixedHeight)
         KEY_VENDOR.startElement(this)
+        const contentBounds = bdsSubInsets(fullBounds, borderInsets)
+        const barInsets = new Insets(0,10,10,0)
+        const child_size = contentBounds.size()
+        child_size.w -= barInsets.right
+        child_size.h -= barInsets.bottom
         let child = this.param.child.layout(rc, {
-            space: fullBounds.size(),
+            space: child_size,
             layout: "grow",
         })
-        const contentBounds = bdsSubInsets(fullBounds, borderInsets)
 
         let os = (offset:Point, e:CEvent) => {
             if(e.type === 'mouse-down' || e.type === 'wheel') {
@@ -41,41 +45,105 @@ class ScrollContainerElement implements GElement {
         ;//this.param.onScrollChanged
         let children = [child]
         {
+            // bottom scroll bar
+            let key =  KEY_VENDOR.getKey()
+            let bar = new GRenderNode({
+                key:key,
+                size: new Size(contentBounds.w-barInsets.right,barInsets.bottom),
+                pos: contentBounds.bottom_left().subtract(new Point(0,barInsets.right)),
+                baseline: 0,
+                borderWidth: ZERO_INSETS,
+                children: [],
+                contentOffset: ZERO_POINT,
+                font: "",
+                kind: "",
+                margin: ZERO_INSETS,
+                padding: ZERO_INSETS,
+                text: "",
+                visualStyle: {
+                    borderColor: TRANSPARENT,
+                    background: 'magenta',
+                    textColor: 'black'
+                }
+            })
+            children.push(bar)
+        }
+        {
+            // right scroll bar
+            let key =  KEY_VENDOR.getKey()
+            let bar = new GRenderNode({
+                key:key,
+                size: new Size(barInsets.right,contentBounds.h - barInsets.bottom),
+                pos: contentBounds.top_right().subtract(new Point(barInsets.right,0)),
+                baseline: 0,
+                borderWidth: ZERO_INSETS,
+                children: [],
+                contentOffset: ZERO_POINT,
+                font: "",
+                kind: "",
+                margin: ZERO_INSETS,
+                padding: ZERO_INSETS,
+                text: "",
+                visualStyle: {
+                    borderColor: TRANSPARENT,
+                    background: 'magenta',
+                    textColor: 'black'
+                }
+            })
+            children.push(bar)
+        }
+
+        const iconSettings = {
+            fontSize: 14,
+            margin: ZERO_INSETS,
+            ghost: false,
+            padding: ZERO_INSETS,
+            borderRadius: ZERO_INSETS,
+        }
+        {
             // left button
             let button = IconButton({
                 icon: Icons.KeyboardArrowLeft,
-                fontSize: 14,
-                ghost: true,
                 handleEvent: (e) => os(this.addToOffset(scrollOffset, new Point(10, 0), child.settings.size, contentBounds), e),
-                margin: ZERO_INSETS
+                ...iconSettings,
             })
             let node = button.layout(rc, cons)
+            node.settings.size = new Size(barInsets.right, barInsets.bottom)
             node.settings.pos.x = contentBounds.left()
             node.settings.pos.y = contentBounds.bottom() - node.settings.size.h
             children.push(node)
         }
         {
             // right button
-            let button = IconButton({icon: Icons.KeyboardArrowRight, ghost: true})
-            let rightr = button.layout(rc, cons)
-            rightr.settings.pos.x = contentBounds.left() + rightr.settings.size.w
-            rightr.settings.pos.y = contentBounds.bottom() - rightr.settings.size.h
-            children.push(rightr)
-            rightr.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(-10, 0), child.settings.size, contentBounds), e)
+            let button = IconButton({icon: Icons.KeyboardArrowRight,
+                ...iconSettings,
+            })
+            let node = button.layout(rc, cons)
+            node.settings.size = new Size(barInsets.right, barInsets.bottom)
+            node.settings.pos.x = contentBounds.right() - node.settings.size.w - barInsets.right
+            node.settings.pos.y = contentBounds.bottom() - node.settings.size.h
+            children.push(node)
+            node.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(-10, 0), child.settings.size, contentBounds), e)
         }
         {
-            let button = IconButton({icon: Icons.KeyboardArrowUp, ghost: true})
+            let button = IconButton({icon: Icons.KeyboardArrowUp,
+                ...iconSettings,
+            })
             let node = button.layout(rc, cons)
+            node.settings.size = new Size(barInsets.right, barInsets.bottom)
             node.settings.pos.x = contentBounds.right() - node.settings.size.w
             node.settings.pos.y = contentBounds.top()
             children.push(node)
             node.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(0, 10), child.settings.size, contentBounds), e)
         }
         {
-            let button = IconButton({icon: Icons.KeyboardArrowDown, ghost: true})
+            let button = IconButton({icon: Icons.KeyboardArrowDown,
+                ...iconSettings,
+            })
             let node = button.layout(rc, cons)
+            node.settings.size = new Size(barInsets.right, barInsets.bottom)
             node.settings.pos.x = contentBounds.right() - node.settings.size.w
-            node.settings.pos.y = contentBounds.top() + node.settings.size.h
+            node.settings.pos.y = contentBounds.bottom() - node.settings.size.h - barInsets.bottom
             children.push(node)
             node.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(0, -10), child.settings.size, contentBounds), e)
         }

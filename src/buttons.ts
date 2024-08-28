@@ -75,8 +75,8 @@ export function IconButton(opts: IconButtonParameters) {
         crossAxisSelfLayout: "shrink",
         mainAxisLayout: "center",
         mainAxisSelfLayout: "shrink",
-        margin: Style.button().margin,
-        padding: Style.button().padding,
+        margin: opts.margin || Style.button().margin,
+        padding:  opts.padding || Style.button().padding,
         handleEvent: opts.handleEvent,
     })
 }
