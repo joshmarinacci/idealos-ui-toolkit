@@ -180,6 +180,7 @@ ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
 ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
+    if(args.key === 'space') args.key = ' '
     model.insertCharAt(pos,args.key)
     pos.x += 1
     return {

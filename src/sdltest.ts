@@ -37,6 +37,10 @@ SDL_TO_CANVAS_MAP.set('return','Enter')
 
 const redraw = (skipLayout:boolean) => {
     const { pixelWidth: width, pixelHeight: height } = window
+    let dpi = window.pixelWidth / window.width
+    // console.log(window,dpi)
+    scene.setDPI(dpi)
+
     // console.log("redraw", skipLayout,width,height)
     if(!skipLayout) {
         scene.layout()
