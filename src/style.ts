@@ -12,7 +12,7 @@ const Colors = {
 
 const FontInfo = {
     fontSize: 14,
-    fontWeight:'plain',
+    fontWeight:'normal',
     font:'sans-serif',
 }
 

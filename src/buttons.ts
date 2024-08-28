@@ -57,6 +57,8 @@ export function IconButton(opts: IconButtonParameters) {
             new TextElement({
                 padding: ZERO_INSETS,
                 font: Style.button().font,
+                fontSize: Style.button().fontSize,
+                fontWeight: Style.button().fontWeight,
                 margin: ZERO_INSETS,
                 visualStyle:{
                     borderColor: TRANSPARENT,
