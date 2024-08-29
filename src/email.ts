@@ -1,7 +1,7 @@
 import {HBox, HSpacer, VBox} from "./layout.js";
 import {ScrollContainer} from "./scroll.js";
 import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
-import {Button, DropdownButton, IconButton} from "./buttons.js";
+import {Button, DropdownButton, IconButton, ToggleGroup} from "./buttons.js";
 import {Label, TextBox, WrappingLabel} from "./text.js";
 import {Icon, Icons} from "./icons.js";
 import {ObjAtom, Schema} from "rtds-core"
@@ -179,8 +179,9 @@ export function EmailDemo() {
                         mainAxisSelfLayout: 'shrink',
                         children: [
                             Label({text: "Inbox"}),
-                            Button({text: "All Mail"}),
-                            Button({text: "Unread"}),
+                            ToggleGroup({
+                                data:["All Mail", "Unread"]
+                            }),
                         ]
                     }),
                     TextBox({

@@ -9,6 +9,7 @@ import {GElement} from "./base.js";
 import {EmailDemo} from "./email.js";
 import {TabbedBox} from "./tabbedBox.js";
 import {MWindow} from "./window.js";
+import {TodoListDemo} from "./todolist.js";
 
 
 const state = {
@@ -197,12 +198,6 @@ export function makePanelDemo() {
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 150,
-                        key: 'scroll-1',
-                        // scrollOffset: state.scrollOffset1,
-                        // onScrollChanged: (newOffset: Point, e: CEvent): void => {
-                        //     state.scrollOffset1 = newOffset
-                        //     e.redraw()
-                        // },
                         child: new MHBoxElement({
                             children: [
                                 Square(20, 'red'),
@@ -219,20 +214,9 @@ export function makePanelDemo() {
                     ScrollContainer({
                         fixedWidth: 150,
                         fixedHeight: 200,
-                        key: 'scroll-2',
-                        // scrollOffset: state.scrollOffset2,
-                        // onScrollChanged: (newOffset: Point, e: CEvent): void => {
-                        //     state.scrollOffset2 = newOffset
-                        //     e.redraw()
-                        // },
                         child: ListView({
                             data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
                             key: 'list-view-xx',
-                            // selected: state.selectedListItem2,
-                            // onSelectedChanged: ((i: number, e: CEvent) => {
-                            //     state.selectedListItem2 = i
-                            //     e.redraw()
-                            // })
                         })
                     })
                 ]
@@ -246,6 +230,7 @@ export function makeTabs(): GElement {
     const listviewDemo = makeListDemo()
     const panelDemo = makePanelDemo()
     const emailDemo = EmailDemo()
+    const todoDemo = TodoListDemo()
 
     let tabs = TabbedBox({
         titles: [
@@ -253,12 +238,14 @@ export function makeTabs(): GElement {
             'List View',
             'Panels',
             'Email',
+            'Todo List'
         ],
         children: [
             compsDemo,
             listviewDemo,
             panelDemo,
             emailDemo,
+            todoDemo,
         ],
     })
     return MWindow({child: tabs})
