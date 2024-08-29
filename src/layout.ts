@@ -48,6 +48,7 @@ export type BoxParams = {
     visualStyle?: VisualStyle
     kind?: string,
     shadow?:boolean
+    key?: string
 }
 
 type BoxRequirements = {
@@ -63,7 +64,7 @@ type BoxRequirements = {
     padding: Insets
     margin: Insets,
     borderWidth: Insets,
-    borderRadius: Insets,
+    borderRadius: Insets | number,
     handleEvent?: EventHandler,
 
     fixedWidth?: number
@@ -413,6 +414,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
 export class HExpander implements GElement {
     layout(_rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        const key = KEY_VENDOR.getKey()
         let size = new Size(20, 20)
         if (cons.layout === 'grow') {
             size = new Size(cons.space.w, 20)
@@ -421,6 +423,7 @@ export class HExpander implements GElement {
             size = new Size(20, 20)
         }
         return new GRenderNode({
+            key:key,
             baseline: 0,
             visualStyle: {
                 background: TRANSPARENT,
@@ -567,6 +570,7 @@ export function HBox(param: BoxParams) {
         kind: param.kind,
         borderColor:param.borderColor,
         borderWidth: param.borderWidth,
+        key: param.key
     })
 }
 
@@ -580,7 +584,8 @@ export function VBox(param: BoxParams) {
         borderWidth: param.borderWidth,
         visualStyle: param.visualStyle,
         kind: param.kind,
-        shadow:param.shadow
+        shadow:param.shadow,
+        key: param.key
     })
 }
 
