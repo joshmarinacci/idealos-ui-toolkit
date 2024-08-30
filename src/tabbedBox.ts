@@ -27,7 +27,12 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                 mainAxisLayout: "start",
                 crossAxisLayout: "end",
                 crossAxisSelfLayout: "shrink",
-                borderWidth: withInsets(1),
+                borderWidth: new Insets(0,0,1,0),
+                visualStyle: {
+                    textColor:"black",
+                    borderColor: "black",
+                    background: Style.panel().backgroundColor,
+                },
                 padding: new Insets(5,0,0,0),
                 children: opts.titles.map(((title, i) => {
                     return Button({
@@ -35,7 +40,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                         text: title,
                         selected: selected == i,
                         borderRadius: new Insets(5,5,0,0),
-                        borderWidth: Style.button().borderWidth,
+                        borderWidth: new Insets(1,1,0,1),
                         handleEvent:(e) => {
                             if(e.type === 'mouse-down') {
                                 setSelected(i)
