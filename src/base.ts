@@ -17,16 +17,25 @@ export type VisualStyle = {
     background?:string
 }
 
-export type ElementSettings = {
-    text: string
-    padding: Insets
-    margin: Insets
-    visualStyle:VisualStyle
-    borderWidth: Insets
+export type FontSettings = {
     font: string
     fontWeight: string
     fontSize: number
-    shadow: boolean
+}
+export type ElementSettings = {
+    key?:string
+    kind?:string
+    text?: string
+    padding?: Insets
+    margin?: Insets
+    visualStyle:VisualStyle
+    hoverStyle?: VisualStyle
+    focusedStyle?: VisualStyle
+    borderWidth?: Insets
+    borderRadius?: Insets | number,
+    fontSettings?: FontSettings
+    handleEvent?:EventHandler,
+    shadow?: boolean
 }
 
 export type MMouseEvent = {
@@ -52,7 +61,9 @@ export type CEvent = MMouseEvent | MKeyboardEvent | MWheelEvent
 export type EventHandler = (event: CEvent) => void
 
 export type RenderNodeSettings = {
-    text: string;
+    kind:string,
+    key:string,
+    text?: string;
     visualStyle:VisualStyle
     hoverStyle?:VisualStyle
     focusedStyle?:VisualStyle
@@ -63,19 +74,17 @@ export type RenderNodeSettings = {
     size: Size;
     pos: Point;
     baseline: number;
-    kind:string,
     inputid?:string,
     children:GRenderNode[],
-    padding: Insets
-    margin: Insets
-    borderWidth: Insets
+    padding?: Insets
+    margin?: Insets
+    borderWidth?: Insets
     borderRadius?: Insets | number
     shadow?:boolean
     handleEvent?:EventHandler,
     clip?:boolean
     canScroll?:boolean
     popup?:boolean
-    key:string,
 }
 export class GRenderNode {
     settings: RenderNodeSettings

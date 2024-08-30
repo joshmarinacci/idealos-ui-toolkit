@@ -4,38 +4,29 @@ import {
     GElement,
     GRenderNode,
     LayoutConstraints,
-    MKeyboardEvent, StateHandler,
-    TRANSPARENT, useState,
+    MKeyboardEvent,
+    StateHandler,
+    TRANSPARENT,
+    useState,
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.js";
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.js";
 import {Style} from "./style.js";
-import {Insets, Point, Size} from "josh_js_util";
-import {addInsets} from "./util.js";
+import {Point, Size} from "josh_js_util";
+import {calcCanvasFont, getTotalInsets} from "./util.js";
 import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.js";
 import {KEY_VENDOR} from "./keys.js";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
-type TextInputSettings = {
-    text?: StateHandler<string>
-    multiline?:boolean,
-    fixedWidth?: number,
-    fixedHeight?: number,
-}
-type TextInputRequirements = {
+
+type TextInputElementSettings = {
     text?: StateHandler<string>
     onChange?: OnChangeCallback<[string,Point]>
-    margin: Insets
-    padding: Insets
-    borderWidth: Insets
     multiline:boolean
     fixedWidth?:number,
     fixedHeight?:number,
-    font: string
-    fontWeight: string
-    fontSize: number
-}
+} & ElementSettings
 
 class TextModel {
     private lines: string[];
@@ -188,8 +179,6 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
         pos:pos
     }
 })
-
-
 ACTION_MAP.addAction('insert-newline', (args) => {
     let model = new TextModel(args.text)
     model.splitLineAt(args.pos)
@@ -218,7 +207,10 @@ type TextElementSettings = {
     multiline?:boolean
     fixedWidth?:number
     bold?:boolean
+    text:string
 } & ElementSettings
+
+
 export class TextElement implements GElement {
     settings: TextElementSettings;
 
@@ -233,14 +225,13 @@ export class TextElement implements GElement {
     }
 
     private layout_multiline(rc: RenderContext, _cons: LayoutConstraints) {
-        rc.ctx.font = this.settings.font
+        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let key = KEY_VENDOR.getKey()
         let [textsize,baseline] = this.calcMetrics(rc)
         let lineHeight = textsize.h
         let lines = this.settings.text.split('\n')
         let y = 0
-        let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
-
+        let total_insets = getTotalInsets(this.settings)
         let size = new Size(0,0)
         size.w = textsize.w
         size.h = textsize.h
@@ -252,6 +243,7 @@ export class TextElement implements GElement {
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
+                key:key,
                 shadow:true,
                 kind:"text-line-element",
                 text:line,
@@ -274,6 +266,7 @@ export class TextElement implements GElement {
 
         size = sizeWithPadding(size,total_insets)
         return new GRenderNode({
+            ... this.settings,
             key:key,
             kind: "text-multiline-element",
             text:"",
@@ -282,24 +275,19 @@ export class TextElement implements GElement {
             pos: new Point(0, 0),
             contentOffset: new Point(total_insets.left, total_insets.top),
             baseline: baseline,
-            visualStyle: this.settings.visualStyle,
             children: nodes,
-            padding: this.settings.padding,
-            margin: this.settings.margin,
-            borderWidth: this.settings.borderWidth,
-            shadow: this.settings.shadow,
         })
     }
 
     private layout_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
         let key = KEY_VENDOR.getKey()
 
-        rc.ctx.font = this.settings.font
+        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let [textsize, baseline] = this.calcMetrics(rc)
         let lineHeight = textsize.h
         let words = this.settings.text.split(' ')
         let x = 0
-        let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
+        let total_insets = getTotalInsets(this.settings)
 
         let size = new Size(0,0)
         size.w = this.settings.fixedWidth as number
@@ -328,6 +316,8 @@ export class TextElement implements GElement {
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
+                ... this.settings,
+                key:key,
                 kind:"text-line-element",
                 shadow:true,
                 text:line,
@@ -370,9 +360,7 @@ export class TextElement implements GElement {
     }
 
     private calcMetrics(rc: RenderContext):[Size,number] {
-        let fontStr = `${this.settings.fontWeight} ${this.settings.fontSize}px ${this.settings.font}`
-        // let fontStr = `${this.settings.fontSize}px ${this.settings.fontWeight} ${this.settings.font}`
-        rc.ctx.font = fontStr
+        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let metrics = rc.ctx.measureText(this.settings.text)
         let size = new Size(
             Math.floor(metrics.width),
@@ -387,27 +375,20 @@ export class TextElement implements GElement {
 
     private layout_single_line_no_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
         let key = KEY_VENDOR.getKey()
-        rc.ctx.font = this.settings.font
+        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let [size,baseline] = this.calcMetrics(rc)
-        size = sizeWithPadding(size, this.settings.padding)
-        size = sizeWithPadding(size, this.settings.margin)
-        size = sizeWithPadding(size, this.settings.borderWidth)
+        size = sizeWithPadding(size, getTotalInsets(this.settings))
         return new GRenderNode({
+            ...this.settings,
             kind: "text-singleline-element",
-            text: this.settings.text,
             font: Style.base().font,
-            fontSize: this.settings.fontSize || Style.base().fontSize,
+            fontSize: this.settings.fontSettings?.fontSize || Style.base().fontSize,
             fontWeight: this.settings.bold?"bold":Style.base().fontWeight,
             size: size,
             pos: new Point(0, 0),
             contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
             baseline: baseline,
-            visualStyle: this.settings.visualStyle,
             children: [],
-            padding: this.settings.padding,
-            margin: this.settings.margin,
-            borderWidth: this.settings.borderWidth,
-            shadow: this.settings.shadow,
             key:key,
         })
 
@@ -415,24 +396,25 @@ export class TextElement implements GElement {
 }
 
 class TextInputElement implements GElement {
-    private settings: TextInputRequirements
+    private settings: TextInputElementSettings
 
-    constructor(opts: TextInputSettings) {
+    constructor(opts: TextInputElementSettings) {
         this.settings = {
             ...opts,
             multiline: opts.multiline?opts.multiline:false,
             borderWidth: withInsets(1),
             margin: Style.button().margin,
             padding: Style.button().padding,
-            font: Style.base().font,
-            fontSize: Style.base().fontSize,
-            fontWeight: Style.base().fontWeight,
+            fontSettings: {
+                font: Style.base().font,
+                fontSize: Style.base().fontSize,
+                fontWeight: Style.base().fontWeight,
+            },
         }
     }
 
     private calcMetrics(rc: RenderContext, text:string):[Size,number] {
-        let fontStr = `${this.settings.fontWeight} ${this.settings.fontSize}px ${this.settings.font}`
-        rc.ctx.font = fontStr
+        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let metrics = rc.ctx.measureText(text)
         let size = new Size(
             Math.floor(metrics.width),
@@ -452,9 +434,11 @@ class TextInputElement implements GElement {
         let [focused, setFocused] = useState(key,"focused",undefined,()=>false)
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
-            font: Style.base().font,
-            fontSize: Style.base().fontSize,
-            fontWeight: Style.base().fontWeight,
+            fontSettings: {
+                font: Style.base().font,
+                fontSize: Style.base().fontSize,
+                fontWeight: Style.base().fontWeight,
+            },
             margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             shadow: true,
@@ -473,9 +457,8 @@ class TextInputElement implements GElement {
         let lines = textString.split("\n")
         let line = lines[cursorPosition.y]
         let text_before = line.substring(0,cursorPosition.x)
-        // console.log("text before is",text_before, this.opts.cursorPosition)
         let [metrics, baseline] = this.calcMetrics(rc, text_before)
-        let total_insets = addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
+        let total_insets = getTotalInsets(this.settings)
         text_node.settings.pos.x = total_insets.left
         text_node.settings.pos.y = total_insets.top
 
@@ -555,7 +538,7 @@ class TextInputElement implements GElement {
     }
 }
 
-export function TextBox(param: TextInputSettings): GElement {
+export function TextBox(param: TextInputElementSettings): GElement {
     return new TextInputElement(param)
 }
 
@@ -569,9 +552,11 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
             background: TRANSPARENT,
         },
         padding: withInsets(5),
-        font: Style.base().font,
-        fontSize: Style.base().fontSize,
-        fontWeight: Style.base().fontWeight,
+        fontSettings: {
+            font: Style.base().font,
+            fontSize: Style.base().fontSize,
+            fontWeight: Style.base().fontWeight,
+        },
         margin: withInsets(5),
         borderWidth: ZERO_INSETS,
         shadow: opts.shadow ? opts.shadow : false,
@@ -588,9 +573,11 @@ export function WrappingLabel(param: { fixedWidth: number; text: string, shadow?
         padding: Style.button().padding,
         margin: ZERO_INSETS,
         borderWidth: ZERO_INSETS,
-        font: Style.base().font,
-        fontSize: Style.base().fontSize,
-        fontWeight:  Style.base().fontWeight,
+        fontSettings: {
+            font: Style.base().font,
+            fontSize: Style.base().fontSize,
+            fontWeight:  Style.base().fontWeight,
+        },
         fixedWidth: param.fixedWidth,
         visualStyle: {
             borderColor: TRANSPARENT,

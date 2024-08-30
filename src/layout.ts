@@ -1,99 +1,39 @@
 import {
     AxisLayout,
     AxisSelfLayout,
+    ElementSettings,
     EventHandler,
     GElement,
     GRenderNode,
-    LayoutConstraints, TRANSPARENT,
-    VisualStyle,
+    LayoutConstraints,
+    TRANSPARENT, VisualStyle,
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.js";
 import {RenderContext} from "./gfx.js";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
-import {addInsets, insetsHeight, insetsWidth} from "./util.js";
+import {bdsAddInsets, bdsSubInsets, getTotalInsets, insetsHeight, insetsWidth, withFallback} from "./util.js";
 import {KEY_VENDOR} from "./keys.js";
 
-type BoxParameters = {
-    kind?: string,
-    mainAxisSelfLayout?: AxisSelfLayout,
-    crossAxisSelfLayout?: AxisSelfLayout,
-    mainAxisLayout?: AxisLayout,
-    crossAxisLayout?: AxisLayout,
-    children: GElement[],
-    visualStyle?: VisualStyle
-    hoverStyle?: VisualStyle
-    focusedStyle?: VisualStyle
-    padding?: Insets
-    margin?: Insets,
-    borderWidth?: Insets,
-    borderColor?: string,
-    borderRadius?: Insets | number,
-    handleEvent?: EventHandler,
-
-    fixedWidth?: number
-    fixedHeight?: number
-    key?: string
-    shadow?:boolean
-}
-export type BoxParams = {
-    mainAxisSelfLayout?: AxisSelfLayout,
-    crossAxisSelfLayout?: AxisSelfLayout,
-    mainAxisLayout?: AxisLayout,
-    crossAxisLayout?: AxisLayout,
-    children: GElement[],
-    borderWidth?:Insets
-    borderColor?:string
-    visualStyle?: VisualStyle
-    kind?: string,
-    shadow?:boolean
-    key?: string
-}
-
-type BoxRequirements = {
+export type BoxRequirements = {
     kind: string,
     mainAxisSelfLayout: AxisSelfLayout,
     crossAxisSelfLayout: AxisSelfLayout,
     mainAxisLayout: AxisLayout,
     crossAxisLayout: AxisLayout,
     children: GElement[],
-    visualStyle: VisualStyle
-    hoverStyle?: VisualStyle
-    focusedStyle?: VisualStyle
-    padding: Insets
-    margin: Insets,
-    borderWidth: Insets,
-    borderRadius: Insets | number,
+    visualStyle?: VisualStyle
     handleEvent?: EventHandler,
-
     fixedWidth?: number
     fixedHeight?: number
-    key?: string
-    shadow?:boolean
-}
-
-export function bdsSubInsets(bds: Bounds, insets: Insets) {
-    return new Bounds(
-        bds.x + insets.left,
-        bds.y + insets.top,
-        bds.w - insets.left - insets.right,
-        bds.h - insets.top - insets.bottom,
-    )
-}
-
-export function bdsAddInsets(bds: Bounds, insets: Insets) {
-    return new Bounds(
-        bds.x - insets.left,
-        bds.y - insets.top,
-        bds.w + insets.left + insets.right,
-        bds.h + insets.top + insets.bottom,
-    )
-}
-
-function withFallback<T>(value: T | undefined, fallback: T): T {
-    return value || fallback
-}
+} & ElementSettings
+export type BoxOptions = {
+    mainAxisSelfLayout?: AxisSelfLayout,
+    crossAxisSelfLayout?: AxisSelfLayout,
+    mainAxisLayout?: AxisLayout,
+    crossAxisLayout?: AxisLayout,
+} & BoxRequirements
 
 class BoxElementBase {
     protected settings: BoxRequirements;
@@ -109,17 +49,6 @@ class BoxElementBase {
         if (this.log_enabled) console.log("HBox", ...output)
     }
 
-    protected subtractInsets(contentBounds: Bounds) {
-        // subtract padding
-        contentBounds = bdsSubInsets(contentBounds, this.settings.margin)
-        contentBounds = bdsSubInsets(contentBounds, this.settings.borderWidth)
-        contentBounds = bdsSubInsets(contentBounds, this.settings.padding)
-        return contentBounds
-    }
-
-    protected getTotalInsets() {
-        return addInsets(addInsets(this.settings.margin, this.settings.borderWidth), this.settings.padding)
-    }
     protected getConstraints() {
         return {
             mainAxisSelfLayout: this.settings.mainAxisSelfLayout,
@@ -134,30 +63,29 @@ class BoxElementBase {
 
 export class MHBoxElement extends BoxElementBase implements GElement {
 
-    constructor(param: BoxParameters) {
+    constructor(param: BoxRequirements) {
         super({
+            ...param,
             kind: param.kind || "hbox",
             borderRadius: param.borderRadius || ZERO_INSETS,
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
             mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
-            children: param.children,
-
+            // children: param.children,
             visualStyle: param.visualStyle || {
                 background: Style.panel().backgroundColor,
                 textColor: Style.panel().textColor,
-                borderColor:  param.borderColor || Style.panel().borderColor,
+                borderColor:  Style.panel().borderColor,
             },
-            hoverStyle: param.hoverStyle || {},
+            // hoverStyle: param.hoverStyle || {},
             margin: withFallback(param.margin, Style.panel().margin),
             padding: withFallback(param.padding, Style.panel().padding),
             borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),
-            handleEvent: param.handleEvent,
-
-            fixedWidth: param.fixedWidth,
-            fixedHeight: param.fixedHeight,
-            key: param.key,
+            // handleEvent: param.handleEvent,
+            // fixedWidth: param.fixedWidth,
+            // fixedHeight: param.fixedHeight,
+            // key: param.key,
         })
     }
 
@@ -170,14 +98,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             return this.do_shrink_layout(rc, cons)
         }
         throw new Error(`unknown self layout type ${this.settings.mainAxisSelfLayout}`)
-    }
-
-
-    private addInsets(contentBounds: Bounds) {
-        contentBounds = bdsAddInsets(contentBounds, this.settings.margin)
-        contentBounds = bdsAddInsets(contentBounds, this.settings.borderWidth)
-        contentBounds = bdsAddInsets(contentBounds, this.settings.padding)
-        return contentBounds
     }
 
     private layout_nodes_cross_axis(chs: GElement[], map: Map<GElement, GRenderNode>, contentBounds: Bounds) {
@@ -240,7 +160,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         }
 
         // account for insets
-        contentBounds = this.subtractInsets(contentBounds)
+        contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
+        // contentBounds = this.subtractInsets(contentBounds)
         this.log("started content bounds", contentBounds)
 
         // layout the non expander children
@@ -305,25 +226,27 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             this.layout_between(chs, map, contentBounds)
         }
         let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
-        fullBounds = this.addInsets(contentBounds)
+        fullBounds = bdsAddInsets(contentBounds, getTotalInsets(this.settings))
+        // fullBounds = this.addInsets(contentBounds)
         this.log(`content bounds ${contentBounds}`)
         this.log(`full bounds ${fullBounds}`)
         return new GRenderNode({
-            visualStyle: this.settings.visualStyle,
-            hoverStyle: this.settings.hoverStyle,
+            ...this.settings,
+            // visualStyle: this.settings.visualStyle,
+            // hoverStyle: this.settings.hoverStyle,
             baseline: 0,
             font: Style.panel().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            kind: this.settings.kind,
+            // kind: this.settings.kind,
             children: children,
-            padding: this.settings.padding,
+            // padding: this.settings.padding,
             contentOffset: contentBounds.position(),
-            margin: this.settings.margin,
-            borderWidth: this.settings.borderWidth,
-            borderRadius: this.settings.borderRadius,
-            handleEvent: this.settings.handleEvent,
+            // margin: this.settings.margin,
+            // borderWidth: this.settings.borderWidth,
+            // borderRadius: this.settings.borderRadius,
+            // handleEvent: this.settings.handleEvent,
             key: key,
         }, {
             'constraints': this.getConstraints(),
@@ -345,7 +268,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             contentBounds.w = this.settings.fixedWidth
             fullBounds.w = this.settings.fixedWidth
         }
-        contentBounds = this.subtractInsets(contentBounds)
+        contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
+        // contentBounds = this.subtractInsets(contentBounds)
         this.log("started content bounds", contentBounds)
         // layout all children.
         KEY_VENDOR.startElement(this)
@@ -370,7 +294,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         })
         contentBounds.w = child_total_width
         contentBounds.h = max_child_height
-        fullBounds = this.addInsets(contentBounds)
+        fullBounds = bdsAddInsets(contentBounds, getTotalInsets(this.settings))
+        // fullBounds = this.addInsets(contentBounds)
         this.log(`content bounds ${contentBounds}`)
         this.log(`full bounds ${fullBounds}`)
 
@@ -387,21 +312,22 @@ export class MHBoxElement extends BoxElementBase implements GElement {
 
         let children = chs.map(ch => map.get(ch) as GRenderNode)
         return new GRenderNode({
-            visualStyle: this.settings.visualStyle,
-            hoverStyle: this.settings.hoverStyle,
+            ... this.settings,
+            // visualStyle: this.settings.visualStyle,
+            // hoverStyle: this.settings.hoverStyle,
             baseline: 0,
             font: Style.base().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            kind: this.settings.kind,
+            // kind: this.settings.kind,
             children: children,
-            padding: this.settings.padding,
+            // padding: this.settings.padding,
             contentOffset: contentBounds.position(),
-            margin: this.settings.margin,
-            borderWidth: this.settings.borderWidth,
-            borderRadius: this.settings.borderRadius,
-            handleEvent: this.settings.handleEvent,
+            // margin: this.settings.margin,
+            // borderWidth: this.settings.borderWidth,
+            // borderRadius: this.settings.borderRadius,
+            // handleEvent: this.settings.handleEvent,
             key: key,
         }, {
             'constraints': this.getConstraints(),
@@ -446,15 +372,14 @@ export class HExpander implements GElement {
 
 export class MVBoxElement extends BoxElementBase implements GElement {
 
-    constructor(param: BoxParameters) {
+    constructor(param: BoxRequirements) {
         super({
+            ...param,
             kind: param.kind || 'vbox',
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
             mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
-            children: param.children,
-
             visualStyle: param.visualStyle || {
                 background: Style.panel().backgroundColor,
                 textColor: Style.base().textColor,
@@ -462,14 +387,8 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             },
             margin: withFallback(param.margin, Style.panel().margin),
             padding: withFallback(param.padding, Style.panel().padding),
-
             borderRadius: withFallback(param.borderRadius, ZERO_INSETS),
             borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),
-
-            handleEvent: param.handleEvent,
-            fixedWidth: param.fixedWidth,
-            fixedHeight: param.fixedHeight,
-            shadow: param.shadow
         })
     }
 
@@ -477,10 +396,6 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         this.log("space = ", cons.layout, cons.space)
         let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
-        // let map = new Map<GElement, GRenderNode>()
-        // let expanders = chs.filter(ch => ch instanceof HExpander)
-        // let non_expanders = chs.filter(ch => !(ch instanceof HExpander))
-        // this.log(`exp ${expanders.length} non = ${non_expanders.length}`)
 
         let fullBounds = new Bounds(0, 0, 0, 0)
         if (this.settings.mainAxisSelfLayout === 'grow') {
@@ -499,7 +414,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             fullBounds.w = this.settings.fixedWidth
         }
         let contentBounds = fullBounds.copy()
-        contentBounds = this.subtractInsets(contentBounds)
+        contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
         this.log(this.settings.kind, fullBounds, contentBounds)
 
         KEY_VENDOR.startElement(this)
@@ -528,7 +443,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             total_children_length += ch.settings.size.h
             max_child_size = Math.max(max_child_size, ch.settings.size.w)
         }
-        let total_insets = this.getTotalInsets()
+        let total_insets = getTotalInsets(this.settings)
         if (this.settings.mainAxisSelfLayout === 'shrink') {
             fullBounds.h = total_children_length + insetsHeight(total_insets)
         }
@@ -560,32 +475,23 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
 }
 
-export function HBox(param: BoxParams) {
+export function HBox(param: BoxOptions) {
     return new MHBoxElement({
+        ... param,
         mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
         mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
-        children: param.children,
-        kind: param.kind,
-        borderColor:param.borderColor,
-        borderWidth: param.borderWidth,
-        key: param.key
     })
 }
 
-export function VBox(param: BoxParams) {
+export function VBox(param: BoxOptions) {
     return new MVBoxElement({
+        ... param,
         mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
         mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
-        children: param.children,
-        borderWidth: param.borderWidth,
-        visualStyle: param.visualStyle,
-        kind: param.kind,
-        shadow:param.shadow,
-        key: param.key
     })
 }
 

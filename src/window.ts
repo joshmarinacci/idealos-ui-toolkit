@@ -2,11 +2,11 @@ import {GElement, GRenderNode, LayoutConstraints, MGlobals, MMouseEvent, ZERO_IN
 import {RenderContext, withInsets} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
-import {bdsSubInsets} from "./layout.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {KEY_VENDOR} from "./keys.js";
+import {bdsSubInsets} from "./util.js";
 
 class MWindowElement implements GElement {
     private child: GElement;
