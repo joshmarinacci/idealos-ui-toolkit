@@ -286,8 +286,10 @@ export function ToggleGroup<T>(opts: ToggleGroupParameters<T>) {
     let [selected, setSelected] = useState(key, "selected", opts.selected, () => 0)
     return HBox({
         borderWidth: withInsets(1),
+        visualStyle: {
+            borderColor: Style.button().borderColor,
+        },
         mainAxisSelfLayout: 'shrink',
-        // borderColor: Style.base().borderColor,
         children: opts.data.map((ch, i) => {
             let bdr = new Insets(0, 0, 0, 1)
             return Button({
