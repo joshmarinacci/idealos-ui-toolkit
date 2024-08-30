@@ -66,7 +66,6 @@ class MWindowElement implements GElement {
         resize.settings.pos = size.asPoint().subtract(new Point(50,50))
         KEY_VENDOR.endElement(this)
         return new GRenderNode({
-            margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             baseline: 0,
             borderWidth: borderWidth,

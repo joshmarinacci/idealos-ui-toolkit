@@ -53,7 +53,6 @@ export function IconButton(opts: IconButtonRequired) {
                     fontSize: Style.button().fontSize,
                     fontWeight: Style.button().fontWeight,
                 },
-                margin: ZERO_INSETS,
                 visualStyle:{
                     borderColor: TRANSPARENT,
                     background: TRANSPARENT,
@@ -68,7 +67,6 @@ export function IconButton(opts: IconButtonRequired) {
         crossAxisSelfLayout: "shrink",
         mainAxisLayout: "center",
         mainAxisSelfLayout: "shrink",
-        margin: opts.margin || Style.button().margin,
         padding:  opts.padding || Style.button().padding,
         handleEvent: opts.handleEvent,
     })
@@ -100,7 +98,6 @@ export const Button = (opts: ButtonParameters) => {
                 fontSize: Style.button().fontSize,
                 fontWeight: Style.button().fontWeight,
             },
-            margin: ZERO_INSETS,
             visualStyle:{
                 borderColor: TRANSPARENT,
                 background: TRANSPARENT,
@@ -114,7 +111,6 @@ export const Button = (opts: ButtonParameters) => {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: 'center',
         mainAxisSelfLayout: 'shrink',
-        margin: opts.margin||Style.button().margin,
         padding: opts.padding || Style.button().padding,
         handleEvent: opts.handleEvent,
     })
@@ -137,7 +133,6 @@ export function Tag(opts: { text: string }) {
                 fontSize: Style.button().fontSize,
                 fontWeight: Style.button().fontWeight,
             },
-            margin: ZERO_INSETS,
             visualStyle: {
                 borderColor: 'transparent',
                 background: TRANSPARENT,
@@ -151,7 +146,6 @@ export function Tag(opts: { text: string }) {
         crossAxisSelfLayout: 'shrink',
         mainAxisLayout: 'center',
         mainAxisSelfLayout: 'shrink',
-        margin: Style.button().margin,
         padding: Style.button().padding,
     })
 }
@@ -299,7 +293,6 @@ export function ToggleGroup<T>(opts: ToggleGroupParameters<T>) {
             return Button({
                 text: ch + "", borderWidth: bdr,
                 borderRadius: ZERO_INSETS,
-                margin: ZERO_INSETS,
                 selected: i === selected,
                 handleEvent: (e) => {
                     if (e.type === 'mouse-down') {

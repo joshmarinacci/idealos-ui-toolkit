@@ -18,7 +18,6 @@ export class PopupContainer implements GElement {
             key:key,
             size: new Size(100, 200),
             pos: new Point(100, 100),
-            margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             borderWidth: ZERO_INSETS,
             children: [child],

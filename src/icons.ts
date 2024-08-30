@@ -83,7 +83,6 @@ export class IconElement implements GElement {
             fontSize: this.fontSize,
             fontWeight: Style.base().fontWeight,
             kind: `icon: ${this.icon}`,
-            margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: new Point(0, 0),
             size: new Size(24, 24),

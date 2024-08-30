@@ -80,7 +80,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 textColor: Style.panel().textColor,
                 borderColor:  Style.panel().borderColor,
             },
-            margin: withFallback(param.margin, Style.panel().margin),
             padding: withFallback(param.padding, Style.panel().padding),
             borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),
         })
@@ -342,7 +341,6 @@ export class HExpander implements GElement {
             children: [],
             font: "",
             kind: "h-expander",
-            margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: ZERO_POINT,
             size: size,
@@ -367,7 +365,6 @@ export class MVBoxElement extends BoxElementBase implements GElement {
                 textColor: Style.base().textColor,
                 borderColor: Style.panel().borderColor
             },
-            margin: withFallback(param.margin, Style.panel().margin),
             padding: withFallback(param.padding, Style.panel().padding),
             borderRadius: withFallback(param.borderRadius, ZERO_INSETS),
             borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),

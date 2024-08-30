@@ -34,7 +34,6 @@ export type ComponentStyle = {
     font:string
     fontSize:number
     fontWeight:string
-    margin:Insets
     padding:Insets
     borderWidth:Insets
     borderRadius: Insets
@@ -46,7 +45,6 @@ const lightBaseComponentStyle:ComponentStyle = {
     borderColor: 'black',
     borderRadius: ZERO_INSETS,
     borderWidth: ZERO_INSETS,
-    margin: ZERO_INSETS,
     padding: ZERO_INSETS,
     textColor: 'black',
     hoverBackgroundColor:'white',
@@ -57,7 +55,6 @@ const darkBaseComponentStyle:ComponentStyle = {
     borderColor: 'white',
     borderRadius: ZERO_INSETS,
     borderWidth: ZERO_INSETS,
-    margin: ZERO_INSETS,
     padding: ZERO_INSETS,
     textColor: 'white',
     hoverBackgroundColor:'black',
@@ -69,7 +66,6 @@ const lightButtonStyle:ComponentStyle = {
     borderColor: 'black',
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
-    margin: withInsets(4),
     padding: withInsets(7),
     textColor: 'black',
     hoverBackgroundColor: '#ccc',
@@ -81,7 +77,6 @@ const darkButtonStyle:ComponentStyle = {
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
     ...FontInfo,
-    margin: withInsets(4),
     padding: withInsets(7),
     textColor: 'white',
     hoverBackgroundColor: '#ccc',
@@ -93,7 +88,6 @@ const lightPanelStyle:ComponentStyle = {
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
     ...FontInfo,
-    margin: withInsets(0),
     padding: withInsets(0),
     textColor: 'black',
     hoverBackgroundColor: '#ccc',
@@ -104,7 +98,6 @@ const darkPanelStyle:ComponentStyle = {
     borderRadius: withInsets(4),
     borderWidth: withInsets(0),
     ...FontInfo,
-    margin: withInsets(0),
     padding: withInsets(0),
     textColor: 'white',
     hoverBackgroundColor: '#ccc',
@@ -117,7 +110,6 @@ const lightSelectedButtonStyle:ComponentStyle = {
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
     ...FontInfo,
-    margin: withInsets(4),
     padding: withInsets(7),
     textColor: 'black',
 }

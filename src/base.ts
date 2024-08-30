@@ -27,7 +27,6 @@ export type ElementSettings = {
     kind?:string
     text?: string
     padding?: Insets
-    margin?: Insets
     visualStyle?:VisualStyle
     hoverStyle?: VisualStyle
     focusedStyle?: VisualStyle
@@ -77,7 +76,6 @@ export type RenderNodeSettings = {
     inputid?:string,
     children:GRenderNode[],
     padding?: Insets
-    margin?: Insets
     borderWidth?: Insets
     borderRadius?: Insets | number
     shadow?:boolean

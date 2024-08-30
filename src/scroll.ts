@@ -57,7 +57,6 @@ class ScrollContainerElement implements GElement {
                 contentOffset: ZERO_POINT,
                 font: "",
                 kind: "",
-                margin: ZERO_INSETS,
                 padding: ZERO_INSETS,
                 text: "",
                 visualStyle: {
@@ -81,7 +80,6 @@ class ScrollContainerElement implements GElement {
                 contentOffset: ZERO_POINT,
                 font: "",
                 kind: "",
-                margin: ZERO_INSETS,
                 padding: ZERO_INSETS,
                 text: "",
                 visualStyle: {
@@ -95,7 +93,6 @@ class ScrollContainerElement implements GElement {
 
         const iconSettings = {
             fontSize: 14,
-            margin: ZERO_INSETS,
             ghost: false,
             padding: ZERO_INSETS,
             borderRadius: ZERO_INSETS,
@@ -165,7 +162,6 @@ class ScrollContainerElement implements GElement {
             children: children,
             contentOffset: ZERO_POINT,
             font: "",
-            margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             pos: fullBounds.position(),
             text: "",

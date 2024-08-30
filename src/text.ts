@@ -259,7 +259,6 @@ export class TextElement implements GElement {
                     background: TRANSPARENT,
                 },
                 padding: ZERO_INSETS,
-                margin: ZERO_INSETS,
                 borderWidth: ZERO_INSETS,
                 children: []
             })
@@ -333,7 +332,6 @@ export class TextElement implements GElement {
                     background: TRANSPARENT,
                 },
                 padding: ZERO_INSETS,
-                margin: ZERO_INSETS,
                 borderWidth: ZERO_INSETS,
                 children: []
             })
@@ -353,7 +351,6 @@ export class TextElement implements GElement {
             visualStyle: this.settings.visualStyle,
             children: nodes,
             padding: this.settings.padding,
-            margin: this.settings.margin,
             borderWidth: this.settings.borderWidth,
             shadow: this.settings.shadow,
         })
@@ -404,7 +401,6 @@ class TextInputElement implements GElement {
             ...opts,
             multiline: opts.multiline?opts.multiline:false,
             borderWidth: withInsets(1),
-            margin: Style.button().margin,
             padding: Style.button().padding,
             fontSettings: {
                 font: Style.base().font,
@@ -440,7 +436,6 @@ class TextInputElement implements GElement {
                 fontSize: Style.base().fontSize,
                 fontWeight: Style.base().fontWeight,
             },
-            margin: ZERO_INSETS,
             padding: ZERO_INSETS,
             shadow: true,
             visualStyle: {
@@ -495,7 +490,6 @@ class TextInputElement implements GElement {
             children: [text_node, cursor_node],
             contentOffset: new Point(total_insets.left, total_insets.top),
             font: Style.base().font,
-            margin: this.settings.margin,
             padding: this.settings.padding,
             pos: new Point(0, 0),
             size: size,
@@ -525,7 +519,6 @@ class TextInputElement implements GElement {
             size: new Size(2,50),
             text:'hithere',
             padding:ZERO_INSETS,
-            margin: ZERO_INSETS,
             borderWidth:ZERO_INSETS,
             visualStyle: {
                 background: 'red',
@@ -558,7 +551,6 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
             fontSize: Style.base().fontSize,
             fontWeight: Style.base().fontWeight,
         },
-        margin: withInsets(5),
         borderWidth: ZERO_INSETS,
         shadow: opts.shadow ? opts.shadow : false,
         multiline: opts.multiline ? opts.multiline : false,
@@ -572,7 +564,6 @@ export function WrappingLabel(param: { fixedWidth: number; text: string, shadow?
         multiline: true,
         shadow: param.shadow||false,
         padding: Style.button().padding,
-        margin: ZERO_INSETS,
         borderWidth: ZERO_INSETS,
         fontSettings: {
             font: Style.base().font,

@@ -5,9 +5,7 @@ import {Size} from "josh_js_util";
 import pureimage from "pureimage"
 import {GRenderNode, LayoutConstraints} from "./base.ts";
 import {HBox} from "./layout.ts";
-import {Button} from "./buttons.ts";
 import {KEY_VENDOR} from "./keys.ts";
-import {TextElement} from "./text.ts";
 import {Square} from "./comps2.ts";
 
 function makeHeadlessRc() {

@@ -38,9 +38,6 @@ export function calcCanvasFont(settings: FontSettings | undefined) {
 
 export function getTotalInsets(settings: ElementSettings): Insets {
     let ins = withInsets(0)
-    if (settings.margin) {
-        ins = addInsets(ins, settings.margin)
-    }
     if (settings.borderWidth) {
         ins = addInsets(ins, settings.borderWidth)
     }

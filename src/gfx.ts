@@ -136,10 +136,6 @@ function doDrawText(rc: RenderContext, n: GRenderNode) {
 }
 
 function validateNode(n: GRenderNode) {
-    if(!n.settings.margin) {
-        console.log(n.settings)
-        throw new Error(`missing margin on ${n.settings.kind}`)
-    }
     if(!n.settings.padding) {
         console.log(n.settings)
         throw new Error(`missing padding on ${n.settings.kind}`)
@@ -166,8 +162,6 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     let bounds = Bounds.fromPointSize(new Point(0,0,),n.settings.size)
 
-    // account for margin
-    bounds = bdsSubInsets(bounds,n.settings.margin)
 
     // fill background inside padding  + border area
     if (draw_node && n.settings.visualStyle.background) {
@@ -209,8 +203,6 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     if (rc.debug.metrics) {
         // draw the padding
         // let ss: Bounds = Bounds.fromPointSize(new Point(0, 0,), n.settings.size)
-        // ss = ss.grow(-n.settings.margin.left)
-        // strokeBounds(rc, ss, 'yellow')
         // ss = ss.grow(-n.settings.borderWidth.left)
         // strokeBounds(rc, ss, 'yellow')
         // ss = ss.grow(-n.settings.padding.left)
