@@ -50,7 +50,8 @@ export function getTotalInsets(settings: ElementSettings): Insets {
     return ins
 }
 
-export function bdsSubInsets(bds: Bounds, insets: Insets) {
+export function bdsSubInsets(bds: Bounds, insets?: Insets) {
+    if(!insets) return bds.copy()
     return new Bounds(
         bds.x + insets.left,
         bds.y + insets.top,

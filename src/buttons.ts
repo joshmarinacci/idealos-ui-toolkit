@@ -1,6 +1,6 @@
 import {IconElement, Icons} from "./icons.js";
 import {
-    EventHandler,
+    ElementSettings,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -22,25 +22,16 @@ import {PopupContainer} from "./popup.js";
 import {ObjList} from "rtds-core";
 
 type ButtonParameters = {
-    margin?:Insets,
-    borderWidth?: Insets
-    borderColor?: string
-    padding?:Insets,
-    text?:string,
     selected?:boolean
-    handleEvent?: EventHandler
-    borderRadius?: Insets | number
-    key?: string
-}
-type IconButtonParameters = {
+} & Partial<ElementSettings>
+type IconButtonRequired = {
     icon: Icons
     ghost?: boolean
-    hoverStyle?:VisualStyle
-    fontSize?:number
 } & ButtonParameters;
 
-export function IconButton(opts: IconButtonParameters) {
+export function IconButton(opts: IconButtonRequired) {
     return new MHBoxElement({
+        kind:IconButton.name,
         visualStyle: {
             borderColor:opts.ghost ? TRANSPARENT : Style.button().borderColor,
             background: opts.ghost ? TRANSPARENT : Style.button().backgroundColor,
@@ -54,12 +45,14 @@ export function IconButton(opts: IconButtonParameters) {
         borderWidth: opts.ghost ? Style.button().borderWidth : opts.borderWidth || Style.button().borderWidth,
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [
-            new IconElement({icon: opts.icon, shadow:true, fontSize:opts.fontSize,}),
+            new IconElement({icon: opts.icon, shadow:true, }),//fontSize:opts.fontSize,}),
             new TextElement({
                 padding: ZERO_INSETS,
-                font: Style.button().font,
-                fontSize: Style.button().fontSize,
-                fontWeight: Style.button().fontWeight,
+                fontSettings: {
+                    font: Style.button().font,
+                    fontSize: Style.button().fontSize,
+                    fontWeight: Style.button().fontWeight,
+                },
                 margin: ZERO_INSETS,
                 visualStyle:{
                     borderColor: TRANSPARENT,
@@ -90,7 +83,7 @@ export const Button = (opts: ButtonParameters) => {
         kind:'button',
         visualStyle: {
             background: opts.selected?Style.selectedButton().backgroundColor:Style.button().backgroundColor,
-            borderColor: opts.borderColor || Style.button().borderColor,
+            borderColor: opts.visualStyle?.borderColor || Style.button().borderColor,
             textColor: Style.button().textColor,
         },
         hoverStyle: {
@@ -102,9 +95,11 @@ export const Button = (opts: ButtonParameters) => {
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
-            font: Style.button().font,
-            fontSize: Style.button().fontSize,
-            fontWeight: Style.button().fontWeight,
+            fontSettings: {
+                font: Style.button().font,
+                fontSize: Style.button().fontSize,
+                fontWeight: Style.button().fontWeight,
+            },
             margin: ZERO_INSETS,
             visualStyle:{
                 borderColor: TRANSPARENT,
@@ -127,6 +122,7 @@ export const Button = (opts: ButtonParameters) => {
 
 export function Tag(opts: { text: string }) {
     return new MHBoxElement({
+        kind:Tag.name,
         visualStyle: {
             background: 'blue',
             borderColor: Style.button().borderColor,
@@ -136,9 +132,11 @@ export function Tag(opts: { text: string }) {
         borderRadius: Style.button().borderRadius,
         children: [new TextElement({
             padding: ZERO_INSETS,
-            font: Style.button().font,
-            fontSize: Style.button().fontSize,
-            fontWeight: Style.button().fontWeight,
+            fontSettings: {
+                font: Style.button().font,
+                fontSize: Style.button().fontSize,
+                fontWeight: Style.button().fontWeight,
+            },
             margin: ZERO_INSETS,
             visualStyle: {
                 borderColor: 'transparent',
@@ -171,32 +169,38 @@ class DropdownButtonElement implements GElement {
         const state = cache.getState(key)
         let [open, setOpen] = state.useState("open", () => false)
         let button = IconButton({
-            text: this.props.text, icon: Icons.KeyboardArrowDown, handleEvent: (e) => {
+
+            text: this.props.text,
+            icon: Icons.KeyboardArrowDown,
+            handleEvent: (e) => {
                 if (e.type === 'mouse-down') {
                     setOpen(!open)
                     e.redraw()
                 }
-            }
+            },
         })
         const popup = new PopupContainer({
             child: VBox({
+                crossAxisSelfLayout: undefined,
+                mainAxisLayout: undefined,
+                visualStyle: undefined,
                 kind: 'popup-menu',
                 mainAxisSelfLayout: 'shrink',
                 crossAxisLayout: 'center',
                 children: this.props.children,
                 borderWidth: withInsets(10),
-                visualStyle: {
-                    background: 'red',
-                    borderColor: 'green',
-                    textColor: 'black',
-                },
+                // visualStyle: {
+                //     background: 'red',
+                //     borderColor: 'green',
+                //     textColor: 'black',
+                // },
             })
         })
         if (open) {
             let hbox = HBox({
                 kind: 'dropdown-button',
                 mainAxisSelfLayout: 'shrink',
-                children: [button, popup]
+                children: [button, popup],
             })
             let hbox_node = hbox.layout(rc, cons)
             hbox_node.settings.key = key
@@ -289,7 +293,7 @@ export function ToggleGroup<T>(opts: ToggleGroupParameters<T>) {
     return HBox({
         borderWidth: withInsets(1),
         mainAxisSelfLayout: 'shrink',
-        borderColor: Style.base().borderColor,
+        // borderColor: Style.base().borderColor,
         children: opts.data.map((ch, i) => {
             let bdr = new Insets(0, 0, 0, 1)
             return Button({

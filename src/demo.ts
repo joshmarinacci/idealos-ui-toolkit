@@ -113,7 +113,7 @@ export function makeCompsDemo() {
                     TextBox({
                         text: {
                             get: () => state.textInputValue,
-                            set: (value) => state.textInputValue= value,
+                            set: (value) => state.textInputValue = value,
                         },
                         multiline:false,
                     }),

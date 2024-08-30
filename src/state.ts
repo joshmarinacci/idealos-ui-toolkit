@@ -36,6 +36,6 @@ export class StateCache {
         if(!this.element_map.has(key)) {
             this.element_map.set(key,new ElementStateCache())
         }
-        return this.element_map.get(key)
+        return this.element_map.get(key) as ElementStateCache
     }
 }

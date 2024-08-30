@@ -68,7 +68,7 @@ export class KeyVendor {
         // console.log('starting',e.constructor.name, this.stack.map(n => n.count).join("."))
     }
 
-    endElement(e:GElement) {
+    endElement(_e:GElement) {
         // console.log('ending  ',e.constructor.name, this.stack.map(n => n.count).join("."))
         this.stack.pop()
     }

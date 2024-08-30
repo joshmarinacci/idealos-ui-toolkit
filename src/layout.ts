@@ -2,7 +2,6 @@ import {
     AxisLayout,
     AxisSelfLayout,
     ElementSettings,
-    EventHandler,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -17,23 +16,27 @@ import {bdsAddInsets, bdsSubInsets, getTotalInsets, insetsHeight, insetsWidth, w
 import {KEY_VENDOR} from "./keys.js";
 
 export type BoxRequirements = {
-    kind: string,
+    kind:string,
     mainAxisSelfLayout: AxisSelfLayout,
     crossAxisSelfLayout: AxisSelfLayout,
     mainAxisLayout: AxisLayout,
     crossAxisLayout: AxisLayout,
     children: GElement[],
-    visualStyle?: VisualStyle
-    handleEvent?: EventHandler,
     fixedWidth?: number
     fixedHeight?: number
+    visualStyle: VisualStyle
 } & ElementSettings
+
 export type BoxOptions = {
+    fixedWidth?: number
+    fixedHeight?: number
     mainAxisSelfLayout?: AxisSelfLayout,
     crossAxisSelfLayout?: AxisSelfLayout,
     mainAxisLayout?: AxisLayout,
     crossAxisLayout?: AxisLayout,
-} & BoxRequirements
+    children: GElement[],
+    visualStyle?: VisualStyle
+} & ElementSettings;
 
 class BoxElementBase {
     protected settings: BoxRequirements;
@@ -63,7 +66,7 @@ class BoxElementBase {
 
 export class MHBoxElement extends BoxElementBase implements GElement {
 
-    constructor(param: BoxRequirements) {
+    constructor(param: BoxOptions) {
         super({
             ...param,
             kind: param.kind || "hbox",
@@ -72,20 +75,14 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
             mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
-            // children: param.children,
             visualStyle: param.visualStyle || {
                 background: Style.panel().backgroundColor,
                 textColor: Style.panel().textColor,
                 borderColor:  Style.panel().borderColor,
             },
-            // hoverStyle: param.hoverStyle || {},
             margin: withFallback(param.margin, Style.panel().margin),
             padding: withFallback(param.padding, Style.panel().padding),
             borderWidth: withFallback(param.borderWidth, Style.panel().borderWidth),
-            // handleEvent: param.handleEvent,
-            // fixedWidth: param.fixedWidth,
-            // fixedHeight: param.fixedHeight,
-            // key: param.key,
         })
     }
 
@@ -232,21 +229,14 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         this.log(`full bounds ${fullBounds}`)
         return new GRenderNode({
             ...this.settings,
-            // visualStyle: this.settings.visualStyle,
-            // hoverStyle: this.settings.hoverStyle,
+            kind:this.settings.kind || "hbox",
             baseline: 0,
             font: Style.panel().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            // kind: this.settings.kind,
             children: children,
-            // padding: this.settings.padding,
             contentOffset: contentBounds.position(),
-            // margin: this.settings.margin,
-            // borderWidth: this.settings.borderWidth,
-            // borderRadius: this.settings.borderRadius,
-            // handleEvent: this.settings.handleEvent,
             key: key,
         }, {
             'constraints': this.getConstraints(),
@@ -313,21 +303,13 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let children = chs.map(ch => map.get(ch) as GRenderNode)
         return new GRenderNode({
             ... this.settings,
-            // visualStyle: this.settings.visualStyle,
-            // hoverStyle: this.settings.hoverStyle,
             baseline: 0,
             font: Style.base().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            // kind: this.settings.kind,
             children: children,
-            // padding: this.settings.padding,
             contentOffset: contentBounds.position(),
-            // margin: this.settings.margin,
-            // borderWidth: this.settings.borderWidth,
-            // borderRadius: this.settings.borderRadius,
-            // handleEvent: this.settings.handleEvent,
             key: key,
         }, {
             'constraints': this.getConstraints(),
@@ -372,7 +354,7 @@ export class HExpander implements GElement {
 
 export class MVBoxElement extends BoxElementBase implements GElement {
 
-    constructor(param: BoxRequirements) {
+    constructor(param: BoxOptions) {
         super({
             ...param,
             kind: param.kind || 'vbox',
@@ -478,6 +460,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 export function HBox(param: BoxOptions) {
     return new MHBoxElement({
         ... param,
+        kind: param.kind || "hbox",
         mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
         mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
@@ -488,6 +471,7 @@ export function HBox(param: BoxOptions) {
 export function VBox(param: BoxOptions) {
     return new MVBoxElement({
         ... param,
+        kind: param.kind || "vbox",
         mainAxisSelfLayout: param.mainAxisSelfLayout || 'grow',
         mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',

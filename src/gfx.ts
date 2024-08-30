@@ -1,6 +1,7 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
-import {bdsSubInsets} from "./layout.js";
+
+import {bdsSubInsets} from "./util.js";
 
 export type RenderContext = {
     size: Size;
@@ -64,7 +65,8 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: 
     ctx.stroke()
 }
 
-function isInsetsEmpty(insets: Insets) {
+function isInsetsEmpty(insets: Insets | undefined) {
+    if(!insets) return true
     return insets.left <= 0 && insets.right <= 0 && insets.top <= 0 && insets.bottom <= 0
 }
 
@@ -108,14 +110,15 @@ function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     }
     let rad = calculateBorderRadius(n.settings)
     if(rad) {
-        strokeRoundRect(rc.ctx, bounds, rad,color, n.settings.borderWidth)
+        strokeRoundRect(rc.ctx, bounds, rad,color, n.settings.borderWidth as Insets)
         // rc.ctx.clip()
     } else {
-        drawBorder(rc.ctx, bounds, color, n.settings.borderWidth)
+        drawBorder(rc.ctx, bounds, color, n.settings.borderWidth as Insets)
     }
 }
 
 function doDrawText(rc: RenderContext, n: GRenderNode) {
+    if(!n.settings.text) return
     // console.log("drawing text",n.settings.text)
     rc.ctx.fillStyle = n.settings.visualStyle.textColor || "black"
     let fontStr = `${n.settings.fontWeight} ${n.settings.fontSize}px ${n.settings.font}`
@@ -205,13 +208,13 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     if (rc.debug.metrics) {
         // draw the padding
-        let ss: Bounds = Bounds.fromPointSize(new Point(0, 0,), n.settings.size)
-        ss = ss.grow(-n.settings.margin.left)
-        strokeBounds(rc, ss, 'yellow')
-        ss = ss.grow(-n.settings.borderWidth.left)
-        strokeBounds(rc, ss, 'yellow')
-        ss = ss.grow(-n.settings.padding.left)
-        strokeBounds(rc, ss, 'cyan')
+        // let ss: Bounds = Bounds.fromPointSize(new Point(0, 0,), n.settings.size)
+        // ss = ss.grow(-n.settings.margin.left)
+        // strokeBounds(rc, ss, 'yellow')
+        // ss = ss.grow(-n.settings.borderWidth.left)
+        // strokeBounds(rc, ss, 'yellow')
+        // ss = ss.grow(-n.settings.padding.left)
+        // strokeBounds(rc, ss, 'cyan')
         // ss = withPadding(ss, n.settings.padding)
 
         // draw the baseline

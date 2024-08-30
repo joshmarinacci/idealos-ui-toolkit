@@ -3,9 +3,9 @@ import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {RenderContext} from "./gfx.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
-import {bdsSubInsets} from "./layout.js";
 import {KEY_VENDOR} from "./keys.js";
 import {Style} from "./style.js";
+import {bdsSubInsets} from "./util.js";
 
 export type ScrollContainerSettings = {
     fixedWidth: number,

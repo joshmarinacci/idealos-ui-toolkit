@@ -28,7 +28,7 @@ export type ElementSettings = {
     text?: string
     padding?: Insets
     margin?: Insets
-    visualStyle:VisualStyle
+    visualStyle?:VisualStyle
     hoverStyle?: VisualStyle
     focusedStyle?: VisualStyle
     borderWidth?: Insets

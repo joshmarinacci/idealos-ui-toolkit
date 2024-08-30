@@ -7,7 +7,7 @@ import {
     MKeyboardEvent,
     StateHandler,
     TRANSPARENT,
-    useState,
+    useState, VisualStyle,
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.js";
@@ -208,6 +208,7 @@ type TextElementSettings = {
     fixedWidth?:number
     bold?:boolean
     text:string
+    visualStyle:VisualStyle
 } & ElementSettings
 
 
