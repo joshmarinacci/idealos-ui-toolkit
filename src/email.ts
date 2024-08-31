@@ -2,10 +2,11 @@ import {HBox, HSpacer, VBox} from "./layout.js";
 import {ScrollContainer} from "./scroll.js";
 import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
 import {Button, DropdownButton, IconButton, ToggleGroup} from "./buttons.js";
-import {Label, TextBox, WrappingLabel} from "./text.js";
+import {Label, WrappingLabel} from "./text.js";
 import {Icon, Icons} from "./icons.js";
 import {ObjAtom, Schema} from "rtds-core"
-import {StateHandler} from "./base.js";
+import {CEvent, StateHandler} from "./base.js";
+import {GridBox} from "./grid.js";
 
 
 const S = new Schema()
@@ -63,35 +64,39 @@ const filter = InboxFilter.cloneWith("Unread")
 
 
 const AppState = S.map({
+    search: S.string(),
     email_folders: email_folders,
     selectedFolder: S.number(),
     messages: messages,
     selectedMessage: S.number()
 })
 
+const onMouseDown = (cb: (e: CEvent) => void) => {
+    return (e: CEvent) => {
+        if (e.type === 'mouse-down') {
+            cb(e)
+        }
+    }
+}
 const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected, index, onSelectedChanged) => {
     return ListViewItem({
         selected: index === selected,
         mainAxisLayout: 'center',
-        handleEvent: (e) => {
-            if (e.type === 'mouse-down') {
-                onSelectedChanged(index, e)
-            }
-        },
+        handleEvent: onMouseDown((e) => onSelectedChanged(index, e)),
         children: [
             VBox({
-                shadow:true,
+                shadow: true,
                 mainAxisSelfLayout: 'shrink',
                 visualStyle: {
-                    background: index==selected?'orange':'white',
+                    background: index == selected ? 'orange' : 'white',
                 },
                 children: [
-                    Label({text: item.get('sender').get(), shadow: true, bold:true  }),
+                    Label({text: item.get('sender').get(), shadow: true, bold: true}),
                     WrappingLabel({
                         text: item.get('subject').get(), fixedWidth: 150,
                         shadow: true
                     }),
-                    WrappingLabel({text: item.get('body').get().substring(0,30)+'...', fixedWidth: 150, shadow: true})
+                    WrappingLabel({text: item.get('body').get().substring(0, 30) + '...', fixedWidth: 150, shadow: true})
                 ]
             }),
         ],
@@ -131,99 +136,91 @@ function EmailBody(selectedMessage: typeof EmailMessage) {
     })
     return ScrollContainer({
         fixedWidth: 300,
-        key: 'email-body',
         fixedHeight: 200,
         child: body,
     })
 }
 
-function atomAsStateHandler<T>(atom:ObjAtom<T>) {
-    const hand:StateHandler<T> = {
-        get:() => atom.get(),
-        set:(v:T) => atom.set(v)
+function atomAsStateHandler<T>(atom: ObjAtom<T>) {
+    const hand: StateHandler<T> = {
+        get: () => atom.get(),
+        set: (v: T) => atom.set(v)
     }
     return hand
 }
 
 export function EmailDemo() {
-    return HBox({
+    return GridBox({
+        mainAxisSelfLayout:'grow',
+        crossAxisSelfLayout:'grow',
+        columns:[
+            {
+                fixedWidth:150,
+            },
+            {
+                fixedWidth:150,
+            },
+            {
+            }
+        ],
+        rows: [
+            {
+                fixedHeight: 50,
+            },
+            {
+            }
+        ],
         children: [
-            VBox({
-                mainAxisSelfLayout: 'shrink',
-                crossAxisSelfLayout: 'shrink',
-                children: [
-                    DropdownButton({
-                        text: "Work", children: [
-                            Button({text: "Work"}),
-                            Button({text: "Personal"}),
-                        ]
-                    }),
-                    ScrollContainer({
-                        key: 'email-folders-scroll',
-                        fixedWidth: 150,
-                        fixedHeight: 300,
-                        child: ListView({
-                            key: "email-folder-list",
-                            data: AppState.get('email_folders'),
-                            selected: atomAsStateHandler(AppState.get('selectedFolder')),
-                            renderItem: EmailFolderRenderer,
-                        })
-                    })
+            DropdownButton({
+                text: "Work", children: [
+                    Button({text: "Work"}),
+                    Button({text: "Personal"}),
                 ]
             }),
-            VBox({
+            HBox({
                 mainAxisSelfLayout: 'shrink',
-                crossAxisSelfLayout: 'shrink',
                 children: [
-                    HBox({
-                        mainAxisSelfLayout: 'shrink',
-                        children: [
-                            Label({text: "Inbox"}),
-                            ToggleGroup({
-                                data:["All Mail", "Unread"]
-                            }),
-                        ]
+                    Label({text: "Inbox"}),
+                    ToggleGroup({
+                        data:["All Mail", "Unread"]
                     }),
-                    TextBox({
-                        multiline: false,
-                        text: {
-                            get:()=> 'search',
-                            set:() => {
-
-                            }
-                        },
-                        fixedWidth: 150,
-                    }),
-                    ScrollContainer({
-                        key: 'email-inbox-scroll',
-                        fixedWidth: 150,
-                        fixedHeight: 200,
-                        child: ListView({
-                            key: "email-inbox",
-                            data: messages,
-                            selected:atomAsStateHandler(AppState.get('selectedMessage')),
-                            renderItem: EmailMessRenderer,
-                        })
-                    })
                 ]
+            }),
+            HBox({
+                children: [
+                    IconButton({icon: Icons.Archive, ghost: true}),
+                    IconButton({icon: Icons.DeleteForever, ghost: true}),
+                    IconButton({icon: Icons.Delete, ghost: true}),
+                    // HSep(),
+                    // IconButton({icon: Icons.Snooze, ghost: true}),
+                    IconButton({icon: Icons.Reply, ghost: true}),
+                    // IconButton({icon: Icons.ReplyAll, ghost: true}),
+                    IconButton({icon: Icons.Forward, ghost: true}),
+                    // HSep()
+                    // IconButton({icon: Icons.LeftPanelCloseIcon, ghost: true}),
+                ]
+            }),
+            ScrollContainer({
+                fixedWidth: 150,
+                fixedHeight: 300,
+                child: ListView({
+                    data: AppState.get('email_folders'),
+                    selected: atomAsStateHandler(AppState.get('selectedFolder')),
+                    renderItem: EmailFolderRenderer,
+                })
+            }),
+            ScrollContainer({
+                fixedWidth: 150,
+                fixedHeight: 200,
+                child: ListView({
+                    data: messages,
+                    selected:atomAsStateHandler(AppState.get('selectedMessage')),
+                    renderItem: EmailMessRenderer,
+                })
             }),
             VBox({
                 crossAxisSelfLayout: 'shrink',
                 children: [
-                    HBox({
-                        children: [
-                            IconButton({icon: Icons.Archive, ghost: true}),
-                            IconButton({icon: Icons.DeleteForever, ghost: true}),
-                            IconButton({icon: Icons.Delete, ghost: true}),
-                            // HSep(),
-                            // IconButton({icon: Icons.Snooze, ghost: true}),
-                            IconButton({icon: Icons.Reply, ghost: true}),
-                            // IconButton({icon: Icons.ReplyAll, ghost: true}),
-                            IconButton({icon: Icons.Forward, ghost: true}),
-                            // HSep()
-                            // IconButton({icon: Icons.LeftPanelCloseIcon, ghost: true}),
-                        ]
-                    }),
                     EmailHeaderView(AppState.get('messages').get(AppState.get('selectedMessage').get())),
                     EmailBody(AppState.get('messages').get(AppState.get('selectedMessage').get())),
                 ]

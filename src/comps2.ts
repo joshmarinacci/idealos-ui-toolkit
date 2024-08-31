@@ -1,5 +1,5 @@
 import {GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from "./base.js";
-import {RenderContext} from "./gfx.js";
+import {RenderContext, withInsets} from "./gfx.js";
 import {Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {KEY_VENDOR} from "./keys.js";
@@ -43,6 +43,27 @@ class SquareElement implements GElement {
 
 export function Square(number: number, fill: string): GElement {
     return new SquareElement(number, fill)
+}
+export function FilledRect(size:Size, fill:string):GRenderNode {
+    let key = KEY_VENDOR.getKey()
+    return new GRenderNode({
+        kind: 'square',
+        text: "",
+        visualStyle: {
+            background: fill,
+            borderColor: 'green',
+            textColor: 'black'
+        },
+        size: size.copy(),
+        pos: new Point(0, 0),
+        baseline: 0,
+        font: Style.base().font,
+        children: [],
+        borderWidth: withInsets(1),
+        padding: ZERO_INSETS,
+        contentOffset: ZERO_POINT,
+        key: key
+    })
 }
 
 export class HSeparator implements GElement {
