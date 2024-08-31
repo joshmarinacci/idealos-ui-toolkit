@@ -120,12 +120,12 @@ export function Tag(opts: { text: string }) {
     return new MHBoxElement({
         kind:Tag.name,
         visualStyle: {
-            background: 'blue',
+            background: 'cyan',
             borderColor: Style.button().borderColor,
             textColor: Style.button().textColor,
         },
         borderWidth: Style.button().borderWidth,
-        borderRadius: Style.button().borderRadius,
+        borderRadius: withInsets(Style.button().fontSize),
         children: [new TextElement({
             padding: ZERO_INSETS,
             fontSettings: {
