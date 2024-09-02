@@ -10,11 +10,13 @@ import {makeTabs} from "./demo.js";
 import * as process from "node:process";
 import {Style} from "./style.js";
 
+
+const SIZE = new Size(1000,600)
 Canvas.registerFont('MaterialIcons-Regular.ttf',{
     family:'material-icons'
 })
 
-const window = sdl.video.createWindow({ resizable: true, width:800, height:600 })
+const window = sdl.video.createWindow({ resizable: true, width:SIZE.w, height:SIZE.h })
 
 function makeTree() {
     return makeTabs()

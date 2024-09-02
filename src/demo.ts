@@ -10,6 +10,7 @@ import {EmailDemo} from "./email.js";
 import {TabbedBox} from "./tabbedBox.js";
 import {MWindow} from "./window.js";
 import {TodoListDemo} from "./todolist.js";
+import {Size} from "josh_js_util";
 
 
 const state = {
@@ -288,5 +289,5 @@ export function makeTabs(): GElement {
             todoDemo,
         ],
     })
-    return MWindow({child: tabs})
+    return MWindow({child: tabs, initSize: new Size(700,400)})
 }

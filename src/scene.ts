@@ -5,7 +5,7 @@ import {
     MMouseEvent,
     MWheelEvent,
 } from "./base.js";
-import {doDraw, drawDebug, fillRect, RenderContext} from "./gfx.js";
+import {doDraw, drawDebug, fillRect, RenderContext, strokeBounds} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 
@@ -277,7 +277,7 @@ export class Scene {
         rc.ctx.save()
         // rc.ctx.translate(0, rc.size.h-100)
         rc.ctx.strokeStyle = 'red'
-        const bounds = new Bounds(rc.canvas.width/2-300,0,300,rc.canvas.height/2)
+        const bounds = new Bounds(rc.canvas.width/2-400,0,400,rc.canvas.height/2)
         this.debugStrokeBounds(rc,bounds,'red',1)
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
         this.ifTarget(this.current_mouse_target,(comp)=>{
@@ -329,10 +329,10 @@ export class Scene {
 
     private drawDebugCompInfo(rc: RenderContext, comp: GRenderNode, w: number) {
         const lh = 16
-        let bounds = new Bounds(0,0,w,80)
-        fillRect(rc.ctx,bounds,'red')
+        let bounds = new Bounds(0,0,w,lh*5)
+        fillRect(rc.ctx,bounds,'white')
+        strokeBounds(rc,bounds,'black')
         let t = comp.settings
-        rc.ctx.translate(0,lh)
         this.debugText(rc,bounds,` kind = ${t.kind}  key=${t.key}`)
         rc.ctx.translate(0,lh)
         this.debugText(rc,bounds,` size = ${t.size}`)
@@ -340,10 +340,11 @@ export class Scene {
         this.debugText(rc,bounds,` border = ${t.borderWidth}`)
         rc.ctx.translate(0,lh)
         this.debugText(rc,bounds,` padding = ${t.padding}`)
+        rc.ctx.translate(0,lh*3)
         comp.settings.children.forEach((ch,i) => {
             rc.ctx.save()
-            rc.ctx.translate(10,10)
-            this.drawDebugCompInfo(rc,ch,w)
+            rc.ctx.translate(10,lh*6*i)
+            this.drawDebugCompInfo(rc,ch,w-15)
             rc.ctx.restore()
         })
     }

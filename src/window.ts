@@ -10,9 +10,11 @@ import {bdsSubInsets} from "./util.js";
 
 class MWindowElement implements GElement {
     private child: GElement;
+    private initSize: Size;
 
-    constructor(param: { child: GElement }) {
+    constructor(param: { child: GElement, initSize:Size }) {
         this.child = param.child
+        this.initSize = param.initSize
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
@@ -20,7 +22,7 @@ class MWindowElement implements GElement {
         KEY_VENDOR.startElement(this)
         const cache:StateCache =  MGlobals.get(STATE_CACHE);
         const state = cache.getState(key)
-        const [size,setSize] = state.useState("window-size",() => new Size(500,300))
+        const [size,setSize] = state.useState("window-size",() => this.initSize)
         const [down,setDown] = state.useState("window-size-down",() => false)
 
 
@@ -88,6 +90,6 @@ class MWindowElement implements GElement {
 
 }
 
-export function MWindow(param: { child: GElement }) {
+export function MWindow(param: { child: GElement, initSize:Size }) {
     return new MWindowElement(param)
 }
