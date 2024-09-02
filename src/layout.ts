@@ -330,6 +330,7 @@ export class HExpander implements GElement {
             size = new Size(20, 20)
         }
         return new GRenderNode({
+            shadow: true,
             key:key,
             baseline: 0,
             visualStyle: {
@@ -473,6 +474,7 @@ export function VBox(param: BoxOptions) {
         mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
+        padding: param.padding
     })
 }
 

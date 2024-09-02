@@ -103,7 +103,7 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
 function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     if(!n.settings.visualStyle.borderColor) return
     if(n.settings.visualStyle.borderColor === TRANSPARENT) return
-    let color = n.settings.visualStyle.borderColor || "black"
+    let color = n.settings.visualStyle.borderColor || "magenta"
     if(isInsetsEmpty(n.settings.borderWidth)) return
     if(n.focused && n.settings.focusedStyle?.borderColor) {
         color = n.settings.focusedStyle.borderColor
@@ -120,7 +120,7 @@ function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
 function doDrawText(rc: RenderContext, n: GRenderNode) {
     if(!n.settings.text) return
     // console.log("drawing text",n.settings.text)
-    rc.ctx.fillStyle = n.settings.visualStyle.textColor || "black"
+    rc.ctx.fillStyle = n.settings.visualStyle.textColor || "magenta"
     let fontStr = `${n.settings.fontWeight} ${n.settings.fontSize}px ${n.settings.font}`
     // console.log("text",n.settings.text, fontStr)//, "baseline",y)
     rc.ctx.font = fontStr

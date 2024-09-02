@@ -7,6 +7,7 @@ import {Icon, Icons} from "./icons.js";
 import {ObjAtom, Schema} from "rtds-core"
 import {CEvent, StateHandler} from "./base.js";
 import {GridBox} from "./grid.js";
+import {withInsets} from "./gfx.js";
 
 
 const S = new Schema()
@@ -81,22 +82,24 @@ const onMouseDown = (cb: (e: CEvent) => void) => {
 const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected, index, onSelectedChanged) => {
     return ListViewItem({
         selected: index === selected,
+        padding: withInsets(8),
         mainAxisLayout: 'center',
         handleEvent: onMouseDown((e) => onSelectedChanged(index, e)),
         children: [
             VBox({
                 shadow: true,
                 mainAxisSelfLayout: 'shrink',
+                padding: withInsets(8),
                 visualStyle: {
                     background: index == selected ? 'orange' : 'white',
                 },
                 children: [
                     Label({text: item.get('sender').get(), shadow: true, bold: true}),
                     WrappingLabel({
-                        text: item.get('subject').get(), fixedWidth: 150,
+                        text: item.get('subject').get(), fixedWidth: 200,
                         shadow: true
                     }),
-                    WrappingLabel({text: item.get('body').get().substring(0, 30) + '...', fixedWidth: 150, shadow: true})
+                    WrappingLabel({text: item.get('body').get().substring(0, 30) + '...', fixedWidth: 200, shadow: true})
                 ]
             }),
         ],
@@ -105,6 +108,7 @@ const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected
 const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, index, onSelectedChanged) => {
     return ListViewItem({
         selected: index == selected,
+        padding: withInsets(8),
         mainAxisLayout: 'between',
         handleEvent: (e) => {
             if (e.type === 'mouse-down') {
@@ -155,10 +159,10 @@ export function EmailDemo() {
         crossAxisSelfLayout:'grow',
         columns:[
             {
-                fixedWidth:150,
+                fixedWidth:200,
             },
             {
-                fixedWidth:150,
+                fixedWidth:200,
             },
             {
             }
@@ -201,8 +205,6 @@ export function EmailDemo() {
                 ]
             }),
             ScrollContainer({
-                fixedWidth: 150,
-                fixedHeight: 300,
                 child: ListView({
                     data: AppState.get('email_folders'),
                     selected: atomAsStateHandler(AppState.get('selectedFolder')),
@@ -210,8 +212,6 @@ export function EmailDemo() {
                 })
             }),
             ScrollContainer({
-                fixedWidth: 150,
-                fixedHeight: 200,
                 child: ListView({
                     data: messages,
                     selected:atomAsStateHandler(AppState.get('selectedMessage')),

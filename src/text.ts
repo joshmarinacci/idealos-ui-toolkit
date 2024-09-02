@@ -473,12 +473,12 @@ class TextInputElement implements GElement {
         }
         const focusedStyle = {
             background: 'hsl(47,100%,79%)',
-            borderColor: 'black'
+            borderColor: 'magenta'
         }
         const visualStyle = {
             background: '#f0f0f0',
             borderColor: '#ccc',
-            textColor: 'black',
+            textColor: 'magenta',
         }
         return new GRenderNode({
             kind: 'text-input-node',

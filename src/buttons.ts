@@ -183,11 +183,6 @@ class DropdownButtonElement implements GElement {
                 crossAxisLayout: 'center',
                 children: this.props.children,
                 borderWidth: withInsets(10),
-                // visualStyle: {
-                //     background: 'red',
-                //     borderColor: 'green',
-                //     textColor: 'black',
-                // },
             })
         })
         if (open) {

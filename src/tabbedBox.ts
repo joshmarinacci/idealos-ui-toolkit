@@ -29,8 +29,8 @@ export function TabbedBox(opts: TabbedBoxOptions) {
                 crossAxisSelfLayout: "shrink",
                 borderWidth: new Insets(0,0,1,0),
                 visualStyle: {
-                    textColor:"black",
-                    borderColor: "black",
+                    textColor:Style.base().textColor,
+                    borderColor: Style.base().borderColor,
                     background: Style.panel().backgroundColor,
                 },
                 padding: new Insets(5,0,0,0),

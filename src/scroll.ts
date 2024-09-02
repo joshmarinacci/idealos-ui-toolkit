@@ -8,8 +8,8 @@ import {Style} from "./style.js";
 import {bdsSubInsets} from "./util.js";
 
 export type ScrollContainerSettings = {
-    fixedWidth: number,
-    fixedHeight: number,
+    fixedWidth?: number,
+    fixedHeight?: number,
     child: GElement,
 }
 
@@ -24,7 +24,11 @@ class ScrollContainerElement implements GElement {
         let key = KEY_VENDOR.getKey()
         const [scrollOffset, setScrollOffset] = useState(key,"scrollOffset",undefined, () => new Point(0,0))
         let borderInsets = Style.panel().borderWidth
-        const fullBounds = new Bounds(0, 0, this.param.fixedWidth, this.param.fixedHeight)
+        let w = cons.space.w
+        if(this.param.fixedWidth) w = this.param.fixedWidth
+        let h = cons.space.h
+        if(this.param.fixedHeight) h = this.param.fixedHeight
+        const fullBounds = new Bounds(0, 0, w, h)
         KEY_VENDOR.startElement(this)
         const contentBounds = bdsSubInsets(fullBounds, borderInsets)
         const barInsets = new Insets(0,10,10,0)
@@ -62,7 +66,7 @@ class ScrollContainerElement implements GElement {
                 visualStyle: {
                     borderColor: TRANSPARENT,
                     background: 'magenta',
-                    textColor: 'black'
+                    textColor: 'magenta'
                 }
             })
             children.push(bar)
@@ -85,7 +89,7 @@ class ScrollContainerElement implements GElement {
                 visualStyle: {
                     borderColor: TRANSPARENT,
                     background: 'magenta',
-                    textColor: 'black'
+                    textColor: 'magenta'
                 }
             })
             children.push(bar)
@@ -207,8 +211,8 @@ class ScrollContainerElement implements GElement {
 }
 
 export function ScrollContainer(param: {
-    fixedWidth: number;
-    fixedHeight: number;
+    fixedWidth?: number;
+    fixedHeight?: number;
     child: GElement
 }): GElement {
     return new ScrollContainerElement(param)

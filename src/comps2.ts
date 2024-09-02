@@ -22,8 +22,8 @@ class SquareElement implements GElement {
             text: "",
             visualStyle: {
                 background: this.fill,
-                borderColor:'black',
-                textColor:'black'
+                borderColor:'magenta',
+                textColor:'magenta'
             },
             size: new Size(this.size, this.size),
             pos: new Point(0, 0),
@@ -52,7 +52,7 @@ export function FilledRect(size:Size, fill:string):GRenderNode {
         visualStyle: {
             background: fill,
             borderColor: 'green',
-            textColor: 'black'
+            textColor: 'magenta'
         },
         size: size.copy(),
         pos: new Point(0, 0),

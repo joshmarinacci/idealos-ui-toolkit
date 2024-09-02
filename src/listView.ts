@@ -12,6 +12,7 @@ type ListViewItemParameters = {
     selected: boolean
     handleEvent: EventHandler
     mainAxisLayout?: AxisLayout
+    padding?:Insets
 }
 
 export function ListViewItem(opts: ListViewItemParameters): GElement {
@@ -22,6 +23,7 @@ export function ListViewItem(opts: ListViewItemParameters): GElement {
         mainAxisLayout: opts.mainAxisLayout || 'start',
         crossAxisLayout: 'center',
         borderWidth: new Insets(0,0,1,0),
+        padding: opts.padding || Style.panel().padding,
         visualStyle:{
             background: opts.selected ? Style.selectedButton().backgroundColor : Style.panel().backgroundColor,
             textColor: Style.base().textColor,

@@ -5,7 +5,7 @@ import {
     MMouseEvent,
     MWheelEvent,
 } from "./base.js";
-import {doDraw, drawDebug, RenderContext} from "./gfx.js";
+import {doDraw, drawDebug, fillRect, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 
@@ -83,7 +83,7 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc,false)
-        drawDebug(this.renderRoot, rc,false)
+        // drawDebug(this.renderRoot, rc,false)
         // doDraw(this.renderRoot,rc,true)
         this.drawDebugOverlay(rc)
         rc.ctx.restore()
@@ -275,15 +275,16 @@ export class Scene {
     }
     private drawDebugOverlay(rc: RenderContext) {
         rc.ctx.save()
-        rc.ctx.translate(0, rc.size.h-100)
+        // rc.ctx.translate(0, rc.size.h-100)
         rc.ctx.strokeStyle = 'red'
-        const bounds = new Bounds(0,0,rc.canvas.width,rc.size.h-100)
+        const bounds = new Bounds(rc.canvas.width/2-300,0,300,rc.canvas.height/2)
         this.debugStrokeBounds(rc,bounds,'red',1)
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
         this.ifTarget(this.current_mouse_target,(comp)=>{
-            let t = comp.settings
-            this.debugText(rc,bounds,` id=${t.kind} ${t.pos} ${t.size}`)
-            this.debugText(rc,bounds.add(new Point(5,15)),` focused=${comp.focused}`)
+            rc.ctx.save()
+            rc.ctx.translate(bounds.x,bounds.y)
+            this.drawDebugCompInfo(rc,comp, bounds.w)
+            rc.ctx.restore()
         })
         rc.ctx.restore()
     }
@@ -324,5 +325,26 @@ export class Scene {
             this.layout()
             this.redraw()
         }
+    }
+
+    private drawDebugCompInfo(rc: RenderContext, comp: GRenderNode, w: number) {
+        const lh = 16
+        let bounds = new Bounds(0,0,w,80)
+        fillRect(rc.ctx,bounds,'red')
+        let t = comp.settings
+        rc.ctx.translate(0,lh)
+        this.debugText(rc,bounds,` kind = ${t.kind}  key=${t.key}`)
+        rc.ctx.translate(0,lh)
+        this.debugText(rc,bounds,` size = ${t.size}`)
+        rc.ctx.translate(0,lh)
+        this.debugText(rc,bounds,` border = ${t.borderWidth}`)
+        rc.ctx.translate(0,lh)
+        this.debugText(rc,bounds,` padding = ${t.padding}`)
+        comp.settings.children.forEach((ch,i) => {
+            rc.ctx.save()
+            rc.ctx.translate(10,10)
+            this.drawDebugCompInfo(rc,ch,w)
+            rc.ctx.restore()
+        })
     }
 }
