@@ -83,7 +83,7 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc,false)
-        // drawDebug(this.renderRoot, rc,false)
+        drawDebug(this.renderRoot, rc, this.debug_target,false)
         // doDraw(this.renderRoot,rc,true)
         this.drawDebugOverlay(rc)
         rc.ctx.restore()
@@ -174,10 +174,10 @@ export class Scene {
             // debug overlay
             if(found.settings.key !== this.debug_target) {
                 // console.log("swap",found.settings.key, this.debug_target)
-                this.ifTarget(this.debug_target,(comp) => comp.debug = false)
-                found.debug = true
-                this.debug_target = found.settings.key
-                this.request_just_redraw()
+                // this.ifTarget(this.debug_target,(comp) => comp.debug = false)
+                // found.debug = true
+                // this.debug_target = found.settings.key
+                // this.request_just_redraw()
             }
 
             // hover effect
@@ -199,14 +199,21 @@ export class Scene {
         if(found) {
             let last = found[found.length - 1]
             this.current_mouse_target = last.settings.key
-            if(shift) {
-                this.debugPrintTarget(found)
-            }
+            // if(shift) {
+            //     this.debugPrintTarget(found)
+            // }
             if (last.settings.handleEvent) last.settings.handleEvent(evt)
             if(last.settings.key !== this.keyboard_target) {
                 // this.ifTarget(this.keyboard_target,(comp)=>{
                     // comp.settings.currentStyle = comp.settings.visualStyle
                 // })
+            }
+            if(last.settings.key !== this.debug_target) {
+                // console.log("swap",last.settings.key, this.debug_target)
+                this.ifTarget(this.debug_target,(comp) => comp.debug = false)
+                // found.debug = true
+                this.debug_target = last.settings.key
+                this.request_just_redraw()
             }
             // if(last.settings.focusedStyle) {
             //     // last.settings.currentStyle = last.settings.focusedStyle
@@ -214,7 +221,7 @@ export class Scene {
             this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
             last.focused = true
             this.keyboard_target = last.settings.key
-            console.log("set focused",last)
+            // console.log("set focused",last)
             this.request_just_redraw()
         }
     }

@@ -128,22 +128,16 @@ const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, inde
 const EmailHeaderView = (mess: typeof EmailMessage) => {
     return HBox({
         children: [
-            Label({text: mess.get('sender').get()}),
+            Label({text: mess.get('sender').get(), bold:true}),
             Label({text: mess.get('subject').get()}),
         ]
     })
 }
 
 function EmailBody(selectedMessage: typeof EmailMessage) {
-    let body = WrappingLabel({
+    return ScrollContainer({child: WrappingLabel({
         text: selectedMessage.get('body').get(),
-        fixedWidth: 300,
-    })
-    return ScrollContainer({
-        fixedWidth: 300,
-        fixedHeight: 200,
-        child: body,
-    })
+    })})
 }
 
 function atomAsStateHandler<T>(atom: ObjAtom<T>) {
