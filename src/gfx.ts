@@ -217,14 +217,28 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     rc.ctx.restore()
 }
 
-export function drawDebug(n: GRenderNode, rc: RenderContext) {
+export function drawDebug(n: GRenderNode, rc: RenderContext, force:boolean, tab?:string) {
     rc.ctx.save()
-    if(n.debug === true) {
+    let bds2;
+    if (n.debug || force) {
+        tab = tab?tab:""
+        console.log(tab,n.settings.kind, n.settings.children.length)
+        console.log(tab,'-','size',n.settings.size)
+        console.log(tab,'-','bdrw',n.settings.borderWidth)
+        console.log(tab,'-','padd',n.settings.padding)
         rc.ctx.strokeStyle = 'red'
         rc.ctx.lineWidth = 1
-        strokeBounds(rc, Bounds.fromPointSize(n.settings.pos.floor(), n.settings.size), 'red')
+        let bds = Bounds.fromPointSize(n.settings.pos.floor(), n.settings.size)
+        strokeBounds(rc, bds, 'red')
+        bds2 = bdsSubInsets(bds, n.settings.borderWidth as Insets)
+        bds2 = bdsSubInsets(bds, n.settings.padding)
+        strokeBounds(rc, bds2, 'green')
+        rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
+        n.settings.children.forEach((ch, i)=> drawDebug(ch, rc, true, tab + "  "))
+        rc.ctx.translate(-n.settings.pos.x, -n.settings.pos.y)
+        // rc.ctx.restore()
     }
     rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
-    n.settings.children.forEach(ch => drawDebug(ch, rc))
+    n.settings.children.forEach(ch => drawDebug(ch, rc,false))
     rc.ctx.restore()
 }

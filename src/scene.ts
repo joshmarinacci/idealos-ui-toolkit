@@ -83,7 +83,7 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc,false)
-        drawDebug(this.renderRoot, rc)
+        drawDebug(this.renderRoot, rc,false)
         // doDraw(this.renderRoot,rc,true)
         this.drawDebugOverlay(rc)
         rc.ctx.restore()

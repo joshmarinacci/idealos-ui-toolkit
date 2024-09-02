@@ -1,8 +1,9 @@
 import {GElement, GRenderNode, LayoutConstraints, MGlobals, SYMBOL_FONT_ENABLED, TRANSPARENT, ZERO_INSETS} from "./base.js";
 import {RenderContext} from "./gfx.js";
 import {IconFontSize, Style} from "./style.js";
-import {Point, Size} from "josh_js_util";
+import {Insets, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
+import {bdsAddInsets} from "./util.js";
 
 export enum Icons {
     LeftPanelCloseIcon = 'left_panel_close',
@@ -68,6 +69,9 @@ export class IconElement implements GElement {
 
     layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         let key = KEY_VENDOR.getKey()
+        let size = new Size(this.fontSize, this.fontSize)
+        const padding= new Insets(0,7,0,0)
+        size = bdsAddInsets(size, padding)
         return new GRenderNode({
             key:key,
             visualStyle: {
@@ -75,7 +79,7 @@ export class IconElement implements GElement {
                 borderColor: "",
                 textColor: Style.base().textColor,
             },
-            baseline: 24,
+            baseline: this.fontSize,
             borderWidth: ZERO_INSETS,
             children: [],
             contentOffset: new Point(0, 0),
@@ -83,9 +87,9 @@ export class IconElement implements GElement {
             fontSize: this.fontSize,
             fontWeight: Style.base().fontWeight,
             kind: `icon: ${this.icon}`,
-            padding: ZERO_INSETS,
+            padding: padding,
             pos: new Point(0, 0),
-            size: new Size(24, 24),
+            size: size,
             text: MGlobals.get(SYMBOL_FONT_ENABLED) === true ? this.icon : "",
             shadow: this.shadow
         })

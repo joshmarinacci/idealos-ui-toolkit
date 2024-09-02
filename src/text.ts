@@ -375,7 +375,8 @@ export class TextElement implements GElement {
         let key = KEY_VENDOR.getKey()
         rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let [size,baseline] = this.calcMetrics(rc)
-        size = sizeWithPadding(size, getTotalInsets(this.settings))
+        let ins = getTotalInsets(this.settings)
+        size = sizeWithPadding(size, ins)
         return new GRenderNode({
             ...this.settings,
             kind: "text-singleline-element",
@@ -384,7 +385,7 @@ export class TextElement implements GElement {
             fontWeight: this.settings.bold?"bold":Style.base().fontWeight,
             size: size,
             pos: new Point(0, 0),
-            contentOffset: new Point(this.settings.padding.left, this.settings.padding.top),
+            contentOffset: new Point(ins.left, ins.top),
             baseline: baseline,
             children: [],
             key:key,

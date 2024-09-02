@@ -17,6 +17,46 @@ const state = {
     toggle:false
 }
 
+export function baselineRow() {
+    return HBox({
+        crossAxisLayout: 'center',
+        children: [
+            Label({text: 'simple components'}),
+            HSpacer(),
+            Button({text: "Button"}),
+            ToggleButton({
+                text: "toggle",
+                selected: {
+                    get: () => state.toggle,
+                    set: (value) => state.toggle = value,
+                }
+            }),
+            IconButton({text: 'Doc', icon: Icons.Document, ghost: false}),
+            CheckBox({
+                text: "Checkbox",
+                // selected: state.checked,
+                // handleEvent: (e) => {
+                //     if (e.type === 'mouse-down') {
+                //         state.checked = !state.checked
+                //         e.redraw()
+                //     }
+                // }
+            }),
+            RadioButton({
+                text: 'radio box',
+                // selected: state.radioed,
+                // handleEvent: (e) => {
+                //     if (e.type === 'mouse-down') {
+                //         state.radioed = !state.radioed
+                //         e.redraw()
+                //     }
+                // }
+            }),
+            Tag({text: 'tag'}),
+        ],
+    })
+}
+
 export function makeCompsDemo() {
     return new MVBoxElement({
         children: [

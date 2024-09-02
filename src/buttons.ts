@@ -92,7 +92,7 @@ export const Button = (opts: ButtonParameters) => {
         borderWidth: opts.borderWidth || Style.button().borderWidth,
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [new TextElement({
-            padding: ZERO_INSETS,
+            padding: withInsets(1),
             fontSettings: {
                 font: Style.button().font,
                 fontSize: Style.button().fontSize,
