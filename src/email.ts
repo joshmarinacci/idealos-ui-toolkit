@@ -82,24 +82,25 @@ const onMouseDown = (cb: (e: CEvent) => void) => {
 const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected, index, onSelectedChanged) => {
     return ListViewItem({
         selected: index === selected,
-        padding: withInsets(8),
-        mainAxisLayout: 'center',
+        padding: withInsets(0),
+        mainAxisLayout: 'start',
         handleEvent: onMouseDown((e) => onSelectedChanged(index, e)),
         children: [
             VBox({
                 shadow: true,
                 mainAxisSelfLayout: 'shrink',
-                padding: withInsets(8),
+                crossAxisSelfLayout:'grow',
+                padding: withInsets(4),
                 visualStyle: {
                     background: index == selected ? 'orange' : 'white',
                 },
                 children: [
                     Label({text: item.get('sender').get(), shadow: true, bold: true}),
                     WrappingLabel({
-                        text: item.get('subject').get(), fixedWidth: 200,
+                        text: item.get('subject').get(),
                         shadow: true
                     }),
-                    WrappingLabel({text: item.get('body').get().substring(0, 30) + '...', fixedWidth: 200, shadow: true})
+                    WrappingLabel({text: item.get('body').get().substring(0, 100) + '...', shadow: true})
                 ]
             }),
         ],
@@ -162,7 +163,7 @@ export function EmailDemo() {
                 fixedWidth:200,
             },
             {
-                fixedWidth:200,
+                fixedWidth:250,
             },
             {
             }

@@ -205,6 +205,7 @@ function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[
 
 type TextElementSettings = {
     multiline?:boolean
+    wrapping?:boolean
     fixedWidth?:number
     bold?:boolean
     text:string
@@ -220,7 +221,7 @@ export class TextElement implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        if(this.settings.fixedWidth) return this.layout_wrapping(rc,cons)
+        if(this.settings.fixedWidth || this.settings.wrapping) return this.layout_wrapping(rc,cons)
         if(this.settings.multiline) return this.layout_multiline(rc,cons);
         return this.layout_single_line_no_wrapping(rc,cons)
     }
@@ -290,7 +291,11 @@ export class TextElement implements GElement {
         let total_insets = getTotalInsets(this.settings)
 
         let size = new Size(0,0)
-        size.w = this.settings.fixedWidth as number
+        if(this.settings.fixedWidth) {
+            size.w = this.settings.fixedWidth as number
+        } else {
+            size.w = _cons.space.w
+        }
         size.h = textsize.h
         size.w -= (total_insets.left + total_insets.right)
         size.h += (total_insets.top + total_insets.bottom)
@@ -559,10 +564,11 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
     })
 }
 
-export function WrappingLabel(param: { fixedWidth: number; text: string, shadow?:boolean }) {
+export function WrappingLabel(param: { fixedWidth?: number; text: string, shadow?:boolean }) {
     return new TextElement({
         text: param.text,
         multiline: true,
+        wrapping:true,
         shadow: param.shadow||false,
         padding: Style.button().padding,
         borderWidth: ZERO_INSETS,

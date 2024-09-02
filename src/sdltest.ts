@@ -11,7 +11,7 @@ import * as process from "node:process";
 import {Style} from "./style.js";
 
 
-const SIZE = new Size(1000,600)
+const SIZE = new Size(1200,600)
 Canvas.registerFont('MaterialIcons-Regular.ttf',{
     family:'material-icons'
 })

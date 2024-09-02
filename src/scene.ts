@@ -280,7 +280,7 @@ export class Scene {
         const bounds = new Bounds(rc.canvas.width/2-400,0,400,rc.canvas.height/2)
         this.debugStrokeBounds(rc,bounds,'red',1)
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
-        this.ifTarget(this.current_mouse_target,(comp)=>{
+        this.ifTarget(this.debug_target,(comp)=>{
             rc.ctx.save()
             rc.ctx.translate(bounds.x,bounds.y)
             this.drawDebugCompInfo(rc,comp, bounds.w)
@@ -335,7 +335,7 @@ export class Scene {
         let t = comp.settings
         this.debugText(rc,bounds,` kind = ${t.kind}  key=${t.key}`)
         rc.ctx.translate(0,lh)
-        this.debugText(rc,bounds,` size = ${t.size}`)
+        this.debugText(rc,bounds,` pos = ${t.pos} size = ${t.size}`)
         rc.ctx.translate(0,lh)
         this.debugText(rc,bounds,` border = ${t.borderWidth}`)
         rc.ctx.translate(0,lh)
