@@ -41,6 +41,7 @@ export type MMouseEvent = {
     type: 'mouse-move' | 'mouse-down' | 'mouse-up'
     position:Point
     redraw:()=>void
+    shift: boolean
 }
 export type MKeyboardEvent = {
     type: 'keyboard-typed'

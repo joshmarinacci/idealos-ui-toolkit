@@ -234,7 +234,7 @@ export function drawDebug(n: GRenderNode, rc: RenderContext, debug:string|undefi
         bds2 = bdsSubInsets(bds, n.settings.padding)
         strokeBounds(rc, bds2, 'green')
         rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
-        n.settings.children.forEach((ch, i)=> drawDebug(ch, rc, true, tab + "  "))
+        n.settings.children.forEach((ch, _i)=> drawDebug(ch, rc, debug, true, tab + "  "))
         rc.ctx.translate(-n.settings.pos.x, -n.settings.pos.y)
         // rc.ctx.restore()
     }

@@ -1,37 +1,8 @@
-import {
-    GElement,
-    GRenderNode,
-    MKeyboardEvent,
-    MMouseEvent,
-    MWheelEvent, ZERO_INSETS,
-} from "./base.js";
-import {doDraw, drawDebug, fillRect, RenderContext, strokeBounds} from "./gfx.js";
-import {Bounds, Insets, Point, Size} from "josh_js_util";
+import {GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent, } from "./base.js";
+import {doDraw, drawDebug, RenderContext} from "./gfx.js";
+import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
-
-function text(ctx: CanvasRenderingContext2D, text: string, point: Point, valign, halign) {
-    ctx.textBaseline = valign
-    ctx.textAlign = halign
-    ctx.fillText(text,point.x,point.y)
-}
-
-function drawInsets(ctx: CanvasRenderingContext2D, b: Bounds, ins: Insets, color: string) {
-        fillRect(ctx, b, color)
-        ctx.fillStyle = 'black'
-        ctx.font = '11px sans-serif'
-        text(ctx, '' + ins.top, b.top_midpoint(), 'top', 'center')
-        text(ctx, '' + ins.bottom, b.bottom_midpoint(), 'bottom', 'center')
-        text(ctx, '' + ins.left, b.left_midpoint(), 'middle', 'left')
-        text(ctx, '' + ins.right, b.right_midpoint(), 'middle', 'right')
-}
-
-function isInvalid(size: Size) {
-    if(!size) return true
-    if(isNaN(size.w)) return true
-    if(isNaN(size.h)) return true
-    if(!(size instanceof Size)) return true
-    return false
-}
+import {drawDebugCompInfo} from "./debug.js";
 
 export class Scene {
     private elementRoot!: GElement;
@@ -188,7 +159,8 @@ export class Scene {
         let evt:MMouseEvent = {
             type:'mouse-move',
             redraw: () => this.request_layout_and_redraw(),
-            position:pos
+            position:pos,
+            shift:false,
         }
         this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
@@ -217,7 +189,8 @@ export class Scene {
         let evt:MMouseEvent = {
             type:'mouse-down',
             redraw: () => this.request_layout_and_redraw(),
-            position:pos
+            position:pos,
+            shift:shift,
         }
         let found = this.findTargetStack(pos, this.renderRoot)
         if(found) {
@@ -253,7 +226,8 @@ export class Scene {
         let evt:MMouseEvent = {
             type:'mouse-up',
             redraw: () => this.request_layout_and_redraw(),
-            position:pos
+            position:pos,
+            shift:false,
         }
         this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
             if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
@@ -293,17 +267,17 @@ export class Scene {
         }
     }
 
-    private debugPrintTarget(found: GRenderNode[]) {
-        console.log("CORE SAMPLE")
-        found.forEach(n => {
-            console.log(n.settings.key, n.settings.kind)
-            if(n.userdata.constraints) {
-                console.table(n.userdata['constraints'])
-            }
-            // console.log(`size ${n.settings.size}`)
-            // console.log('border', n.settings.borderWidth)
-        })
-    }
+    // private debugPrintTarget(found: GRenderNode[]) {
+    //     console.log("CORE SAMPLE")
+    //     found.forEach(n => {
+    //         console.log(n.settings.key, n.settings.kind)
+    //         if(n.userdata.constraints) {
+    //             console.table(n.userdata['constraints'])
+    //         }
+    //         // console.log(`size ${n.settings.size}`)
+    //         // console.log('border', n.settings.borderWidth)
+    //     })
+    // }
     private drawDebugOverlay(rc: RenderContext) {
         rc.ctx.save()
         // rc.ctx.translate(0, rc.size.h-100)
@@ -314,7 +288,7 @@ export class Scene {
         this.ifTarget(this.debug_target,(comp)=>{
             rc.ctx.save()
             rc.ctx.translate(bounds.x,bounds.y)
-            this.drawDebugCompInfo(rc,comp, bounds.w)
+            drawDebugCompInfo(rc,comp, bounds.w)
             rc.ctx.restore()
         })
         rc.ctx.restore()
@@ -327,10 +301,6 @@ export class Scene {
     private debugFillBounds(rc: RenderContext, bounds: Bounds, fill: string) {
         rc.ctx.fillStyle = fill
         rc.ctx.fillRect(bounds.x,bounds.y,bounds.w,bounds.h)
-    }
-    private debugText(rc: RenderContext, bounds: Bounds, text: string, color:string) {
-        rc.ctx.fillStyle = color || 'black'
-        rc.ctx.fillText(text,bounds.x,bounds.y+20)
     }
 
 
@@ -358,47 +328,4 @@ export class Scene {
         }
     }
 
-    private drawDebugCompInfo(rc: RenderContext, comp: GRenderNode, w: number) {
-        const lh = 16
-        let bounds = new Bounds(0,0,w,100)
-        fillRect(rc.ctx,bounds,'white')
-        strokeBounds(rc,bounds,'black')
-        let t = comp.settings
-
-        rc.ctx.fillStyle = 'black'
-        rc.ctx.font = '11px sans-serif'
-        rc.ctx.textAlign = 'start'
-        rc.ctx.textBaseline = 'middle'
-
-        rc.ctx.save()
-        let b = new Bounds( w-100,0,100,100)
-        //fill rect around size
-        drawInsets(rc.ctx,b,comp.settings.borderWidth || ZERO_INSETS,'#aaaaaa')
-        b =b.grow(-15)
-        drawInsets(rc.ctx,b,comp.settings.padding || ZERO_INSETS,'#f0f0f0')
-        b =b.grow(-15)
-        fillRect(rc.ctx,b,'#f0d000')
-        //fill rect around inner content
-        rc.ctx.restore()
-
-        this.debugText(rc,bounds,` kind = ${t.kind}  key=${t.key}`,'black')
-        rc.ctx.translate(0,lh)
-        if(isInvalid(t.size)) {
-            this.debugText(rc,bounds,` pos = ${t.pos} size = ${t.size}`,'red')
-        } else {
-            this.debugText(rc,bounds,` pos = ${t.pos} size = ${t.size}`,'black')
-        }
-        rc.ctx.translate(0,lh)
-        this.debugText(rc,bounds,` text = ${t.text}`)
-        // rc.ctx.translate(0,lh)
-        // this.debugText(rc,bounds,` padding = ${t.padding}`)
-
-
-        comp.settings.children.forEach((ch,i) => {
-            rc.ctx.save()
-            rc.ctx.translate(0,105*i+100)
-            this.drawDebugCompInfo(rc,ch,w)
-            rc.ctx.restore()
-        })
-    }
 }
