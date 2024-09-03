@@ -64,7 +64,6 @@ const DefaultItemRenderer:ListItemRenderer<unknown> = (item:unknown,selected:num
         selected: index === selected,
         handleEvent: (e) => {
             if(e.type === 'mouse-down') onSelectedChanged(index, e)
-            if(e.type === 'keyboard-typed') return e.ignore()
         }
     })
 }
@@ -77,18 +76,21 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
     const navUp = (e:CEvent) => {
         console.log("nav up", selected, e.type)
         if(selected > 0) {
-            setSelected(selected-1)
-            e.redraw()
+            setSelected(selected - 1)
         }
+        e.use()
+        e.redraw()
     }
     const navDown = (e:CEvent) => {
         console.log("nav down", selected, e.type)
-            setSelected(selected+1)
-            e.redraw()
+        setSelected(selected+1)
+        e.use()
+        e.redraw()
     }
     const navTo = (s:number,e:CEvent) => {
         console.log("nav to", selected, e.type)
         setSelected(s)
+        e.use()
         e.redraw()
     }
     return new MVBoxElement({
@@ -106,7 +108,6 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
             if(e.type === 'keyboard-typed') {
                 if(e.key === 'ArrowUp') return navUp(e)
                 if(e.key === 'ArrowDown') return navDown(e)
-                return e.ignore
             }
         },
         children: opts.data.map((item, index) => {

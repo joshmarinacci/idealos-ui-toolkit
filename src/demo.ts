@@ -192,9 +192,6 @@ export function makeListDemo() {
                             if(e.type === 'mouse-down') {
                                 return os(index, e)
                             }
-                            if(e.type === 'keyboard-typed') {
-                                return e.ignore()
-                            }
                         }
                     })
                 }

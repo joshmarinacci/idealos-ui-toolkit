@@ -1,4 +1,4 @@
-import {GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent, } from "./base.js";
+import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent,} from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
@@ -159,12 +159,12 @@ export class Scene {
     }
 
     public handleMouseMove(pos: Point) {
-        // dispatch old mouse move
         let evt:MMouseEvent = {
             type:'mouse-move',
             redraw: () => this.request_layout_and_redraw(),
             position:pos,
             shift:false,
+            use: () => {}
         }
         this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
@@ -193,6 +193,7 @@ export class Scene {
         let evt:MMouseEvent = {
             type:'mouse-down',
             redraw: () => this.request_layout_and_redraw(),
+            use: () => {},
             position:pos,
             shift:shift,
         }
@@ -200,16 +201,19 @@ export class Scene {
         if(found) {
             let last = found[found.length - 1]
             this.current_mouse_target = last.settings.key
-            if (last.settings.handleEvent) last.settings.handleEvent(evt)
+            // if (last.settings.handleEvent) last.settings.handleEvent(evt)
             if(last.settings.key !== this.debug_target) {
                 this.ifTarget(this.debug_target,(comp) => comp.debug = false)
                 this.debug_target = last.settings.key
                 this.request_just_redraw()
             }
+            //swap focus
             this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
             last.focused = true
             this.keyboard_target = last.settings.key
             this.keyboard_path = found
+            // dispatch event
+            this.dispatchEvent(evt,found.slice())
             this.request_just_redraw()
         }
     }
@@ -217,6 +221,7 @@ export class Scene {
         let evt:MMouseEvent = {
             type:'mouse-up',
             redraw: () => this.request_layout_and_redraw(),
+            use: () => {},
             position:pos,
             shift:false,
         }
@@ -225,44 +230,15 @@ export class Scene {
         })
     }
     handleKeydownEvent(key:string, control:boolean, shift:boolean) {
-        // this.log("kbd ",key,'to',this.keyboard_target)
-        /*
-            * send to keyboard target
-            * if target doesn't consume it
-                * send it to the parent
-            * if it is never consumed then print warning at the top level
-         */
-        console.log("keyboard path", key, this.keyboard_path.map(n => n.settings.kind).join(", "))
-        this.ifTarget(this.keyboard_target,(comp)=>{
-            let ignored = false
-            let evt: MKeyboardEvent = {
-                type: 'keyboard-typed',
-                redraw: () => this.request_layout_and_redraw(),
-                key: key,
-                control: control,
-                shift:shift,
-                ignore: () => {
-                    ignored = true
-                }
-            }
-            if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
-            if(ignored) {
-                console.log("ignored. need to go up to the parent")
-                // console.log("comp",comp)
-                // console.log(this.keyboard_path)
-                let n = this.keyboard_path.findIndex(n => n.settings.key === comp.settings.key)
-                // console.log("current is",n)
-                if(n > 0) {
-                    let next = this.keyboard_path[n-1]
-                    // console.log("next is",next)
-                    ignored = false
-                    if(next.settings.handleEvent) next.settings.handleEvent(evt)
-                    if(ignored) {
-                        console.warn("still ignored")
-                    }
-                }
-            }
-        })
+        let evt: MKeyboardEvent = {
+            type: 'keyboard-typed',
+            redraw: () => this.request_layout_and_redraw(),
+            use: () => {},
+            key: key,
+            control: control,
+            shift:shift,
+        }
+        this.dispatchEvent(evt,this.keyboard_path)
     }
     public handleWheelEvent(pos: Point, delta:Point) {
         let found = this.findScrollTarget(pos, this.renderRoot)
@@ -280,6 +256,7 @@ export class Scene {
                         this.redraw()
                     }
                 },
+                use: () => {}
             }
             if(found.settings.handleEvent) found.settings.handleEvent(evt)
         }
@@ -334,4 +311,33 @@ export class Scene {
         }
     }
 
+    private dispatchEvent(evt: CEvent, nodes: GRenderNode[]) {
+        nodes = nodes.slice()
+        console.log("===\nevt",evt.type)
+        let used = false
+        evt.use = () => {
+            console.log("using it")
+            used = true
+        }
+        while(true) {
+            let comp = nodes.pop()
+            if (comp) {
+                console.log("sending to ", comp.settings.key, comp.settings.kind)
+                if (comp.settings.handleEvent) {
+                    comp.settings.handleEvent(evt)
+                    if (used) {
+                        console.log("it was used. done");
+                        break
+                    } else {
+                        console.log("was not used. going up")
+                    }
+                } else {
+                    console.warn("didn't handle event")
+                }
+            } else {
+                console.warn("no comp")
+                break;
+            }
+        }
+    }
 }

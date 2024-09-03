@@ -36,26 +36,28 @@ export type ElementSettings = {
     shadow?: boolean
 }
 
+type BaseEvent = {
+    redraw:()=>void
+    use:()=>void
+}
 export type MMouseEvent = {
     type: 'mouse-move' | 'mouse-down' | 'mouse-up'
     position:Point
     redraw:()=>void
     shift: boolean
-}
+} & BaseEvent
 export type MKeyboardEvent = {
     type: 'keyboard-typed'
     key:string,
     control:boolean,
     shift:boolean,
     redraw:()=>void
-    ignore:()=>void
-}
+} & BaseEvent
 export type MWheelEvent = {
     type: 'wheel'
     deltaX:number,
     deltaY:number,
-    redraw:()=>void
-}
+} & BaseEvent
 export type CEvent = MMouseEvent | MKeyboardEvent | MWheelEvent
 
 export type EventHandler = (event: CEvent) => void
