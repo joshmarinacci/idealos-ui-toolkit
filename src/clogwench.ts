@@ -4,11 +4,12 @@ import process from "node:process"
 import {Scene} from "./scene.js";
 import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
-import {Bounds, Logger, make_logger, Point} from "josh_js_util";
+import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {Socket} from "node:net";
 import {VBox} from "./layout.js";
 import {Square} from "./comps2.js";
 import * as fs from "node:fs";
+import {baselineRow} from "./demo.js";
 
 const STD_PORT = 3333
 type IncomingMessage = {
@@ -31,6 +32,11 @@ type MouseDownEvent = {
     button:string,
     x:number,
     y:number,
+}
+type WindowResizeEvent = {
+    app_id:string,
+    window_id:string,
+    size: Size,
 }
 export type Color = {
     r:number,
@@ -181,6 +187,7 @@ class CWindow {
     // private bounds: Bounds;
     private log: Logger;
     private scene: Scene;
+    private bitmap: Bitmap;
     constructor(app: ClogwenchApp, info: OpenWindowResponse) {
         this.app = app
         this.window_id = info.window_id
@@ -189,16 +196,46 @@ class CWindow {
         this.log = make_logger('window')
     }
     dispatch(e) {
-        this.log.info(e)
+        this.log.info("dispatched",e)
         if(e.MouseDown) {
             let evt = e.MouseDown as MouseDownEvent
             console.log("clicked at",evt)
             this.scene.handleMouseDown(new Point(evt.x,evt.y),false)
         }
+        if(e.WindowResized) {
+            let evt = e.WindowResized as WindowResizeEvent
+            console.log("resized to",evt)
+            this.scene.setSize(evt.size)
+            this.bitmap = pureimage.make(evt.size.w,evt.size.h)
+            this.scene.setCanvas(this.bitmap)
+            this.redraw()
+        }
     }
 
     setScene(scene: Scene) {
         this.scene = scene
+    }
+
+    setBitmap(bitmap: Bitmap) {
+        this.bitmap = bitmap
+    }
+
+    redraw() {
+        this.scene.layout()
+        this.scene.redraw()
+        console.log("scene laid out and redraw")
+        let app = this.app
+        let win = this
+        let rect = new Bounds(0,0,this.scene.size.w,this.scene.size.h)
+        const cmd:DrawImageCommand = {
+            app_id: app.id,
+            window_id: win.window_id,
+            rect,
+            buffer: new ImageWrapper(this.bitmap)
+        }
+        app.send({
+            DrawImageCommand:cmd
+        })
     }
 }
 
@@ -226,20 +263,7 @@ function toARGB(value: any) {
 }
 
 function start() {
-    const button = Button({
-        text:"quit",
-        handleEvent:(e) => {
-            console.log("app got the event",e)
-            process.exit()
-        }
-    })
-    return VBox({
-        children:[
-            button,
-            Square(20,"red")
-        ]
-    })
-
+    return baselineRow()
 }
 
 class ImageWrapper implements BufferImage {
@@ -270,43 +294,29 @@ async function doit() {
     await app.send_and_wait({AppConnect: {HelloApp: {}}})
     let bounds = new Bounds(50,50,200,200)
     let win = await app.open_window(bounds)
-    // console.log("Opened the window",win)
-
     const bitmap = pureimage.make(bounds.w, bounds.h)
-
     const scene = new Scene(start)
     scene.setDPI(1)
     MGlobals.set(Scene.name, scene)
     MGlobals.set(SYMBOL_FONT_ENABLED, true)
     MGlobals.set(STATE_CACHE, new StateCache())
-    win.setScene(scene)
     await scene.init()
     scene.setCanvas(bitmap)
+    win.setScene(scene)
+    win.setBitmap(bitmap)
     scene.setDPI(1)
     scene.setSize(bounds.size())
-    scene.layout()
-    scene.redraw()
-    console.log("scene laid out and redraw")
-
-    const rect = Bounds.fromPointSize(new Point(0,0),bounds.size())
-    // const ctx = bitmap.getContext('2d')
-    // ctx.fillStyle = '#ff0000'
-    // ctx.fillRect(0,0,bounds.w,bounds.h)
-    // ctx.fillStyle = '#000000'
-    // console.log("font",ctx.font)
-    // ctx.font = '30px sans-serif'
-    // ctx.fillText("Hello",20,40)
-    await pureimage.encodePNGToStream(bitmap, fs.createWriteStream("out.png"))
-    const cmd:DrawImageCommand = {
-        app_id: app.id,
-        window_id: win.window_id,
-        rect,
-        buffer: new ImageWrapper(bitmap)
-    }
-    app.send({
-        DrawImageCommand:cmd
+    scene.onShouldRedraw(() => {
+        console.log("should redraw")
+        win.redraw()
     })
-
+    scene.onShouldJustRedraw(() => {
+        console.log("should just redraw")
+        win.redraw()
+    })
+    win.redraw()
+    // const rect = Bounds.fromPointSize(new Point(0,0),bounds.size())
+    // await pureimage.encodePNGToStream(bitmap, fs.createWriteStream("out.png"))
     await app.wait_for_close()
 }
 

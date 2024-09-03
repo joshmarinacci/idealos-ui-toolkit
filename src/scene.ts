@@ -14,7 +14,7 @@ export class Scene {
     private current_mouse_target: string | undefined;
     private debug_target: string | undefined
     private renderMap: Map<string, GRenderNode>;
-    private size: Size;
+    size: Size;
     private should_redraw_callback?: () => void;
     private devicePixelRatio: number;
     private should_just_redraw_callback?: () => void;

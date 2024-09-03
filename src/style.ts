@@ -104,8 +104,10 @@ const darkPanelStyle:ComponentStyle = {
 }
 
 const lightSelectedButtonStyle:ComponentStyle = {
-    backgroundColor: 'hsl(35,100%,50%)',
-    hoverBackgroundColor: 'hsl(35,100%,70%)',
+    // backgroundColor: 'hsl(35,100%,50%)',
+    backgroundColor:'#FF9500',
+    // hoverBackgroundColor: 'hsl(35,100%,70%)',
+    hoverBackgroundColor:'#FFBF66',
     borderColor: 'black',
     borderRadius: withInsets(4),
     borderWidth: withInsets(1),
