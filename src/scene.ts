@@ -61,6 +61,7 @@ export class Scene {
     }
 
     layout() {
+        this.log("layout")
         if(!this.renderMap) this.renderMap = new Map()
         KEY_VENDOR.reset()
         // this.log("layout phase")
@@ -75,6 +76,7 @@ export class Scene {
     }
 
     redraw() {
+        this.log("redraw")
         let rc = this.makeRc()
         rc.ctx.save()
         rc.ctx.scale(rc.scale, rc.scale)
@@ -339,5 +341,9 @@ export class Scene {
                 break;
             }
         }
+    }
+
+    private log(str: string) {
+        console.log("SCENE",str)
     }
 }

@@ -3,7 +3,7 @@ import {Label, TextBox, WrappingLabel} from "./text.js";
 import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "./buttons.js";
 import {IconElement, Icons} from "./icons.js";
 import {HSeparator, Square} from "./comps2.js";
-import {ListView, ListViewItem} from "./listView.js";
+import {ListView, ListViewItem, TreeView} from "./listView.js";
 import {ScrollContainer} from "./scroll.js";
 import {GElement} from "./base.js";
 import {EmailDemo} from "./email.js";
@@ -259,6 +259,12 @@ export function makePanelDemo() {
     })
 }
 
+export function testList() {
+    return ListView({
+        data: ["john", "Jacob", 'jingleheimer'],
+    })
+}
+
 export function makeTabs(): GElement {
     const compsDemo = makeCompsDemo()
     const listviewDemo = makeListDemo()
@@ -283,4 +289,10 @@ export function makeTabs(): GElement {
         ],
     })
     return MWindow({child: tabs, initSize: new Size(700,400)})
+}
+
+
+export function makeTree():GElement {
+    return new TreeView({
+    })
 }
