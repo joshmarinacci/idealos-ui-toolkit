@@ -197,6 +197,14 @@ export function makeListDemo() {
                         }
                     })
                 }
+            }),
+            ScrollContainer({
+                fixedWidth: 150,
+                fixedHeight: 200,
+                child: ListView({
+                    data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
+                    key: 'list-view-xx',
+                })
             })
         ]
     })
@@ -249,19 +257,6 @@ export function makePanelDemo() {
                     })
                 ]
             }),
-            new MVBoxElement({
-                children: [
-                    Label({text: 'scrolling list'}),
-                    ScrollContainer({
-                        fixedWidth: 150,
-                        fixedHeight: 200,
-                        child: ListView({
-                            data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
-                            key: 'list-view-xx',
-                        })
-                    })
-                ]
-            })
         ]
     })
 }
