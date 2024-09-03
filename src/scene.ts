@@ -19,8 +19,10 @@ export class Scene {
     private devicePixelRatio: number;
     private should_just_redraw_callback?: () => void;
     private keyboard_path: GRenderNode[];
+    private debug_enabled: boolean;
 
     constructor(makeTree: () => GElement) {
+        this.debug_enabled = false
         this.makeTree = makeTree
         this.devicePixelRatio = 1
         this.size = new Size(100,100)
@@ -84,9 +86,11 @@ export class Scene {
         rc.ctx.fillStyle = '#f0f0f0'
         rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
         doDraw(this.renderRoot, rc,false)
-        drawDebug(this.renderRoot, rc, this.debug_target,false)
-        // doDraw(this.renderRoot,rc,true)
-        this.drawDebugOverlay(rc)
+        if(this.debug_enabled) {
+            drawDebug(this.renderRoot, rc, this.debug_target, false)
+            // doDraw(this.renderRoot,rc,true)
+            this.drawDebugOverlay(rc)
+        }
         rc.ctx.restore()
     }
 
