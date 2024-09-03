@@ -1,9 +1,8 @@
 import {GElement, GRenderNode, LayoutConstraints, MGlobals, SYMBOL_FONT_ENABLED, TRANSPARENT, ZERO_INSETS} from "./base.js";
-import {RenderContext} from "./gfx.js";
+import {RenderContext, sizeWithPadding} from "./gfx.js";
 import {IconFontSize, Style} from "./style.js";
 import {Insets, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
-import {bdsAddInsets} from "./util.js";
 
 export enum Icons {
     LeftPanelCloseIcon = 'left_panel_close',
@@ -71,7 +70,7 @@ export class IconElement implements GElement {
         let key = KEY_VENDOR.getKey()
         let size = new Size(this.fontSize, this.fontSize)
         const padding= new Insets(0,7,0,0)
-        size = bdsAddInsets(size, padding)
+        size = sizeWithPadding(size,padding)
         return new GRenderNode({
             key:key,
             visualStyle: {
