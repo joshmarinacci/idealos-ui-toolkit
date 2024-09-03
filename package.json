@@ -28,6 +28,7 @@
     "vitest": "^1.4.0"
   },
   "devDependencies": {
-    "pureimage": "^0.4.13"
+    "pureimage": "^0.4.13",
+    "@types/node": "^22.5.2"
   }
 }

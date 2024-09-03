@@ -1,15 +1,14 @@
 import {Button} from "./buttons.js";
-import process from "process"
+import pureimage, {Bitmap} from "pureimage"
+import process from "node:process"
 import {Scene} from "./scene.js";
 import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Logger, make_logger, Point} from "josh_js_util";
-import {Socket} from "net";
+import {Socket} from "node:net";
 import {VBox} from "./layout.js";
 import {Square} from "./comps2.js";
-import {i} from "vitest/dist/reporters-yx5ZTtEV.js";
-import * as buffer from "node:buffer";
-import * as buffer from "node:buffer";
+import * as fs from "node:fs";
 
 const STD_PORT = 3333
 type IncomingMessage = {
@@ -203,74 +202,12 @@ class CWindow {
     }
 }
 
-class BufferImage {
+interface BufferImage {
     width: number;
     height: number;
     data: number[];
     layout: { ARGB: any[] };
     id: string;
-
-
-    constructor(w:number, h:number) {
-        this.width = w
-        this.height = h
-        this.data = []
-        for(let i=0; i<this.width*this.height; i++) {
-            this.data[i*4+0] = 255
-            this.data[i*4+1] = 255
-            this.data[i*4+2] = 0
-            this.data[i*4+3] = 255
-        }
-        this.layout = {ARGB:[]}
-        // this.id = "some long string"
-        this.id = "31586440-53ac-4a47-83dd-54c88e857fa5"
-    }
-    set_pixel(x:number, y:number, color:Color) {
-        if(x < 0) return
-        if(y < 0) return
-        if(x >= this.width) return
-        if(y >= this.height) return
-        let n = (y*this.width+x)
-        this.data[n*4 + 0] = color.a
-        this.data[n*4 + 1] = color.r
-        this.data[n*4 + 2] = color.g
-        this.data[n*4 + 3] = color.b
-    }
-    get_pixel(x:number,y:number):Color {
-        if(x<0) return MAGENTA
-        if(y<0) return MAGENTA
-        if(x >= this.width) return MAGENTA
-        if(y >= this.height) return MAGENTA
-        let n = (y*this.width+x)
-        let color:Color = {
-            a: this.data[n*4+0],
-            r: this.data[n*4+1],
-            g: this.data[n*4+2],
-            b: this.data[n*4+3],
-        }
-        return color
-    }
-    draw_rect(rect: Bounds, color:Color):void {
-        for(let i = rect.x; i<rect.right(); i++) {
-            for(let j=rect.y; j<rect.bottom(); j++) {
-                // console.log("setting",i,j)
-                this.set_pixel(i,j,color)
-            }
-        }
-    }
-    draw_image(dst_rect: Bounds, img: BufferImage) {
-        // console.log("buffer drawing image",dst_rect,img)
-        this.draw_rect(dst_rect,MAGENTA);
-        for(let i = dst_rect.x; i<dst_rect.right(); i++) {
-            for(let j=dst_rect.y; j<dst_rect.bottom(); j++) {
-                let sx = i-dst_rect.x
-                let sy = j-dst_rect.y
-                let c = img.get_pixel(sx,sy);
-                // console.log("setting",i,j,'from',sx,sy,'color',c)
-                this.set_pixel(i,j,c)
-            }
-        }
-    }
 }
 
 const CSS_TO_ARGB:Record<string,Color> = {
@@ -286,102 +223,6 @@ function toARGB(value: any) {
         if(CSS_TO_ARGB[str]) return CSS_TO_ARGB[str]
     }
     return RED
-}
-
-class ClogwenchCanvasContext {
-    get fillStyle(): Color {
-        return this._fill;
-    }
-
-    set fillStyle(value: Color) {
-        this._fill = toARGB(value);
-    }
-    private canvas: ClogwenchCanvas;
-    private log: Logger;
-    private _fill:Color
-    constructor(param: ClogwenchCanvas) {
-        this.canvas = param
-        this.log = make_logger('window')
-        this._fill = MAGENTA
-    }
-    measureText(str:string) {
-        this.log.info("mesuring text",str)
-        return {
-            width: str.length*10,
-            emHeightAscent: 10,
-            emHeightDescent: 0,
-        }
-    }
-    fillRect(x:number,y:number,w:number,h:number) {
-        this.log.info("filling rectangle",x,y,w,h)
-        if(isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)) {
-            this.log.warn("rect has invalid values",x,y,w,h)
-            return
-        }
-        let dr:DrawRectCommand = {
-            app_id: this.canvas.window.app.id,
-            window_id: this.canvas.window.window_id,
-            rect: new Bounds(x,y,w,h),
-            color: this._fill,
-        }
-        this.canvas.window.app.send({
-            DrawRectCommand:dr,
-        })
-
-    }
-    translate() {
-
-    }
-    beginPath() {
-
-    }
-    roundRect() {
-
-    }
-    fill() {
-    }
-    stroke() {
-
-    }
-    fillText(text:string, x:number, y:number) {
-        this.log.info("filling text",text,x,y)
-        const buffer = new BufferImage(text.length*10,10)
-        for(let i=0; i<text.length; i++) {
-            buffer.draw_rect(new Bounds(i*10, 3, 8, 7), this._fill)
-        }
-        const rect = new Bounds(Math.floor(x),Math.floor(y-10),text.length*10,10)
-        const cmd:DrawImageCommand = {
-            app_id: this.canvas.window.app.id,
-            window_id: this.canvas.window.window_id,
-            rect,
-            buffer
-        }
-        this.canvas.window.app.send({
-            DrawImageCommand:cmd
-        })
-    }
-    strokeRect() {
-    }
-    scale() {
-
-    }
-    save() {
-
-    }
-    restore(){
-
-    }
-
-
-}
-class ClogwenchCanvas {
-    window: CWindow;
-    constructor(window:CWindow) {
-        this.window = window
-    }
-    getContext() {
-        return new ClogwenchCanvasContext(this)
-    }
 }
 
 function start() {
@@ -401,7 +242,28 @@ function start() {
 
 }
 
+class ImageWrapper implements BufferImage {
+    public width: number;
+    height: number;
+    data: number[];
+    layout: { ARGB: any[]; };
+    id: string;
+    constructor(img: Bitmap) {
+        this.width = img.width
+        this.height = img.height
+        this.data = Array.from(img.data)
+        this.id = "31586440-53ac-4a47-83dd-54c88e857fa5"
+        this.layout =  { ARGB: [] };
+    }
+}
+
 async function doit() {
+    let font = pureimage.registerFont(
+        "./fonts/SourceSansPro-Regular.ttf",
+        "sans-serif"
+    )
+    await font.load()
+
     let app = new ClogwenchApp()
     await app.connect()
     console.log("connected")
@@ -410,6 +272,8 @@ async function doit() {
     let win = await app.open_window(bounds)
     // console.log("Opened the window",win)
 
+    const bitmap = pureimage.make(bounds.w, bounds.h)
+
     const scene = new Scene(start)
     scene.setDPI(1)
     MGlobals.set(Scene.name, scene)
@@ -417,12 +281,32 @@ async function doit() {
     MGlobals.set(STATE_CACHE, new StateCache())
     win.setScene(scene)
     await scene.init()
-    scene.setCanvas(new ClogwenchCanvas(win))
+    scene.setCanvas(bitmap)
     scene.setDPI(1)
     scene.setSize(bounds.size())
     scene.layout()
     scene.redraw()
     console.log("scene laid out and redraw")
+
+    const rect = Bounds.fromPointSize(new Point(0,0),bounds.size())
+    // const ctx = bitmap.getContext('2d')
+    // ctx.fillStyle = '#ff0000'
+    // ctx.fillRect(0,0,bounds.w,bounds.h)
+    // ctx.fillStyle = '#000000'
+    // console.log("font",ctx.font)
+    // ctx.font = '30px sans-serif'
+    // ctx.fillText("Hello",20,40)
+    await pureimage.encodePNGToStream(bitmap, fs.createWriteStream("out.png"))
+    const cmd:DrawImageCommand = {
+        app_id: app.id,
+        window_id: win.window_id,
+        rect,
+        buffer: new ImageWrapper(bitmap)
+    }
+    app.send({
+        DrawImageCommand:cmd
+    })
+
     await app.wait_for_close()
 }
 

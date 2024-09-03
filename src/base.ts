@@ -99,6 +99,10 @@ export class GRenderNode {
         this.debug = false
         this.hover = false
         this.focused = false
+        if(isNaN(settings.baseline)) {
+            console.log("Rendernode created without baseline")
+            throw new Error("missing baseline")
+        }
     }
 }
 

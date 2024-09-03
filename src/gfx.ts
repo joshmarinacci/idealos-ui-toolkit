@@ -1,7 +1,7 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
 
-import {bdsSubInsets} from "./util.js";
+import {bdsSubInsets, calcCanvasFont2} from "./util.js";
 
 export type RenderContext = {
     size: Size;
@@ -94,7 +94,8 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     }
     let rad = calculateBorderRadius(n.settings)
     if(rad) {
-        fillRoundRect(rc.ctx,bounds, rad, bg)
+        // fillRoundRect(rc.ctx,bounds, rad, bg)
+        fillRect(rc.ctx, bounds, bg)
     } else {
         fillRect(rc.ctx, bounds, bg)
     }
@@ -110,7 +111,8 @@ function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     }
     let rad = calculateBorderRadius(n.settings)
     if(rad) {
-        strokeRoundRect(rc.ctx, bounds, rad,color, n.settings.borderWidth as Insets)
+        // strokeRoundRect(rc.ctx, bounds, rad,color, n.settings.borderWidth as Insets)
+        drawBorder(rc.ctx, bounds, color, n.settings.borderWidth as Insets)
         // rc.ctx.clip()
     } else {
         drawBorder(rc.ctx, bounds, color, n.settings.borderWidth as Insets)
@@ -121,16 +123,19 @@ function doDrawText(rc: RenderContext, n: GRenderNode) {
     if(!n.settings.text) return
     // console.log("drawing text",n.settings.text)
     rc.ctx.fillStyle = n.settings.visualStyle.textColor || "magenta"
-    let fontStr = `${n.settings.fontWeight} ${n.settings.fontSize}px ${n.settings.font}`
-    // console.log("text",n.settings.text, fontStr)//, "baseline",y)
-    rc.ctx.font = fontStr
+    rc.ctx.font = calcCanvasFont2(n.settings)
+    // console.log("text",n.settings.text, rc.ctx.font)
     // rc.ctx.textRendering = 'optimizeLegibility'
     // rc.ctx.textAlign = 'start'
     // rc.ctx.textBaseline = 'alphabetic'
     // console.log("font",rc.ctx.font)
     // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
     let x = n.settings.contentOffset.x
+    if(isNaN(n.settings.baseline)){
+        console.log("missing baseline")
+    }
     let y = n.settings.contentOffset.y + n.settings.baseline
+    // console.log("text",n.settings.text, x,y,fnt)
     rc.ctx.fillText(n.settings.text,x,y)
 
 }

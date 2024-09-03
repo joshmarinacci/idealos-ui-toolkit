@@ -1,5 +1,5 @@
 import {Bounds, Insets, Size} from "josh_js_util";
-import {ElementSettings, FontSettings} from "./base.js";
+import {ElementSettings, FontSettings, RenderNodeSettings} from "./base.js";
 import {withInsets} from "./gfx.js";
 
 export function makeCanvas(size: Size) {
@@ -33,8 +33,15 @@ export function calcCanvasFont(settings: FontSettings | undefined) {
     if (!settings) {
         return "16px sans-serif"
     }
-    return `${settings.fontWeight} ${settings.fontSize}px ${settings.font}`
+    return `${settings.fontSize}px ${settings.font}`
 }
+export function calcCanvasFont2(settings:RenderNodeSettings|undefined) {
+    if (!settings) {
+        return "16px sans-serif"
+    }
+    return `${settings.fontSize}px ${settings.font}`
+}
+
 
 export function getTotalInsets(settings: ElementSettings): Insets {
     let ins = withInsets(0)
