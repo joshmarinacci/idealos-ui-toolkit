@@ -12,7 +12,9 @@ import {withInsets} from "./gfx.js";
 
 const S = new Schema()
 
+// @ts-ignore
 const EmailAccount = S.enum(['Work', 'home'], 'home')
+// @ts-ignore
 const emailAccount = EmailAccount.cloneWith('Work')
 const Folder = S.map({
     name: S.string(),
@@ -22,15 +24,25 @@ const Folder = S.map({
 type EmailFolder = typeof Folder
 const Folders = S.list(Folder)
 const email_folders = Folders.cloneWith([
+// @ts-ignore
     {name: "Inbox", count: 128, icon: Icons.Inbox},
+// @ts-ignore
     {name: 'Drafts', count: 9, icon: Icons.Draft},
+// @ts-ignore
     {name: 'Sent', count: -1, icon: Icons.Send},
+// @ts-ignore
     {name: 'Junk', count: 23, icon: Icons.Delete},
+// @ts-ignore
     {name: 'Trash', count: -1, icon: Icons.Delete},
+// @ts-ignore
     {name: 'Archive', count: -1, icon: Icons.Archive},
+// @ts-ignore
     {name: 'Social', count: 972, icon: Icons.Group},
+// @ts-ignore
     {name: 'Updates', count: 342, icon: Icons.Info},
+// @ts-ignore
     {name: 'Forums', count: 128, icon: Icons.Forum},
+// @ts-ignore
     {name: 'Shopping', count: 8, icon: Icons.ShoppingCart},
 ])
 const EmailMessage = S.map({
@@ -44,6 +56,7 @@ const EmailMessage = S.map({
 const Messages = S.list(EmailMessage)
 const messages = Messages.cloneWith([
     {
+// @ts-ignore
         sender: "Emily Davis",
         subject: "Re: Question about Budget",
         date: Date.now(),
@@ -52,6 +65,7 @@ const messages = Messages.cloneWith([
         unread: true,
     },
     {
+// @ts-ignore
         sender: "Michael Wilson",
         subject: "Important Annoucnement",
         date: Date.now(),
@@ -60,7 +74,9 @@ const messages = Messages.cloneWith([
         tags: ['meeting', 'work', 'important'],
     }
 ])
+// @ts-ignore
 const InboxFilter = S.enum(["All mail", "Unread"], "Unread")
+// @ts-ignore
 const filter = InboxFilter.cloneWith("Unread")
 
 

@@ -1,14 +1,13 @@
 import {MHBoxElement, MVBoxElement} from "./layout.js";
 import {Button} from "./buttons.js";
-import {withInsets} from "./gfx.js";
 import {Insets} from "josh_js_util";
-import {StateHandler, useState} from "./base.js";
+import {GElement, StateHandler, useState} from "./base.js";
 import {Style} from "./style.js";
 import {KEY_VENDOR} from "./keys.js";
 
 export type TabbedBoxOptions = {
     titles: string[],
-    children: MVBoxElement[],
+    children: GElement[],
     selected?:StateHandler<number>
 }
 export function TabbedBox(opts: TabbedBoxOptions) {

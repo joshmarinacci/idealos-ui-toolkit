@@ -25,7 +25,6 @@ export type FontSettings = {
 export type ElementSettings = {
     key?:string
     kind?:string
-    text?: string
     padding?: Insets
     visualStyle?:VisualStyle
     hoverStyle?: VisualStyle

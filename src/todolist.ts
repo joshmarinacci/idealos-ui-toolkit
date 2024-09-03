@@ -24,9 +24,11 @@ const TodoList = S.list(TodoItem)
 
 const data = TodoList.cloneWith([
     {
+        // @ts-ignore
         title: 'first',
     },
     {
+        // @ts-ignore
         title: 'second',
     }
 ])

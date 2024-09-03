@@ -22,11 +22,13 @@ export class Scene {
     constructor(makeTree: () => GElement) {
         this.makeTree = makeTree
         this.devicePixelRatio = 1
+        this.size = new Size(100,100)
+        this.renderMap = new Map<string, GRenderNode>();
     }
 
-    private log(...text: any[]) {
-        console.log("SCENE: ",...text)
-    }
+    // private log(...text: any[]) {
+    //     console.log("SCENE: ",...text)
+    // }
     setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas
     }
@@ -267,22 +269,10 @@ export class Scene {
         }
     }
 
-    // private debugPrintTarget(found: GRenderNode[]) {
-    //     console.log("CORE SAMPLE")
-    //     found.forEach(n => {
-    //         console.log(n.settings.key, n.settings.kind)
-    //         if(n.userdata.constraints) {
-    //             console.table(n.userdata['constraints'])
-    //         }
-    //         // console.log(`size ${n.settings.size}`)
-    //         // console.log('border', n.settings.borderWidth)
-    //     })
-    // }
     private drawDebugOverlay(rc: RenderContext) {
         rc.ctx.save()
-        // rc.ctx.translate(0, rc.size.h-100)
         rc.ctx.strokeStyle = 'red'
-        const bounds = new Bounds(rc.canvas.width/2-400,0,400,rc.canvas.height/2)
+        const bounds = new Bounds(this.size.w-400,0,400,this.size.h)
         this.debugStrokeBounds(rc,bounds,'red',1)
         this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
         this.ifTarget(this.debug_target,(comp)=>{

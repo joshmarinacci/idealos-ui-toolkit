@@ -89,9 +89,10 @@ scene.init().then(() => {
             return
         }
         if(SDL_TO_CANVAS_MAP.has(key)) {
-            key = SDL_TO_CANVAS_MAP.get(key)
+            key = SDL_TO_CANVAS_MAP.get(key) as string
         }
-        scene.handleKeydownEvent(key, e.ctrl, e.shift)
+        // for some reason the types of ctrl and shift are number, but really booleans
+        scene.handleKeydownEvent(key, e.ctrl as unknown as boolean, e.shift as unknown as boolean)
     })
     scene.onShouldRedraw(() => redraw(false))
     scene.onShouldJustRedraw(() => redraw(true))

@@ -22,6 +22,7 @@ import {PopupContainer} from "./popup.js";
 import {ObjList} from "rtds-core";
 
 type ButtonParameters = {
+    text?:string
     selected?:boolean
 } & Partial<ElementSettings>
 type IconButtonRequired = {
