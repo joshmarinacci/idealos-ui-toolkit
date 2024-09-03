@@ -18,12 +18,14 @@ export class Scene {
     private should_redraw_callback?: () => void;
     private devicePixelRatio: number;
     private should_just_redraw_callback?: () => void;
+    private keyboard_path: GRenderNode[];
 
     constructor(makeTree: () => GElement) {
         this.makeTree = makeTree
         this.devicePixelRatio = 1
         this.size = new Size(100,100)
         this.renderMap = new Map<string, GRenderNode>();
+        this.keyboard_path = []
     }
 
     // private log(...text: any[]) {
@@ -198,29 +200,16 @@ export class Scene {
         if(found) {
             let last = found[found.length - 1]
             this.current_mouse_target = last.settings.key
-            // if(shift) {
-            //     this.debugPrintTarget(found)
-            // }
             if (last.settings.handleEvent) last.settings.handleEvent(evt)
-            if(last.settings.key !== this.keyboard_target) {
-                // this.ifTarget(this.keyboard_target,(comp)=>{
-                    // comp.settings.currentStyle = comp.settings.visualStyle
-                // })
-            }
             if(last.settings.key !== this.debug_target) {
-                // console.log("swap",last.settings.key, this.debug_target)
                 this.ifTarget(this.debug_target,(comp) => comp.debug = false)
-                // found.debug = true
                 this.debug_target = last.settings.key
                 this.request_just_redraw()
             }
-            // if(last.settings.focusedStyle) {
-            //     // last.settings.currentStyle = last.settings.focusedStyle
-            // }
             this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
             last.focused = true
             this.keyboard_target = last.settings.key
-            // console.log("set focused",last)
+            this.keyboard_path = found
             this.request_just_redraw()
         }
     }
@@ -237,15 +226,42 @@ export class Scene {
     }
     handleKeydownEvent(key:string, control:boolean, shift:boolean) {
         // this.log("kbd ",key,'to',this.keyboard_target)
+        /*
+            * send to keyboard target
+            * if target doesn't consume it
+                * send it to the parent
+            * if it is never consumed then print warning at the top level
+         */
+        console.log("keyboard path", key, this.keyboard_path.map(n => n.settings.kind).join(", "))
         this.ifTarget(this.keyboard_target,(comp)=>{
+            let ignored = false
             let evt: MKeyboardEvent = {
                 type: 'keyboard-typed',
                 redraw: () => this.request_layout_and_redraw(),
                 key: key,
                 control: control,
                 shift:shift,
+                ignore: () => {
+                    ignored = true
+                }
             }
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
+            if(ignored) {
+                // console.log("ignored. need to go up to the parent")
+                // console.log("comp",comp)
+                // console.log(this.keyboard_path)
+                let n = this.keyboard_path.findIndex(n => n.settings.key === comp.settings.key)
+                // console.log("current is",n)
+                if(n > 0) {
+                    let next = this.keyboard_path[n-1]
+                    // console.log("next is",next)
+                    ignored = false
+                    if(next.settings.handleEvent) next.settings.handleEvent(evt)
+                    if(ignored) {
+                        console.warn("still ignored")
+                    }
+                }
+            }
         })
     }
     public handleWheelEvent(pos: Point, delta:Point) {

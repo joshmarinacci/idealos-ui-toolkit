@@ -48,6 +48,7 @@ export type MKeyboardEvent = {
     control:boolean,
     shift:boolean,
     redraw:()=>void
+    ignore:()=>void
 }
 export type MWheelEvent = {
     type: 'wheel'

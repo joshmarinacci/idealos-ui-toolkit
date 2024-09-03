@@ -64,6 +64,7 @@ const DefaultItemRenderer:ListItemRenderer<unknown> = (item:unknown,selected:num
         selected: index === selected,
         handleEvent: (e) => {
             if(e.type === 'mouse-down') onSelectedChanged(index, e)
+            if(e.type === 'keyboard-typed') return e.ignore()
         }
     })
 }
@@ -72,6 +73,24 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
     const key = KEY_VENDOR.getKey()
     let [selected, setSelected] = useState<number>(key,"selected",opts.selected,()=>0)
     const renderer = opts.renderItem || DefaultItemRenderer
+    // console.log("doing layout",key)
+    const navUp = (e:CEvent) => {
+        console.log("nav up", selected)
+        if(selected > 0) {
+            setSelected(selected-1)
+            e.redraw()
+        }
+    }
+    const navDown = (e:CEvent) => {
+        console.log("nav down", selected)
+            setSelected(selected+1)
+            e.redraw()
+    }
+    const navTo = (s:number,e:CEvent) => {
+        console.log("nav to", selected)
+        setSelected(s)
+        e.redraw()
+    }
     return new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
@@ -83,11 +102,14 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
             background: Style.panel().backgroundColor
         },
         borderWidth: withInsets(1),
+        handleEvent:(e) => {
+            if(e.type === 'keyboard-typed') {
+                if(e.key === 'ArrowUp') navUp(e)
+                if(e.key === 'ArrowDown') navDown(e)
+            }
+        },
         children: opts.data.map((item, index) => {
-            return renderer(item, selected, index, (s, e) => {
-                setSelected(s)
-                e.redraw()
-            })
+            return renderer(item, selected, index, (s, e) => navTo(s, e))
         })
     })
 }
