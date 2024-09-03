@@ -75,19 +75,19 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
     const renderer = opts.renderItem || DefaultItemRenderer
     // console.log("doing layout",key)
     const navUp = (e:CEvent) => {
-        console.log("nav up", selected)
+        console.log("nav up", selected, e.type)
         if(selected > 0) {
             setSelected(selected-1)
             e.redraw()
         }
     }
     const navDown = (e:CEvent) => {
-        console.log("nav down", selected)
+        console.log("nav down", selected, e.type)
             setSelected(selected+1)
             e.redraw()
     }
     const navTo = (s:number,e:CEvent) => {
-        console.log("nav to", selected)
+        console.log("nav to", selected, e.type)
         setSelected(s)
         e.redraw()
     }
@@ -104,8 +104,9 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         borderWidth: withInsets(1),
         handleEvent:(e) => {
             if(e.type === 'keyboard-typed') {
-                if(e.key === 'ArrowUp') navUp(e)
-                if(e.key === 'ArrowDown') navDown(e)
+                if(e.key === 'ArrowUp') return navUp(e)
+                if(e.key === 'ArrowDown') return navDown(e)
+                return e.ignore
             }
         },
         children: opts.data.map((item, index) => {

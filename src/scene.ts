@@ -247,7 +247,7 @@ export class Scene {
             }
             if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
             if(ignored) {
-                // console.log("ignored. need to go up to the parent")
+                console.log("ignored. need to go up to the parent")
                 // console.log("comp",comp)
                 // console.log(this.keyboard_path)
                 let n = this.keyboard_path.findIndex(n => n.settings.key === comp.settings.key)

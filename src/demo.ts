@@ -177,10 +177,6 @@ export function makeListDemo() {
         children: [
             ListView({
                 data: ["john", "Jacob", 'jingleheimer'],
-                // selected: {
-                //     get: () => state.selectedListItem1,
-                //     set: (value) => state.selectedListItem1 = value
-                // },
             }),
             ListView({
                 data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar'],
@@ -193,7 +189,12 @@ export function makeListDemo() {
                         ],
                         selected: index === selected,
                         handleEvent: (e) => {
-                            os(index, e)
+                            if(e.type === 'mouse-down') {
+                                return os(index, e)
+                            }
+                            if(e.type === 'keyboard-typed') {
+                                return e.ignore()
+                            }
                         }
                     })
                 }
