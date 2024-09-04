@@ -212,7 +212,7 @@ export class Scene {
             let last = found[found.length - 1]
             this.current_mouse_target = last.settings.key
             // if (last.settings.handleEvent) last.settings.handleEvent(evt)
-            if(last.settings.key !== this.debug_target) {
+            if(last.settings.key !== this.debug_target && shift) {
                 this.ifTarget(this.debug_target,(comp) => comp.debug = false)
                 this.debug_target = last.settings.key
                 this.request_just_redraw()

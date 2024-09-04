@@ -6,7 +6,7 @@ import {baselineRow, makeCompsDemo, makeTabs, testList} from "./demo.ts";
 import {makeCanvas} from "./util.js";
 import {Point, Size} from "josh_js_util";
 import {MWindow} from "./window.js";
-import {EmailDemo} from "./email.js";
+import {EmailDemo, rightColum} from "./email.js";
 import {Button} from "./buttons.js";
 
 // const state = {
@@ -22,7 +22,7 @@ import {Button} from "./buttons.js";
 //     textInputCursorPosition: new Point(5, 0)
 // }
 
-const size =new Size(600,600)
+const size =new Size(1000,600)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -34,10 +34,9 @@ async function loadFont() {
 }
 
 
-function doit() {
-    return MWindow({ child:EmailDemo(), })
-}
-
+// const doit = () => MWindow({ child:EmailDemo()})
+const doit = () => makeTabs()
+// const doit = () => EmailDemo()
 // const doit = () => EmailDemo()
 // const doit = () => makeCompsDemo()
 // const doit = () => baselineRow()
