@@ -74,6 +74,7 @@ export class Scene {
         KEY_VENDOR.start()
         this.elementRoot = this.makeTree()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
+        console.log("final render root ",this.renderRoot.settings.pos)
         KEY_VENDOR.end()
         // KEY_VENDOR.dump(this.renderRoot)
         this.syncRenderMap(this.renderRoot)

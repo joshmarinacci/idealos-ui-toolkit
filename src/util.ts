@@ -1,4 +1,4 @@
-import {Bounds, Insets, Size} from "josh_js_util";
+import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {ElementSettings, FontSettings, RenderNodeSettings} from "./base.js";
 import {withInsets} from "./gfx.js";
 
@@ -75,4 +75,42 @@ export function bdsAddInsets(bds: Bounds, insets: Insets) {
 
 export function withFallback<T>(value: T | undefined, fallback: T): T {
     return value || fallback
+}
+
+
+export class DebugPoint extends Point {
+    private log: Logger;
+    private _x:number
+    get x(): number {
+        return this._x;
+    }
+    set x(value: number) {
+        const stack = new Error().stack;
+        if(this.log) this.log.info("set x",value,'\n',stack)
+        this._x = value;
+    }
+    private _y:number
+    get y(): number {
+        return this._y;
+    }
+    set y(value: number) {
+        const stack = new Error().stack;
+        if(this.log) this.log.info("set y",value,'\n',stack)
+        this._y = value;
+    }
+    constructor(x:number,y:number) {
+        super(x,y);
+        this._x = x
+        this._y = y
+        this.log = make_logger("DEBUG_POINT")
+        const stack = new Error().stack;
+        this.log.info("createed with",this._x,this._y,'\n',stack)
+    }
+    toString(): string {
+        return `Pt(${this._x},${this._y})`
+    }
+    copy(): Point {
+        this.log.info(`copying( ${this._x}, ${this._y})`)
+        return new DebugPoint(this._x, this._y)
+    }
 }

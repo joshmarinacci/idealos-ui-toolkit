@@ -2,10 +2,12 @@ import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {Scene} from "./scene.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {setup_common_keybindings} from "./actions.ts";
-import {makeTabs} from "./demo.ts";
+import {baselineRow, makeCompsDemo, makeTabs, testList} from "./demo.ts";
 import {makeCanvas} from "./util.js";
 import {Point, Size} from "josh_js_util";
-import {rightColum} from "./email.js";
+import {MWindow} from "./window.js";
+import {EmailDemo} from "./email.js";
+import {Button} from "./buttons.js";
 
 // const state = {
 //     toggle: false,
@@ -20,7 +22,7 @@ import {rightColum} from "./email.js";
 //     textInputCursorPosition: new Point(5, 0)
 // }
 
-const size =new Size(1024,600)
+const size =new Size(600,600)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -32,8 +34,15 @@ async function loadFont() {
 }
 
 
+// function doit() {
+//     return MWindow({ child:EmailDemo(), })
+// }
+// const doit = () => EmailDemo()
+const doit = () => makeCompsDemo()
+// const doit = () => Button({text:"Button"})
+// const doit = () => testList()
 setup_common_keybindings()
-const scene = new Scene(rightColum)
+const scene = new Scene(doit)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())

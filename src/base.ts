@@ -1,6 +1,7 @@
 import {RenderContext} from "./gfx.js";
 import {Insets, Point, Size} from "josh_js_util";
 import {STATE_CACHE, StateCache} from "./state.js";
+import {DebugPoint} from "./util.js";
 
 export type LayoutConstraints = {
     space:Size
@@ -109,7 +110,8 @@ export class GRenderNode {
 export type AxisSelfLayout = "grow" | "shrink"
 export type AxisLayout = 'start' | 'center' | 'end' | 'between'
 export const ZERO_INSETS = new Insets(0, 0, 0, 0);
-export const ZERO_POINT = new Point(0, 0)
+export const ZERO_POINT = new DebugPoint(0, 0)
+
 export const TRANSPARENT = 'transparent';
 
 

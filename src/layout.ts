@@ -10,7 +10,7 @@ import {
     ZERO_POINT
 } from "./base.js";
 import {RenderContext} from "./gfx.js";
-import {Bounds, Insets, Point, Size} from "josh_js_util";
+import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {bdsAddInsets, bdsSubInsets, getTotalInsets, insetsHeight, insetsWidth, withFallback} from "./util.js";
 import {KEY_VENDOR} from "./keys.js";
@@ -40,16 +40,11 @@ export type BoxOptions = {
 
 class BoxElementBase {
     protected settings: BoxRequirements;
-    private log_enabled: boolean;
+    protected log: Logger;
 
     constructor(settings: BoxRequirements) {
         this.settings = settings
-        this.log_enabled = false
-    }
-
-    // @ts-ignore
-    protected log(...output: any[]) {
-        if (this.log_enabled) console.log("HBox", ...output)
+        this.log = make_logger(this.settings.kind)
     }
 
     protected getConstraints() {
@@ -86,7 +81,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        this.log(`space`,cons)
+        this.log.info(`space`,cons)
         if (this.settings.mainAxisSelfLayout === 'grow') {
             return this.do_grow_layout(rc, cons)
         }
@@ -138,10 +133,10 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let chs = this.settings.children
         let expanders = chs.filter(ch => ch instanceof HExpander)
         let non_expanders = chs.filter(ch => !(ch instanceof HExpander))
-        this.log(`exp ${expanders.length} non = ${non_expanders.length}`)
+        this.log.info(`exp ${expanders.length} non = ${non_expanders.length}`)
         let map = new Map<GElement, GRenderNode>()
 
-        this.log("growing my width")
+        this.log.info("growing my width")
         contentBounds.w = cons.space.w
         fullBounds.w = cons.space.w
 
@@ -158,7 +153,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         // account for insets
         contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
         // contentBounds = this.subtractInsets(contentBounds)
-        this.log("started content bounds", contentBounds)
+        this.log.info("started content bounds", contentBounds)
 
         // layout the non expander children
         let non_expander_total_width = 0
@@ -170,10 +165,10 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             non_expander_total_width += node.settings.size.w
             map.set(ch, node)
         })
-        this.log(`non ex-ch total width ${non_expander_total_width}`)
+        this.log.info(`non ex-ch total width ${non_expander_total_width}`)
         let leftover = contentBounds.w - non_expander_total_width
         let leftover_per_child = leftover / expanders.length
-        this.log(`leftover ${leftover}`)
+        this.log.info(`leftover ${leftover}`)
         // layout the expander children
         expanders.map(ch => {
             let node = ch.layout(rc, {
@@ -184,7 +179,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             // non_expander_total_width += node.settings.size.w
             map.set(ch, node)
         })
-        this.log(`final leftover is ${leftover}`)
+        this.log.info(`final leftover is ${leftover}`)
 
         //find the max child height
         let max_child_height = 0
@@ -211,7 +206,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             x = contentBounds.x + leftover
         }
         let y = contentBounds.y
-        this.log("layout children at", x, y, contentBounds)
+        this.log.info("layout children at", x, y, contentBounds)
         this.layout_nodes_cross_axis(chs, map, contentBounds)
         chs.forEach(ch => {
             let node = map.get(ch) as GRenderNode
@@ -224,8 +219,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
         fullBounds = bdsAddInsets(contentBounds, getTotalInsets(this.settings))
         // fullBounds = this.addInsets(contentBounds)
-        this.log(`content bounds ${contentBounds}`)
-        this.log(`full bounds ${fullBounds}`)
+        this.log.info(`content bounds ${contentBounds}`)
+        this.log.info   (`full bounds ${fullBounds}`)
         return new GRenderNode({
             ...this.settings,
             kind:this.settings.kind || "hbox",
@@ -248,7 +243,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
         let map = new Map<GElement, GRenderNode>()
-        this.log('shrinking my width')
+        this.log.info('shrinking my width')
         contentBounds.w = cons.space.w
         fullBounds.w = cons.space.w
         contentBounds.h = cons.space.h
@@ -259,7 +254,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         }
         contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
         // contentBounds = this.subtractInsets(contentBounds)
-        this.log("started content bounds", contentBounds)
+        this.log.info("started content bounds", contentBounds)
         // layout all children.
         KEY_VENDOR.startElement(this)
         chs.forEach(ch => {
@@ -285,8 +280,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         contentBounds.h = max_child_height
         fullBounds = bdsAddInsets(contentBounds, getTotalInsets(this.settings))
         // fullBounds = this.addInsets(contentBounds)
-        this.log(`content bounds ${contentBounds}`)
-        this.log(`full bounds ${fullBounds}`)
+        this.log.info(`content bounds ${contentBounds}`)
+        this.log.info(`full bounds ${fullBounds}`)
 
         // position all children
         this.layout_nodes_cross_axis(chs, map, contentBounds)
@@ -373,7 +368,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        this.log("space = ", cons.layout, cons.space)
+        this.log.info("space = ", cons.layout, cons.space)
         let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
 
@@ -395,7 +390,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         }
         let contentBounds = fullBounds.copy()
         contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
-        this.log(this.settings.kind, fullBounds, contentBounds)
+        this.log.info(this.settings.kind, fullBounds, contentBounds)
 
         KEY_VENDOR.startElement(this)
         // layout children
@@ -408,12 +403,10 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         KEY_VENDOR.endElement(this)
 
         // position children
-        let y = contentBounds.y
-        let x = contentBounds.x
+        let pos = contentBounds.position()
         for (let ch of children) {
-            ch.settings.pos.y = y
-            ch.settings.pos.x = x
-            y += ch.settings.size.h
+            ch.settings.pos = pos
+            pos = pos.add(new Point(0,ch.settings.size.h))
         }
 
         //resize myself back out
@@ -430,7 +423,6 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         if (this.settings.crossAxisSelfLayout === 'shrink') {
             fullBounds.w = max_child_size + insetsWidth(total_insets)
         }
-        this.log("using fixed width", this.settings.fixedWidth)
         if (this.settings.fixedWidth) {
             fullBounds.w = this.settings.fixedWidth
         }

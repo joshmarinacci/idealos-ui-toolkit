@@ -45,26 +45,30 @@ export function debugText(rc: RenderContext, pos:Point, text: string, color:stri
 export function drawDebugCompInfo (rc: RenderContext, path: GRenderNode[], debugBounds:Bounds) {
     const lh = 16
     path.forEach((comp, i)=>{
-        let t = comp.settings
-        let bounds = Bounds.fromPointSize(debugBounds.position(),new Size(debugBounds.w,100))
-            .add(new Point(0,i*100))
-        fillRect(rc.ctx,bounds,'rgba(255,255,255,0.6)')
-        strokeBounds(rc,bounds,'black')
-        let pos = bounds.position().copy()
+        try {
+            let t = comp.settings
+            let bounds = Bounds.fromPointSize(debugBounds.position(), new Size(debugBounds.w, 100))
+                .add(new Point(0, i * 100))
+            fillRect(rc.ctx, bounds, 'rgba(255,255,255,0.6)')
+            strokeBounds(rc, bounds, 'black')
+            let pos = bounds.position().copy()
 
-        debugText(rc,pos,` kind = ${t.kind}  key=${t.key}`,'black')
-        pos.y += lh
-        debugText(rc,pos,` pos = ${t.pos}`, isInvalidPoint(t.pos)?'red':'black')
-        pos.y += lh
-        debugText(rc,pos,` size = ${t.size}`, isInvalidSize(t.size)?'red':'black')
+            debugText(rc, pos, ` kind = ${t.kind}  key=${t.key}`, 'black')
+            pos.y += lh
+            debugText(rc, pos, ` pos = ${t.pos}`, isInvalidPoint(t.pos) ? 'red' : 'black')
+            pos.y += lh
+            debugText(rc, pos, ` size = ${t.size}`, isInvalidSize(t.size) ? 'red' : 'black')
 
-        // draw spacing diagram
-        let b = new Bounds( debugBounds.right()-100,bounds.y,100,100)
-        //fill rect around size
-        drawInsets(rc.ctx,b,comp.settings.borderWidth || ZERO_INSETS,'#aaaaaa')
-        b =b.grow(-15)
-        drawInsets(rc.ctx,b,comp.settings.padding || ZERO_INSETS,'#f0f0f0')
-        b =b.grow(-15)
-        fillRect(rc.ctx,b,'#f0d000')
+            // draw spacing diagram
+            let b = new Bounds(debugBounds.right() - 100, bounds.y, 100, 100)
+            //fill rect around size
+            drawInsets(rc.ctx, b, comp.settings.borderWidth || ZERO_INSETS, '#aaaaaa')
+            b = b.grow(-15)
+            drawInsets(rc.ctx, b, comp.settings.padding || ZERO_INSETS, '#f0f0f0')
+            b = b.grow(-15)
+            fillRect(rc.ctx, b, '#f0d000')
+        } catch (e) {
+            console.error(e)
+        }
     })
 }
