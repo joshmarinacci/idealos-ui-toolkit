@@ -5,6 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {makeTabs} from "./demo.ts";
 import {makeCanvas} from "./util.js";
 import {Point, Size} from "josh_js_util";
+import {rightColum} from "./email.js";
 
 // const state = {
 //     toggle: false,
@@ -19,6 +20,8 @@ import {Point, Size} from "josh_js_util";
 //     textInputCursorPosition: new Point(5, 0)
 // }
 
+const size =new Size(1024,600)
+
 async function loadFont() {
     // const font = new FontFace('material-icons',
     //     'url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)')
@@ -30,14 +33,13 @@ async function loadFont() {
 
 
 setup_common_keybindings()
-const scene = new Scene(makeTabs)
+const scene = new Scene(rightColum)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 loadFont().then(() => {
     return scene.init()
 }).then(() => {
-    const size =new Size(800,600)
     const canvas = makeCanvas(size)
     scene.setDPI(window.devicePixelRatio)
     canvas.addEventListener('mousemove', (e) => {
@@ -47,7 +49,6 @@ loadFont().then(() => {
         pos = pos.subtract(new Point(rect.x, rect.y))
         scene.handleMouseMove(pos)
     })
-
     canvas.addEventListener('mousedown', (e) => {
         // @ts-ignore
         let rect = e.target.getBoundingClientRect()
@@ -72,11 +73,7 @@ loadFont().then(() => {
         pos = pos.subtract(new Point(rect.x, rect.y))
         scene.handleWheelEvent(pos,new Point(e.deltaX, e.deltaY))
     })
-
-    scene.onShouldJustRedraw(() => {
-        scene.redraw()
-    })
-
+    scene.onShouldJustRedraw(() => scene.redraw())
     scene.setCanvas(canvas)
     scene.setSize(size)
     scene.layout()

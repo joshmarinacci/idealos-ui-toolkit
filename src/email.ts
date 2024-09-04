@@ -151,7 +151,9 @@ const EmailHeaderView = (mess: typeof EmailMessage) => {
 }
 
 function EmailBody(selectedMessage: typeof EmailMessage) {
-    return ScrollContainer({child: WrappingLabel({
+    return ScrollContainer({
+        fixedHeight: 300,
+        child: WrappingLabel({
         text: selectedMessage.get('body').get(),
     })})
 }
@@ -236,6 +238,18 @@ export function EmailDemo() {
                     EmailBody(AppState.get('messages').get(AppState.get('selectedMessage').get())),
                 ]
             }),
+        ]
+    })
+}
+
+export function rightColum() {
+    return VBox({
+        fixedWidth:400,
+        fixedHeight: 300,
+        crossAxisSelfLayout: 'shrink',
+        children: [
+            EmailHeaderView(AppState.get('messages').get(AppState.get('selectedMessage').get())),
+            EmailBody(AppState.get('messages').get(AppState.get('selectedMessage').get())),
         ]
     })
 }

@@ -22,7 +22,7 @@ export class Scene {
     private debug_enabled: boolean;
 
     constructor(makeTree: () => GElement) {
-        this.debug_enabled = false
+        this.debug_enabled = true
         this.makeTree = makeTree
         this.devicePixelRatio = 1
         this.size = new Size(100,100)

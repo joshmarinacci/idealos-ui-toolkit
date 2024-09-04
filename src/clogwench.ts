@@ -247,7 +247,7 @@ interface BufferImage {
     id: string;
 }
 
-const CSS_TO_ARGB:Record<string,Color> = {
+const CSS_TO_COLOR:Record<string,Color> = {
     transparent:TRANSPARENT,
     black:BLACK,
     red:RED,
@@ -257,7 +257,7 @@ const CSS_TO_ARGB:Record<string,Color> = {
 function toARGB(value: any) {
     if(typeof value === 'string') {
         let str = value
-        if(CSS_TO_ARGB[str]) return CSS_TO_ARGB[str]
+        if(CSS_TO_COLOR[str]) return CSS_TO_COLOR[str]
     }
     return RED
 }
@@ -296,7 +296,7 @@ async function doit() {
     let win = await app.open_window(bounds)
     const bitmap = pureimage.make(bounds.w, bounds.h)
     const scene = new Scene(start)
-    scene.setDPI(1)
+    scene.setDPI(0.5)
     MGlobals.set(Scene.name, scene)
     MGlobals.set(SYMBOL_FONT_ENABLED, true)
     MGlobals.set(STATE_CACHE, new StateCache())
