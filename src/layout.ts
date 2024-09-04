@@ -38,6 +38,14 @@ export type BoxOptions = {
     visualStyle?: VisualStyle
 } & ElementSettings;
 
+export type BoxConstraints = {
+    fixedWidth?: number
+    fixedHeight?: number
+    mainAxisSelfLayout: AxisSelfLayout,
+    crossAxisSelfLayout: AxisSelfLayout,
+    mainAxisLayout: AxisLayout,
+    crossAxisLayout: AxisLayout,
+}
 class BoxElementBase {
     protected settings: BoxRequirements;
     protected log: Logger;
@@ -47,7 +55,7 @@ class BoxElementBase {
         this.log = make_logger(this.settings.kind)
     }
 
-    protected getConstraints() {
+    protected getConstraints():BoxConstraints {
         return {
             mainAxisSelfLayout: this.settings.mainAxisSelfLayout,
             mainAxisLayout: this.settings.mainAxisLayout,

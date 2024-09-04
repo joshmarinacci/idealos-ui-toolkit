@@ -104,13 +104,13 @@ export class DebugPoint extends Point {
         this._y = y
         this.log = make_logger("DEBUG_POINT")
         const stack = new Error().stack;
-        this.log.info("createed with",this._x,this._y,'\n',stack)
+        // this.log.info("createed with",this._x,this._y,'\n',stack)
     }
     toString(): string {
         return `Pt(${this._x},${this._y})`
     }
     copy(): Point {
-        this.log.info(`copying( ${this._x}, ${this._y})`)
+        // this.log.info(`copying( ${this._x}, ${this._y})`)
         return new DebugPoint(this._x, this._y)
     }
 }
