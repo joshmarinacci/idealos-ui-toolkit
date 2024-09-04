@@ -4,12 +4,12 @@ import {GRenderNode, ZERO_INSETS} from "./base.js";
 
 export type TextValign = "top" | "middle" | "bottom"
 export type TextHalign = "left" | 'center' | "right"
+
 function text(ctx: CanvasRenderingContext2D, text: string, point: Point, valign:TextValign, halign:TextHalign) {
     ctx.textBaseline = valign
     ctx.textAlign = halign
     ctx.fillText(text, point.x, point.y)
 }
-
 export function drawInsets(ctx: CanvasRenderingContext2D, b: Bounds, ins: Insets, color: string) {
     fillRect(ctx, b, color)
     ctx.fillStyle = 'black'
@@ -19,61 +19,52 @@ export function drawInsets(ctx: CanvasRenderingContext2D, b: Bounds, ins: Insets
     text(ctx, '' + ins.left, b.left_midpoint(), 'middle', 'left')
     text(ctx, '' + ins.right, b.right_midpoint(), 'middle', 'right')
 }
-
-export function isInvalid(size: Size) {
+export function isInvalidSize(size: Size) {
     if (!size) return true
     if (isNaN(size.w)) return true
     if (isNaN(size.h)) return true
     if (!(size instanceof Size)) return true
     return false
 }
-
-
-export function debugText(rc: RenderContext, bounds: Bounds, text: string, color:string) {
-    rc.ctx.fillStyle = color || 'black'
-    rc.ctx.fillText(text,bounds.x,bounds.y+20)
+export function isInvalidPoint(point: Point) {
+    if (!point) return true
+    if (isNaN(point.x)) return true
+    if (isNaN(point.y)) return true
+    if (!(point instanceof Point)) return true
+    return false
 }
-
-export function drawDebugCompInfo (rc: RenderContext, comp: GRenderNode, w: number) {
-    const lh = 16
-    let bounds = new Bounds(0,0,w,100)
-    fillRect(rc.ctx,bounds,'white')
-    strokeBounds(rc,bounds,'black')
-    let t = comp.settings
-
+export function debugText(rc: RenderContext, pos:Point, text: string, color:string) {
     rc.ctx.fillStyle = 'black'
-    rc.ctx.font = '11px sans-serif'
+    rc.ctx.font = '12px sans-serif'
     rc.ctx.textAlign = 'start'
     rc.ctx.textBaseline = 'middle'
+    rc.ctx.fillStyle = color || 'black'
+    rc.ctx.fillText(text,pos.x,pos.y+20)
+}
 
-    rc.ctx.save()
-    let b = new Bounds( w-100,0,100,100)
-    //fill rect around size
-    drawInsets(rc.ctx,b,comp.settings.borderWidth || ZERO_INSETS,'#aaaaaa')
-    b =b.grow(-15)
-    drawInsets(rc.ctx,b,comp.settings.padding || ZERO_INSETS,'#f0f0f0')
-    b =b.grow(-15)
-    fillRect(rc.ctx,b,'#f0d000')
-    //fill rect around inner content
-    rc.ctx.restore()
+export function drawDebugCompInfo (rc: RenderContext, path: GRenderNode[], debugBounds:Bounds) {
+    const lh = 16
+    path.forEach((comp, i)=>{
+        let t = comp.settings
+        let bounds = Bounds.fromPointSize(debugBounds.position(),new Size(debugBounds.w,100))
+            .add(new Point(0,i*100))
+        fillRect(rc.ctx,bounds,'rgba(255,255,255,0.6)')
+        strokeBounds(rc,bounds,'black')
+        let pos = bounds.position().copy()
 
-    debugText(rc,bounds,` kind = ${t.kind}  key=${t.key}`,'black')
-    rc.ctx.translate(0,lh)
-    if(isInvalid(t.size)) {
-        debugText(rc,bounds,` pos = ${t.pos} size = ${t.size}`,'red')
-    } else {
-        debugText(rc,bounds,` pos = ${t.pos} size = ${t.size}`,'black')
-    }
-    rc.ctx.translate(0,lh)
-    debugText(rc,bounds,` text = ${t.text}`,'black')
-    // rc.ctx.translate(0,lh)
-    // this.debugText(rc,bounds,` padding = ${t.padding}`)
+        debugText(rc,pos,` kind = ${t.kind}  key=${t.key}`,'black')
+        pos.y += lh
+        debugText(rc,pos,` pos = ${t.pos}`, isInvalidPoint(t.pos)?'red':'black')
+        pos.y += lh
+        debugText(rc,pos,` size = ${t.size}`, isInvalidSize(t.size)?'red':'black')
 
-
-    comp.settings.children.forEach((ch,i) => {
-        rc.ctx.save()
-        rc.ctx.translate(0,105*i+100)
-        drawDebugCompInfo(rc,ch,w)
-        rc.ctx.restore()
+        // draw spacing diagram
+        let b = new Bounds( debugBounds.right()-100,bounds.y,100,100)
+        //fill rect around size
+        drawInsets(rc.ctx,b,comp.settings.borderWidth || ZERO_INSETS,'#aaaaaa')
+        b =b.grow(-15)
+        drawInsets(rc.ctx,b,comp.settings.padding || ZERO_INSETS,'#f0f0f0')
+        b =b.grow(-15)
+        fillRect(rc.ctx,b,'#f0d000')
     })
 }

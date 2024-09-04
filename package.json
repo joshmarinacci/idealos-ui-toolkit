@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/*.ts --outdir=build",
-    "prep": "mkdir -p build && cp index.html build && ln -s ../node_modules/material-symbols/ build/",
+    "prep": "mkdir -p build && cp index.html build && ln -sf ../node_modules/material-symbols/ build/",
     "esbuild-serve": "npm run prep && esbuild src/index.ts --bundle --outdir=build --watch --serve --servedir=build",
     "start": "mkdir -p build && cp index.html build && esbuild src/index.ts --bundle --watch --outdir=build --servedir=build",
     "sdl-test": "npm run clean && mkdir -p build && esbuild src/*.ts --outdir=build && node build/sdltest.js",

@@ -1,7 +1,7 @@
 import {AxisSelfLayout, GElement, GRenderNode, LayoutConstraints, ZERO_POINT} from "./base.js";
 import {RenderContext} from "./gfx.js";
 import {KEY_VENDOR} from "./keys.js";
-import {Bounds} from "josh_js_util";
+import {Bounds, Logger, make_logger} from "josh_js_util";
 import {Style} from "./style.js";
 
 type GridColumn = {
@@ -22,12 +22,15 @@ type GridBoxOptions = {
 
 class GridBoxElement implements GElement {
     private settings: GridBoxOptions;
+    private log: Logger;
 
     constructor(opts: GridBoxOptions) {
         this.settings = opts
+        this.log = make_logger("GRID_BOX")
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
+        this.log.info("layout", cons)
         const key = KEY_VENDOR.getKey()
         const boxes: GRenderNode[] = []
 
@@ -76,7 +79,7 @@ class GridBoxElement implements GElement {
             children: boxes,
             contentOffset: ZERO_POINT,
             font: "",
-            kind: "",
+            kind: "grid-box",
             pos: ZERO_POINT.copy(),
             size: cons.space.copy(),
             padding: Style.panel().padding,

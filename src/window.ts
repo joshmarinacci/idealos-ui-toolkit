@@ -8,13 +8,19 @@ import {STATE_CACHE, StateCache} from "./state.js";
 import {KEY_VENDOR} from "./keys.js";
 import {bdsSubInsets} from "./util.js";
 
+
+type MWindowOptions = {
+    child:GElement
+    initSize?:Size
+}
+
 class MWindowElement implements GElement {
     private child: GElement;
     private initSize: Size;
 
-    constructor(param: { child: GElement, initSize:Size }) {
-        this.child = param.child
-        this.initSize = param.initSize
+    constructor(opts: MWindowOptions) {
+        this.child = opts.child
+        this.initSize = opts.initSize || new Size(600,400)
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
@@ -90,6 +96,6 @@ class MWindowElement implements GElement {
 
 }
 
-export function MWindow(param: { child: GElement, initSize:Size }) {
-    return new MWindowElement(param)
+export function MWindow(opts: MWindowOptions) {
+    return new MWindowElement(opts)
 }

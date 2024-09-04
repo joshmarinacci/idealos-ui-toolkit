@@ -11,14 +11,15 @@ export class Scene {
     private makeTree: () => GElement;
     private current_hover: string | undefined;
     private keyboard_target: string | undefined
+    private keyboard_path: GRenderNode[];
     private current_mouse_target: string | undefined;
     private debug_target: string | undefined
+    private debug_path: GRenderNode[];
     private renderMap: Map<string, GRenderNode>;
     size: Size;
     private should_redraw_callback?: () => void;
     private devicePixelRatio: number;
     private should_just_redraw_callback?: () => void;
-    private keyboard_path: GRenderNode[];
     private debug_enabled: boolean;
 
     constructor(makeTree: () => GElement) {
@@ -28,6 +29,7 @@ export class Scene {
         this.size = new Size(100,100)
         this.renderMap = new Map<string, GRenderNode>();
         this.keyboard_path = []
+        this.debug_path = []
     }
 
     // private log(...text: any[]) {
@@ -178,13 +180,13 @@ export class Scene {
         let found = this.findTarget(pos, this.renderRoot)
         if (found) {
             // debug overlay
-            if(found.settings.key !== this.debug_target) {
+            // if(found.settings.key !== this.debug_target) {
                 // console.log("swap",found.settings.key, this.debug_target)
                 // this.ifTarget(this.debug_target,(comp) => comp.debug = false)
                 // found.debug = true
                 // this.debug_target = found.settings.key
                 // this.request_just_redraw()
-            }
+            // }
 
             // hover effect
             if(found.settings.key !== this.current_hover) {
@@ -218,6 +220,7 @@ export class Scene {
             last.focused = true
             this.keyboard_target = last.settings.key
             this.keyboard_path = found
+            this.debug_path = found
             // dispatch event
             this.dispatchEvent(evt,found.slice())
             this.request_just_redraw()
@@ -271,27 +274,10 @@ export class Scene {
     private drawDebugOverlay(rc: RenderContext) {
         rc.ctx.save()
         rc.ctx.strokeStyle = 'red'
-        const bounds = new Bounds(this.size.w-400,0,400,this.size.h)
-        this.debugStrokeBounds(rc,bounds,'red',1)
-        this.debugFillBounds(rc,bounds,'rgba(255,255,255,0.5)')
-        this.ifTarget(this.debug_target,(comp)=>{
-            rc.ctx.save()
-            rc.ctx.translate(bounds.x,bounds.y)
-            drawDebugCompInfo(rc,comp, bounds.w)
-            rc.ctx.restore()
-        })
+        const bounds = new Bounds(this.size.w-300,0,300,this.size.h)
+        drawDebugCompInfo(rc,this.debug_path,bounds)
         rc.ctx.restore()
     }
-    private debugStrokeBounds(rc: RenderContext, bounds: Bounds, fill: string, thickness: number) {
-        rc.ctx.strokeStyle = fill
-        rc.ctx.lineWidth = thickness
-        rc.ctx.strokeRect(bounds.x,bounds.y,bounds.w,bounds.h)
-    }
-    private debugFillBounds(rc: RenderContext, bounds: Bounds, fill: string) {
-        rc.ctx.fillStyle = fill
-        rc.ctx.fillRect(bounds.x,bounds.y,bounds.w,bounds.h)
-    }
-
 
     onShouldRedraw(cb: () => void) {
         this.should_redraw_callback = cb
