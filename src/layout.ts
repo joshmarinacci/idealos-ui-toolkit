@@ -95,13 +95,16 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         chs.forEach(ch => {
             let node = map.get(ch) as GRenderNode
             if (this.settings.crossAxisLayout === 'start') {
-                node.settings.pos.y = contentBounds.y
+                let y =  contentBounds.y
+                node.settings.pos = new Point(node.settings.pos.x, y)
             }
             if (this.settings.crossAxisLayout === 'center') {
-                node.settings.pos.y = contentBounds.y + (contentBounds.h - node.settings.size.h) / 2
+                let y =  contentBounds.y + (contentBounds.h - node.settings.size.h) / 2
+                node.settings.pos = new Point(node.settings.pos.x,y)
             }
             if (this.settings.crossAxisLayout === 'end') {
-                node.settings.pos.y = contentBounds.y + contentBounds.h - node.settings.size.h
+                let y = contentBounds.y + contentBounds.h - node.settings.size.h
+                node.settings.pos = new Point(node.settings.pos.x,y)
             }
         })
     }
