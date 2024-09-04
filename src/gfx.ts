@@ -163,7 +163,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     }
     // console.log('drawing',n.settings.pos)
     rc.ctx.save()
-    rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
+    rc.ctx.translate(n.settings.pos.x, Math.floor(n.settings.pos.y))
 
     let bounds = Bounds.fromPointSize(new Point(0,0,),n.settings.size)
 
