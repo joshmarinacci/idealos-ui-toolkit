@@ -85,11 +85,9 @@ ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
     let pos = args.pos.subtract(new Point(1,0))
     if(pos.x < 0) {
         if(pos.y > 0) {
-            pos.y--
-            pos.x = model.lineLengthAt(pos)
+            pos = new Point(model.lineLengthAt(pos),pos.y-1)
         } else {
-            pos.x = 0
-            pos.y = 0
+            pos = ZERO_POINT.copy()
         }
     }
     return {
@@ -182,9 +180,7 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
 ACTION_MAP.addAction('insert-newline', (args) => {
     let model = new TextModel(args.text)
     model.splitLineAt(args.pos)
-    let pos = args.pos.copy()
-    pos.x = 0
-    pos.y += 1
+    let pos = new Point(0,args.pos.y+1)
     return {text:model.toText(), pos:pos}
 })
 
@@ -461,11 +457,12 @@ class TextInputElement implements GElement {
         let text_before = line.substring(0,cursorPosition.x)
         let [metrics, baseline] = this.calcMetrics(rc, text_before)
         let total_insets = getTotalInsets(this.settings)
-        text_node.settings.pos.x = total_insets.left
-        text_node.settings.pos.y = total_insets.top
+        text_node.settings.pos = new Point(total_insets.left, total_insets.top)
 
-        cursor_node.settings.pos.x = total_insets.left + metrics.w
-        cursor_node.settings.pos.y = total_insets.top + cursorPosition.y * baseline
+        cursor_node.settings.pos = new Point(
+            total_insets.left + metrics.w  ,
+            total_insets.top + cursorPosition.y * baseline
+        )
         cursor_node.settings.size.h = metrics.h
         const size = new Size(100,100)
         if(this.settings.fixedWidth) {

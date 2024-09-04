@@ -1,4 +1,4 @@
-import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent,} from "./base.js";
+import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent, ZERO_POINT,} from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
@@ -74,7 +74,8 @@ export class Scene {
         KEY_VENDOR.start()
         this.elementRoot = this.makeTree()
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
-        console.log("final render root ",this.renderRoot.settings.pos)
+        // console.log(`final render root ${this.renderRoot.settings.pos} `)
+        // console.log(`final zero point ${ZERO_POINT}`)
         KEY_VENDOR.end()
         // KEY_VENDOR.dump(this.renderRoot)
         this.syncRenderMap(this.renderRoot)

@@ -34,11 +34,13 @@ async function loadFont() {
 }
 
 
-// function doit() {
-//     return MWindow({ child:EmailDemo(), })
-// }
+function doit() {
+    return MWindow({ child:EmailDemo(), })
+}
+
 // const doit = () => EmailDemo()
-const doit = () => makeCompsDemo()
+// const doit = () => makeCompsDemo()
+// const doit = () => baselineRow()
 // const doit = () => Button({text:"Button"})
 // const doit = () => testList()
 setup_common_keybindings()
