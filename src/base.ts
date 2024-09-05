@@ -41,9 +41,11 @@ type BaseEvent = {
     redraw:()=>void
     use:()=>void
 }
+export type MouseButton = "None" | "Primary" | "Secondary"
 export type MMouseEvent = {
     type: 'mouse-move' | 'mouse-down' | 'mouse-up'
     position:Point
+    button: MouseButton
     redraw:()=>void
     shift: boolean
 } & BaseEvent

@@ -1,4 +1,4 @@
-import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MWheelEvent, ZERO_POINT,} from "./base.js";
+import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MouseButton, MWheelEvent, } from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
@@ -168,12 +168,13 @@ export class Scene {
         }
     }
 
-    public handleMouseMove(pos: Point) {
+    public handleMouseMove(pos: Point, button:MouseButton, shift:boolean) {
         let evt:MMouseEvent = {
             type:'mouse-move',
             redraw: () => this.request_layout_and_redraw(),
             position:pos,
-            shift:false,
+            shift:shift,
+            button:button,
             use: () => {}
         }
         this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
@@ -199,13 +200,14 @@ export class Scene {
             }
         }
     }
-    handleMouseDown(pos: Point,shift:boolean) {
+    handleMouseDown(pos: Point,button:MouseButton,shift:boolean) {
         let evt:MMouseEvent = {
             type:'mouse-down',
             redraw: () => this.request_layout_and_redraw(),
             use: () => {},
             position:pos,
             shift:shift,
+            button:button
         }
         let found = this.findTargetStack(pos, this.renderRoot)
         if(found) {
@@ -228,13 +230,14 @@ export class Scene {
             this.request_just_redraw()
         }
     }
-    handleMouseUp(pos:Point) {
+    handleMouseUp(pos:Point, button:MouseButton, shift:boolean) {
         let evt:MMouseEvent = {
             type:'mouse-up',
             redraw: () => this.request_layout_and_redraw(),
             use: () => {},
             position:pos,
-            shift:false,
+            button: button,
+            shift:shift,
         }
         this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
             if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)

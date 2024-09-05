@@ -1,14 +1,10 @@
-import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.ts";
+import {MGlobals, MouseButton, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {Scene} from "./scene.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {setup_common_keybindings} from "./actions.ts";
-import {baselineRow, makeCompsDemo, makeTabs, testList} from "./demo.ts";
 import {makeCanvas} from "./util.js";
 import {Point, Size} from "josh_js_util";
-import {MWindow} from "./window.js";
-import {EmailDemo, rightColum} from "./email.js";
-import {Button} from "./buttons.js";
-import {TextBox} from "./text.js";
+import {MinesweeperApp} from "./minesweeper.js";
 
 // const state = {
 //     toggle: false,
@@ -36,8 +32,8 @@ async function loadFont() {
 
 
 // const doit = () => MWindow({ child:EmailDemo()})
-const doit = () => makeTabs()
-// const doit = () => TextBox({})
+// const doit = () => makeTabs()
+const doit = () => MinesweeperApp()
 // const doit = () => EmailDemo()
 // const doit = () => EmailDemo()
 // const doit = () => makeCompsDemo()
@@ -49,6 +45,17 @@ const scene = new Scene(doit)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
+
+function toMouseButton(e: MouseEvent):MouseButton {
+    let button:MouseButton = 'None'
+    if(e.buttons === 1) {
+        button = 'Primary'
+    }
+    if(e.buttons === 2) {
+        button = 'Secondary'
+    }
+    return button
+}
 loadFont().then(() => {
     return scene.init()
 }).then(() => {
@@ -59,21 +66,24 @@ loadFont().then(() => {
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleMouseMove(pos)
+        scene.handleMouseMove(pos, toMouseButton(e), e.shiftKey)
     })
     canvas.addEventListener('mousedown', (e) => {
         // @ts-ignore
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleMouseDown(pos,e.shiftKey)
+        scene.handleMouseDown(pos,toMouseButton(e),e.shiftKey)
+    })
+    canvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
     })
     canvas.addEventListener('mouseup', (e) => {
         // @ts-ignore
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleMouseUp(pos)
+        scene.handleMouseUp(pos,toMouseButton(e),e.shiftKey)
     })
     window.addEventListener('keydown', (e) => {
         scene.handleKeydownEvent(e.key, e.ctrlKey, e.shiftKey)

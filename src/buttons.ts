@@ -77,11 +77,12 @@ const NULL_HOVER:VisualStyle = {
     borderColor:TRANSPARENT,
 }
 export const Button = (opts: ButtonParameters) => {
+    let bg = opts.visualStyle?.background || Style.button().backgroundColor;
     return new MHBoxElement({
         key:opts.key,
         kind:'button',
         visualStyle: {
-            background: opts.selected?Style.selectedButton().backgroundColor:Style.button().backgroundColor,
+            background: opts.selected?Style.selectedButton().backgroundColor:bg,
             borderColor: opts.visualStyle?.borderColor || Style.button().borderColor,
             textColor: Style.button().textColor,
         },
