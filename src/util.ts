@@ -1,6 +1,8 @@
 import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
-import {ElementSettings, FontSettings, RenderNodeSettings} from "./base.js";
+import {ElementSettings, FontSettings, MGlobals, RenderNodeSettings} from "./base.js";
 import {withInsets} from "./gfx.js";
+import {Obj} from "rtds-core";
+import {Scene} from "./scene.js";
 
 export function makeCanvas(size: Size) {
     const canvas = document.createElement('canvas')
@@ -113,4 +115,15 @@ export class DebugPoint extends Point {
         // this.log.info(`copying( ${this._x}, ${this._y})`)
         return new DebugPoint(this._x, this._y)
     }
+}
+
+export function useRefresh<T>(_key: string, data: Obj<T>) {
+    const hand = () => {
+        // console.log("the data has changed")
+        const scene = MGlobals.get(Scene.name) as Scene
+        scene.layout()
+        scene.redraw()
+        data.off('changed', hand)
+    }
+    data.on('changed', hand)
 }

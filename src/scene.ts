@@ -307,10 +307,10 @@ export class Scene {
 
     private dispatchEvent(evt: CEvent, keys: string[]) {
         keys = keys.slice()
-        console.log("===\nevt",evt.type)
+        // console.log("===\nevt",evt.type)
         let used = false
         evt.use = () => {
-            console.log("using it")
+            // console.log("using it")
             used = true
         }
         while(true) {
@@ -318,20 +318,20 @@ export class Scene {
             let key = keys.pop() as string
             let node = this.renderMap.get(key)
             if(node) {
-                console.log("sending to ", node.settings.key, node.settings.kind)
+                // console.log("sending to ", node.settings.key, node.settings.kind)
                 if (node.settings.handleEvent) {
                     node.settings.handleEvent(evt)
                     if (used) {
-                        console.log("it was used. done");
+                        // console.log("it was used. done");
                         break
                     } else {
-                        console.log("was not used. going up")
+                        // console.log("was not used. going up")
                     }
                 } else {
-                    console.warn("didn't handle event")
+                    // console.warn("didn't handle event")
                 }
             } else {
-                console.warn("no comp")
+                // console.warn("no comp")
                 break;
             }
         }

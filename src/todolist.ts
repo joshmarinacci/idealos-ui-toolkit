@@ -5,6 +5,7 @@ import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
 import {Label} from "./text.js";
 import {CEvent, StateHandler} from "./base.js";
 import {KEY_VENDOR} from "./keys.js";
+import {useRefresh} from "./util.js";
 
 const S = new Schema()
 const TodoItem = S.map(
@@ -67,6 +68,7 @@ const state = {
 
 export function TodoListDemo() {
     const key = KEY_VENDOR.getKey()
+    useRefresh(key,data)
     const addItem = (e: CEvent) => {
         if (e.type != 'mouse-down') return
         const item = TodoItem.cloneWith({
