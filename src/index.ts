@@ -8,6 +8,7 @@ import {Point, Size} from "josh_js_util";
 import {MWindow} from "./window.js";
 import {EmailDemo, rightColum} from "./email.js";
 import {Button} from "./buttons.js";
+import {TextBox} from "./text.js";
 
 // const state = {
 //     toggle: false,
@@ -36,6 +37,7 @@ async function loadFont() {
 
 // const doit = () => MWindow({ child:EmailDemo()})
 const doit = () => makeTabs()
+// const doit = () => TextBox({})
 // const doit = () => EmailDemo()
 // const doit = () => EmailDemo()
 // const doit = () => makeCompsDemo()

@@ -11,7 +11,7 @@ export class Scene {
     private makeTree: () => GElement;
     private current_hover: string | undefined;
     private keyboard_target: string | undefined
-    private keyboard_path: GRenderNode[];
+    private keyboard_path: string[];
     private current_mouse_target: string | undefined;
     private debug_target: string | undefined
     private debug_path: GRenderNode[];
@@ -221,10 +221,10 @@ export class Scene {
             this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
             last.focused = true
             this.keyboard_target = last.settings.key
-            this.keyboard_path = found
+            this.keyboard_path = found.map(n => n.settings.key)
             this.debug_path = found
             // dispatch event
-            this.dispatchEvent(evt,found.slice())
+            this.dispatchEvent(evt,this.keyboard_path)
             this.request_just_redraw()
         }
     }
@@ -305,8 +305,8 @@ export class Scene {
         }
     }
 
-    private dispatchEvent(evt: CEvent, nodes: GRenderNode[]) {
-        nodes = nodes.slice()
+    private dispatchEvent(evt: CEvent, keys: string[]) {
+        keys = keys.slice()
         console.log("===\nevt",evt.type)
         let used = false
         evt.use = () => {
@@ -314,11 +314,13 @@ export class Scene {
             used = true
         }
         while(true) {
-            let comp = nodes.pop()
-            if (comp) {
-                console.log("sending to ", comp.settings.key, comp.settings.kind)
-                if (comp.settings.handleEvent) {
-                    comp.settings.handleEvent(evt)
+            if(keys.length < 1) break
+            let key = keys.pop() as string
+            let node = this.renderMap.get(key)
+            if(node) {
+                console.log("sending to ", node.settings.key, node.settings.kind)
+                if (node.settings.handleEvent) {
+                    node.settings.handleEvent(evt)
                     if (used) {
                         console.log("it was used. done");
                         break

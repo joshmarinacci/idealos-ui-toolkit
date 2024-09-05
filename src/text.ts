@@ -171,10 +171,9 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let pos = args.pos.copy()
     if(args.key === 'space') args.key = ' '
     model.insertCharAt(pos,args.key)
-    pos.x += 1
     return {
         text:model.toText(),
-        pos:pos
+        pos:new Point(pos.x+1,pos.y)
     }
 })
 ACTION_MAP.addAction('insert-newline', (args) => {
@@ -187,7 +186,7 @@ ACTION_MAP.addAction('insert-newline', (args) => {
 function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent):[string, Point] {
     if(META_KEYS.includes(kbe.key)) return [text,cursorPosition]
     let action_name = ACTION_MAP.match(kbe)
-    // console.log('action name',action_name, cursorPosition)
+    // console.log('TEXT-INPUT, action name',action_name, 'pos',cursorPosition)
     if(action_name) {
         let action_impl = ACTION_MAP.actions.get(action_name)
         if(action_impl) {
@@ -504,6 +503,7 @@ class TextInputElement implements GElement {
                     let t2 = processText(textString, cursorPosition, kbe)
                     setText(t2[0])
                     setCursorPosition(t2[1])
+                    e.use()
                     e.redraw()
                 }
             }
