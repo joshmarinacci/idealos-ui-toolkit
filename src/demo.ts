@@ -198,9 +198,9 @@ export function makeListDemo() {
             }),
             ScrollContainer({
                 fixedWidth: 150,
-                fixedHeight: 200,
+                fixedHeight: 150,
                 child: ListView({
-                    data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux'],
+                    data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux','foo', 'bar', 'baz', 'qux',],
                     key: 'list-view-xx',
                 })
             })
