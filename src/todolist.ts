@@ -1,11 +1,11 @@
-import {ObjAtom, Schema} from 'rtds-core'
+import {Schema} from 'rtds-core'
 import {Button, CheckBox} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
 import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
 import {Label} from "./text.js";
-import {CEvent, StateHandler} from "./base.js";
+import {CEvent} from "./base.js";
 import {KEY_VENDOR} from "./keys.js";
-import {useRefresh} from "./util.js";
+import {AtomAsState, useRefresh} from "./util.js";
 
 const S = new Schema()
 const TodoItem = S.map(
@@ -37,15 +37,6 @@ const data = TodoList.cloneWith([
 data.on('changed', () => {
     console.log("data has changed")
 })
-
-function AtomAsState<T>(atom: ObjAtom<T>): StateHandler<T> {
-    return {
-        get: () => atom.get(),
-        set: (v) => {
-            atom.set(v)
-        }
-    }
-}
 
 const RenderListItem: ListItemRenderer<typeof TodoItem> = (item: typeof TodoItem, selected, index, onSelectedChanged) => {
     return ListViewItem({

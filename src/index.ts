@@ -5,6 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {makeCanvas} from "./util.js";
 import {Point, Size} from "josh_js_util";
 import {MinesweeperApp} from "./minesweeper.js";
+import {DrawingApp} from "./drawing.js";
 
 // const state = {
 //     toggle: false,
@@ -33,7 +34,8 @@ async function loadFont() {
 
 // const doit = () => MWindow({ child:EmailDemo()})
 // const doit = () => makeTabs()
-const doit = () => MinesweeperApp()
+// const doit = () => MinesweeperApp()
+const doit = () => DrawingApp()
 // const doit = () => EmailDemo()
 // const doit = () => EmailDemo()
 // const doit = () => makeCompsDemo()

@@ -1,7 +1,7 @@
 import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
-import {ElementSettings, FontSettings, MGlobals, RenderNodeSettings} from "./base.js";
+import {ElementSettings, FontSettings, MGlobals, RenderNodeSettings, StateHandler} from "./base.js";
 import {withInsets} from "./gfx.js";
-import {Obj} from "rtds-core";
+import {Obj, ObjAtom} from "rtds-core";
 import {Scene} from "./scene.js";
 
 export function makeCanvas(size: Size) {
@@ -126,4 +126,13 @@ export function useRefresh<T>(_key: string, data: Obj<T>) {
         data.off('changed', hand)
     }
     data.on('changed', hand)
+}
+
+export function AtomAsState<T>(atom: ObjAtom<T>): StateHandler<T> {
+    return {
+        get: () => atom.get(),
+        set: (v) => {
+            atom.set(v)
+        }
+    }
 }
