@@ -1,30 +1,30 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
+import {FontSettings, GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
 
-import {bdsSubInsets, calcCanvasFont2} from "./util.js";
+import {bdsSubInsets} from "./util.js";
 
+export type RenderingSurface = {
+    save():void
+    scale(s1:number,s2:number):void
+    translate(off:Point):void
+    restore():void
+    fillRect(bounds: Bounds, color: string): void;
+    measureText(fontSettings: FontSettings, text: string): [Size, number];
+    fillText(settings: RenderNodeSettings, text: string, color: string): void;
+}
 export type RenderContext = {
-    size: Size;
+    size: Size
     scale: number
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D
-    debug: {
-        metrics: boolean
-    },
+    surface: RenderingSurface
 }
 
-export function fillRect(ctx: CanvasRenderingContext2D, bounds: Bounds, color: string) {
-    ctx.fillStyle = color
-    ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
-}
 
-function drawBorder(ctx: CanvasRenderingContext2D, b: Bounds, color: string, w: Insets) {
+function drawBorder(rc: RenderContext, b: Bounds, color: string, w: Insets) {
     // console.log("DRAW BORDER", b,color,w)
-    ctx.fillStyle = color
-    ctx.fillRect(b.x, b.y, b.w, w.top);
-    ctx.fillRect(b.x, b.y, w.left, b.h);
-    ctx.fillRect(b.x2-w.right,b.y,w.right,b.h)
-    ctx.fillRect(b.x,b.y2-w.bottom,b.w,w.bottom)
+    rc.surface.fillRect(new Bounds(b.x, b.y, b.w, w.top),color);
+    rc.surface.fillRect(new Bounds(b.x, b.y, w.left, b.h),color);
+    rc.surface.fillRect(new Bounds(b.x2-w.right, b.y, w.right, b.h),color);
+    rc.surface.fillRect(new Bounds(b.x, b.y2-w.bottom, b.w, w.bottom),color);
 }
 
 export function withPadding(ss: Bounds, padding: Insets) {
@@ -95,9 +95,9 @@ function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     let rad = calculateBorderRadius(n.settings)
     if(rad) {
         // fillRoundRect(rc.ctx,bounds, rad, bg)
-        fillRect(rc.ctx, bounds, bg)
+        rc.surface.fillRect(bounds, bg)
     } else {
-        fillRect(rc.ctx, bounds, bg)
+        rc.surface.fillRect(bounds, bg)
     }
 }
 
@@ -112,32 +112,17 @@ function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     let rad = calculateBorderRadius(n.settings)
     if(rad) {
         // strokeRoundRect(rc.ctx, bounds, rad,color, n.settings.borderWidth as Insets)
-        drawBorder(rc.ctx, bounds, color, n.settings.borderWidth as Insets)
+        drawBorder(rc, bounds, color, n.settings.borderWidth as Insets)
         // rc.ctx.clip()
     } else {
-        drawBorder(rc.ctx, bounds, color, n.settings.borderWidth as Insets)
+        drawBorder(rc, bounds, color, n.settings.borderWidth as Insets)
     }
 }
 
 function doDrawText(rc: RenderContext, n: GRenderNode) {
     if(!n.settings.text) return
     // console.log("drawing text",n.settings.text)
-    rc.ctx.fillStyle = n.settings.visualStyle.textColor || "magenta"
-    rc.ctx.font = calcCanvasFont2(n.settings)
-    // console.log("text",n.settings.text, rc.ctx.font)
-    // rc.ctx.textRendering = 'optimizeLegibility'
-    // rc.ctx.textAlign = 'start'
-    // rc.ctx.textBaseline = 'alphabetic'
-    // console.log("font",rc.ctx.font)
-    // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
-    let x = n.settings.contentOffset.x
-    if(isNaN(n.settings.baseline)){
-        console.log("missing baseline")
-    }
-    let y = n.settings.contentOffset.y + n.settings.baseline
-    // console.log("text",n.settings.text, x,y,fnt)
-    rc.ctx.fillText(n.settings.text,x,y)
-
+    rc.surface.fillText(n.settings,n.settings.text,n.settings.visualStyle.textColor || 'magenta')
 }
 
 function validateNode(n: GRenderNode) {
@@ -162,8 +147,8 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
         draw_node = false
     }
     // console.log('drawing',n.settings.pos)
-    rc.ctx.save()
-    rc.ctx.translate(n.settings.pos.x, Math.floor(n.settings.pos.y))
+    rc.surface.save()
+    rc.surface.translate(n.settings.pos.floor())
 
     let bounds = Bounds.fromPointSize(new Point(0,0,),n.settings.size)
 

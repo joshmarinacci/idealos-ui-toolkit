@@ -1,5 +1,5 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {fillRect, RenderContext, strokeBounds} from "./gfx.js";
+import {RenderContext, strokeBounds} from "./gfx.js";
 import {GRenderNode, ZERO_INSETS} from "./base.js";
 import {BoxConstraints} from "./layout.js";
 
@@ -50,7 +50,7 @@ export function drawDebugCompInfo (rc: RenderContext, path: GRenderNode[], debug
             let t = node.settings
             let bounds = Bounds.fromPointSize(debugBounds.position(), new Size(debugBounds.w, 100))
                 .add(new Point(0, i * 100))
-            fillRect(rc.ctx, bounds, 'rgba(255,255,255,0.6)')
+            rc.surface.fillRect(bounds, 'rgba(255,255,255,0.6)')
             strokeBounds(rc, bounds, 'black')
             let pos = bounds.position().copy()
 

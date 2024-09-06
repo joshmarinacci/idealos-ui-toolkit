@@ -1,6 +1,7 @@
 import {
     CEvent,
     ElementSettings,
+    FontSettings,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -14,7 +15,7 @@ import {
 import {RenderContext, sizeWithPadding, withInsets} from "./gfx.js";
 import {Style} from "./style.js";
 import {Point, Size} from "josh_js_util";
-import {calcCanvasFont, getTotalInsets} from "./util.js";
+import {getTotalInsets} from "./util.js";
 import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.js";
 import {KEY_VENDOR} from "./keys.js";
 
@@ -222,7 +223,7 @@ export class TextElement implements GElement {
     }
 
     private layout_multiline(rc: RenderContext, _cons: LayoutConstraints) {
-        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
+        // rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let key = KEY_VENDOR.getKey()
         let [textsize,baseline] = this.calcMetrics(rc)
         let lineHeight = textsize.h
@@ -236,7 +237,8 @@ export class TextElement implements GElement {
             size.w = this.settings.fixedWidth
         }
         let nodes:GRenderNode[] = lines.map(line => {
-            let metrics = rc.ctx.measureText(line)
+            let [m,_b] = rc.surface.measureText(this.settings.fontSettings as FontSettings,line)
+            // let metrics = rc.ctx.measureText(line)
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
@@ -245,7 +247,7 @@ export class TextElement implements GElement {
                 kind:"text-line-element",
                 text:line,
                 font: Style.base().font,
-                size: new Size(metrics.width,lineHeight),
+                size: new Size(m.w,lineHeight),
                 pos: pos,
                 contentOffset: new Point(0,0),
                 baseline: baseline,
@@ -278,7 +280,7 @@ export class TextElement implements GElement {
     private layout_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
         let key = KEY_VENDOR.getKey()
 
-        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
+        // rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let [textsize, baseline] = this.calcMetrics(rc)
         let lineHeight = textsize.h
         let words = this.settings.text.split(' ')
@@ -299,7 +301,9 @@ export class TextElement implements GElement {
         let current_line = ""
         for(let word of words) {
             word = word + " "
-            let word_width = rc.ctx.measureText(word).width
+            let [wsize,_wbaseline] = rc.surface.measureText(this.settings.fontSettings as FontSettings,word)
+            // let word_width = rc.ctx.measureText(word).width
+            let word_width = wsize.w
             if(x + word_width > size.w) {
                 lines.push(current_line)
                 current_line = word
@@ -312,7 +316,7 @@ export class TextElement implements GElement {
         lines.push(current_line)
         let y = 0
         let nodes:GRenderNode[] = lines.map(line => {
-            let metrics = rc.ctx.measureText(line)
+            let [lsize,_lbaseline] = rc.surface.measureText(this.settings.fontSettings as FontSettings,line)
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
@@ -322,7 +326,7 @@ export class TextElement implements GElement {
                 shadow:true,
                 text:line,
                 font: Style.base().font,
-                size: new Size(metrics.width,lineHeight),
+                size: new Size(lsize.w,lineHeight),
                 pos: pos,
                 contentOffset: new Point(0,0),
                 baseline: baseline,
@@ -358,22 +362,11 @@ export class TextElement implements GElement {
     }
 
     private calcMetrics(rc: RenderContext):[Size,number] {
-        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
-        let metrics = rc.ctx.measureText(this.settings.text)
-        let size = new Size(
-            Math.floor(metrics.width),
-            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
-        let baseline = metrics.fontBoundingBoxAscent
-        if(!metrics.fontBoundingBoxAscent) {
-            size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
-            baseline = metrics.emHeightAscent
-        }
-        return [size, baseline]
+        return rc.surface.measureText(this.settings.fontSettings as FontSettings, this.settings.text)
     }
 
     private layout_single_line_no_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
         let key = KEY_VENDOR.getKey()
-        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
         let [size,baseline] = this.calcMetrics(rc)
         let ins = getTotalInsets(this.settings)
         size = sizeWithPadding(size, ins)
@@ -412,17 +405,18 @@ class TextInputElement implements GElement {
     }
 
     private calcMetrics(rc: RenderContext, text:string):[Size,number] {
-        rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
-        let metrics = rc.ctx.measureText(text)
-        let size = new Size(
-            Math.floor(metrics.width),
-            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
-        let baseline = metrics.fontBoundingBoxAscent
-        if(!metrics.fontBoundingBoxAscent) {
-            size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
-            baseline = metrics.emHeightAscent
-        }
-        return [size, baseline]
+        return rc.surface.measureText(this.settings.fontSettings as FontSettings,text)
+        // rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
+        // let metrics = rc.ctx.measureText(text)
+        // let size = new Size(
+        //     Math.floor(metrics.width),
+        //     Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
+        // let baseline = metrics.fontBoundingBoxAscent
+        // if(!metrics.fontBoundingBoxAscent) {
+        //     size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
+        //     baseline = metrics.emHeightAscent
+        // }
+        // return [size, baseline]
     }
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
@@ -450,7 +444,6 @@ class TextInputElement implements GElement {
         let text_node = text.layout(rc,_cons)
         const cursor_node = this.makeCursor()
 
-        rc.ctx.font = Style.base().font
         let lines = textString.split("\n")
         let line = lines[cursorPosition.y]
         let text_before = line.substring(0,cursorPosition.x)

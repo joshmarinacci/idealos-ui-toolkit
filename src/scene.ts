@@ -1,13 +1,16 @@
-import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MouseButton, MWheelEvent, } from "./base.js";
+import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MouseButton, MWheelEvent, ZERO_POINT,} from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 import {drawDebugCompInfo} from "./debug.js";
 
-export class Scene {
+export type SceneOpts = {
+    size?: Size;
+    debug_enabled?:boolean
+}
+export abstract class Scene {
     private elementRoot!: GElement;
     renderRoot!: GRenderNode;
-    canvas!: HTMLCanvasElement;
     private makeTree: () => GElement;
     private current_hover: string | undefined;
     private keyboard_target: string | undefined
@@ -16,53 +19,33 @@ export class Scene {
     private debug_target: string | undefined
     private debug_path: GRenderNode[];
     private renderMap: Map<string, GRenderNode>;
-    size: Size;
     private should_redraw_callback?: () => void;
     private devicePixelRatio: number;
     private should_just_redraw_callback?: () => void;
-    private debug_enabled: boolean;
+    protected opts: Required<SceneOpts>;
 
-    constructor(makeTree: () => GElement) {
-        this.debug_enabled = true
-        this.makeTree = makeTree
+    constructor(opts:SceneOpts) {
+        this.opts = {
+            debug_enabled: opts.debug_enabled || false,
+            size:opts.size || new Size(100,100)
+        }
+        this.makeTree = () => {
+            throw new Error("component building function not set in Scene")
+        }
         this.devicePixelRatio = 1
-        this.size = new Size(100,100)
         this.renderMap = new Map<string, GRenderNode>();
         this.keyboard_path = []
         this.debug_path = []
     }
 
-    // private log(...text: any[]) {
-    //     console.log("SCENE: ",...text)
-    // }
-    setCanvas(canvas: HTMLCanvasElement) {
-        this.canvas = canvas
-    }
-    getCanvas() {
-        return this.canvas
-    }
     setSize(size: Size) {
-        this.size = size
+        this.opts.size = size
     }
 
     async init() {
     }
 
-    private makeRc() {
-        const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
-
-        let sc = 1* this.devicePixelRatio
-        const rc: RenderContext = {
-            canvas: this.canvas,
-            ctx: ctx,
-            scale: sc,
-            debug: {
-                metrics: false
-            },
-            size: new Size(this.canvas.width / sc, this.canvas.height / sc)
-        }
-        return rc
-    }
+    protected abstract makeRc():RenderContext
 
     layout() {
         this.log("layout")
@@ -84,18 +67,17 @@ export class Scene {
     redraw() {
         this.log("redraw")
         let rc = this.makeRc()
-        rc.ctx.save()
-        rc.ctx.scale(rc.scale, rc.scale)
+        rc.surface.save()
+        rc.surface.scale(rc.scale, rc.scale)
         // rc.ctx.translate(10,10)
-        rc.ctx.fillStyle = '#f0f0f0'
-        rc.ctx.fillRect(0, 0, rc.size.w, rc.size.h);
+        rc.surface.fillRect(Bounds.fromPointSize(ZERO_POINT,rc.size),'#f0f0f0')
         doDraw(this.renderRoot, rc,false)
-        if(this.debug_enabled) {
+        if(this.opts.debug_enabled) {
             drawDebug(this.renderRoot, rc, this.debug_target, false)
             // doDraw(this.renderRoot,rc,true)
             this.drawDebugOverlay(rc)
         }
-        rc.ctx.restore()
+        rc.surface.restore()
     }
 
     private findTarget(pos: Point, node: GRenderNode): GRenderNode | undefined {
@@ -279,7 +261,7 @@ export class Scene {
     private drawDebugOverlay(rc: RenderContext) {
         rc.ctx.save()
         rc.ctx.strokeStyle = 'red'
-        const bounds = new Bounds(this.size.w-300,0,300,this.size.h)
+        const bounds = new Bounds(this.opts.size.w-300,0,300,this.opts.size.h)
         drawDebugCompInfo(rc,this.debug_path,bounds)
         rc.ctx.restore()
     }
@@ -342,5 +324,9 @@ export class Scene {
 
     private log(str: string) {
         console.log("SCENE",str)
+    }
+
+    setComponentFunction(doit: () => GElement) {
+        this.makeTree = doit
     }
 }
