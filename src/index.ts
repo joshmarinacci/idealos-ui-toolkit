@@ -41,6 +41,18 @@ class CanvasRenderingSurface implements RenderingSurface {
         this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
     }
 
+    strokeBounds(bounds: Bounds, color: string, thickness: number): void {
+        this.ctx.strokeStyle= color
+        this.ctx.lineWidth = thickness
+        this.ctx.strokeRect(bounds.x, bounds.y, bounds.w, bounds.h)
+    }
+
+    clipRect(bounds: Bounds): void {
+        this.ctx.beginPath()
+        this.ctx.rect(bounds.x,bounds.y,bounds.w,bounds.h)
+        this.ctx.clip()
+    }
+
     fillText(settings: RenderNodeSettings, text: string, color: string): void {
         this.ctx.fillStyle = color
         this.ctx.font = calcCanvasFont2(settings)
@@ -113,7 +125,9 @@ class CanvasScene extends Scene {
 }
 
 setup_common_keybindings()
-const scene = new CanvasScene({})
+const scene = new CanvasScene({
+    debug_enabled:true
+})
 scene.setComponentFunction(makeTabs)
 
 MGlobals.set(Scene.name, scene)

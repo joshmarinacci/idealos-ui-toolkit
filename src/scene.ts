@@ -259,11 +259,10 @@ export abstract class Scene {
     }
 
     private drawDebugOverlay(rc: RenderContext) {
-        rc.ctx.save()
-        rc.ctx.strokeStyle = 'red'
+        rc.surface.save()
         const bounds = new Bounds(this.opts.size.w-300,0,300,this.opts.size.h)
         drawDebugCompInfo(rc,this.debug_path,bounds)
-        rc.ctx.restore()
+        rc.surface.restore()
     }
 
     onShouldRedraw(cb: () => void) {

@@ -11,6 +11,8 @@ export type RenderingSurface = {
     fillRect(bounds: Bounds, color: string): void;
     measureText(fontSettings: FontSettings, text: string): [Size, number];
     fillText(settings: RenderNodeSettings, text: string, color: string): void;
+    clipRect(bounds: Bounds): void;
+    strokeBounds(bounds: Bounds, color: string, thickness: number): void;
 }
 export type RenderContext = {
     size: Size
@@ -45,10 +47,10 @@ export function debugText(rc: RenderContext, id: string, pos: Point) {
     rc.ctx.fillText(id, pos.x, pos.y)
 }
 
-export function strokeBounds(rc: RenderContext, size: Bounds, color: string) {
-    rc.ctx.strokeStyle = color
-    rc.ctx.strokeRect(size.x, size.y, size.w, size.h)
-}
+// export function strokeBounds(rc: RenderContext, size: Bounds, color: string) {
+//     rc.ctx.strokeStyle = color
+//     rc.ctx.strokeRect(size.x, size.y, size.w, size.h)
+// }
 
 function fillRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, fill: string) {
     ctx.fillStyle = fill
@@ -174,9 +176,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     }
 
     if(n.settings.clip) {
-        rc.ctx.beginPath()
-        rc.ctx.rect(bounds.x,bounds.y,bounds.w,bounds.h)
-        rc.ctx.clip()
+        rc.surface.clipRect(bounds)
     }
     n.settings.children.forEach(ch => {
         if(n.settings.popup) {
@@ -190,25 +190,16 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
         }
     })
 
-    if (rc.debug.metrics) {
-        // draw the padding
-        // let ss: Bounds = Bounds.fromPointSize(new Point(0, 0,), n.settings.size)
-        // ss = ss.grow(-n.settings.borderWidth.left)
-        // strokeBounds(rc, ss, 'yellow')
-        // ss = ss.grow(-n.settings.padding.left)
-        // strokeBounds(rc, ss, 'cyan')
-        // ss = withPadding(ss, n.settings.padding)
-
-        // draw the baseline
-        rc.ctx.fillStyle = 'cyan'
-        rc.ctx.fillRect(n.settings.contentOffset.x, n.settings.contentOffset.y + n.settings.baseline, n.settings.size.w, 1)
-        debugText(rc, n.settings.kind, new Point(5, 10))
-    }
-    rc.ctx.restore()
+    // if (rc.debug.metrics) {
+    //     rc.ctx.fillStyle = 'cyan'
+    //     rc.ctx.fillRect(n.settings.contentOffset.x, n.settings.contentOffset.y + n.settings.baseline, n.settings.size.w, 1)
+    //     debugText(rc, n.settings.kind, new Point(5, 10))
+    // }
+    rc.surface.restore()
 }
 
 export function drawDebug(n: GRenderNode, rc: RenderContext, debug:string|undefined, force:boolean, tab?:string) {
-    rc.ctx.save()
+    rc.surface.save()
     let bds2;
     if (n.settings.key === debug || force) {
         tab = tab?tab:""
@@ -216,19 +207,16 @@ export function drawDebug(n: GRenderNode, rc: RenderContext, debug:string|undefi
         // console.log(tab,'-','size',n.settings.size)
         // console.log(tab,'-','bdrw',n.settings.borderWidth)
         // console.log(tab,'-','padd',n.settings.padding)
-        rc.ctx.strokeStyle = 'red'
-        rc.ctx.lineWidth = 1
         let bds = Bounds.fromPointSize(n.settings.pos.floor(), n.settings.size)
-        strokeBounds(rc, bds, 'red')
+        rc.surface.strokeBounds(bds, 'red',1)
         bds2 = bdsSubInsets(bds, n.settings.borderWidth as Insets)
         bds2 = bdsSubInsets(bds, n.settings.padding)
-        strokeBounds(rc, bds2, 'green')
-        rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
+        rc.surface.strokeBounds(bds2, 'green',1)
+        rc.surface.translate(n.settings.pos)
         n.settings.children.forEach((ch, _i)=> drawDebug(ch, rc, debug, true, tab + "  "))
-        rc.ctx.translate(-n.settings.pos.x, -n.settings.pos.y)
-        // rc.ctx.restore()
+        rc.surface.translate(n.settings.pos.scale(-1))//-n.settings.pos.x, -n.settings.pos.y)
     }
-    rc.ctx.translate(n.settings.pos.x, n.settings.pos.y)
+    rc.surface.translate(n.settings.pos)
     n.settings.children.forEach(ch => drawDebug(ch, rc,debug,false))
-    rc.ctx.restore()
+    rc.surface.restore()
 }
