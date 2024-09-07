@@ -1,10 +1,10 @@
-import {FontSettings, MGlobals, MouseButton, RenderNodeSettings, SYMBOL_FONT_ENABLED} from "./base.ts";
+import {MGlobals, MouseButton, SYMBOL_FONT_ENABLED} from "./base.ts";
 import {Scene, SceneOpts} from "./scene.ts";
 import {STATE_CACHE, StateCache} from "./state.ts";
 import {setup_common_keybindings} from "./actions.ts";
-import {calcCanvasFont, calcCanvasFont2, makeCanvas} from "./util.js";
+import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {RenderContext, RenderingSurface} from "./gfx.js";
+import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {makeTabs} from "./demo.js";
 
 // const state = {
@@ -53,27 +53,28 @@ class CanvasRenderingSurface implements RenderingSurface {
         this.ctx.clip()
     }
 
-    fillText(settings: RenderNodeSettings, text: string, color: string): void {
-        this.ctx.fillStyle = color
-        this.ctx.font = calcCanvasFont2(settings)
-        // console.log("text",n.settings.text, rc.ctx.font)
-        // rc.ctx.textRendering = 'optimizeLegibility'
-        // rc.ctx.textAlign = 'start'
-        // rc.ctx.textBaseline = 'alphabetic'
-        // console.log("font",rc.ctx.font)
-        // console.log(`drawing metrics "${n.settings.text}" => ${rc.ctx.measureText(n.settings.text).width}`)
-        let x = settings.contentOffset.x
-        if(isNaN(settings.baseline)){
-            console.log("missing baseline")
+    fillText(text: string, pos:Point, opts?:TextOpts): void {
+        this.ctx.save()
+        this.ctx.fillStyle = 'black'
+        this.ctx.textRendering = 'optimizeLegibility'
+        if(opts) {
+            this.ctx.fillStyle = opts.color || 'black'
+            if(opts.fontSize && opts.fontFamily) {
+                this.ctx.font = calcCanvasFont3(opts.fontSize, opts.fontFamily)
+            }
+            if(opts.valign === 'top') this.ctx.textBaseline = 'top'
+            if(opts.valign === 'middle') this.ctx.textBaseline = 'middle'
+            if(opts.valign === 'bottom') this.ctx.textBaseline = 'bottom'
+            if(opts.halign === 'left') this.ctx.textAlign = 'left'
+            if(opts.halign === 'center') this.ctx.textAlign = 'center'
+            if(opts.halign === 'right') this.ctx.textAlign = 'right'
         }
-        let y = settings.contentOffset.y + settings.baseline
-        // console.log("text",n.settings.text, x,y,fnt)
-        this.ctx.fillText(text,x,y)
-
+        this.ctx.fillText(text,pos.x,pos.y)
+        this.ctx.restore()
     }
-
-    measureText(fontSettings: FontSettings, text: string): [Size, number] {
-        this.ctx.font = calcCanvasFont(fontSettings)
+    measureText(text: string, opts:TextOpts): [Size, number] {
+        this.ctx.font = calcCanvasFont3(opts.fontSize || 12, opts.fontFamily ||
+        'sans-serif')
         let metrics = this.ctx.measureText(text)
         let size = new Size(
             Math.floor(metrics.width),

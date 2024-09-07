@@ -237,8 +237,10 @@ export class TextElement implements GElement {
             size.w = this.settings.fixedWidth
         }
         let nodes:GRenderNode[] = lines.map(line => {
-            let [m,_b] = rc.surface.measureText(this.settings.fontSettings as FontSettings,line)
-            // let metrics = rc.ctx.measureText(line)
+            let [m,_b] = rc.surface.measureText(line, {
+                fontSize: this.settings.fontSettings?.fontSize,
+                fontFamily: this.settings.fontSettings?.font
+            })
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
@@ -301,7 +303,10 @@ export class TextElement implements GElement {
         let current_line = ""
         for(let word of words) {
             word = word + " "
-            let [wsize,_wbaseline] = rc.surface.measureText(this.settings.fontSettings as FontSettings,word)
+            let [wsize,_wbaseline] = rc.surface.measureText(word,{
+                fontSize: this.settings.fontSettings?.fontSize,
+                fontFamily: this.settings.fontSettings?.font
+            })
             // let word_width = rc.ctx.measureText(word).width
             let word_width = wsize.w
             if(x + word_width > size.w) {
@@ -316,7 +321,10 @@ export class TextElement implements GElement {
         lines.push(current_line)
         let y = 0
         let nodes:GRenderNode[] = lines.map(line => {
-            let [lsize,_lbaseline] = rc.surface.measureText(this.settings.fontSettings as FontSettings,line)
+            let [lsize,_lbaseline] = rc.surface.measureText(line,{
+                fontSize: this.settings.fontSettings?.fontSize,
+                fontFamily: this.settings.fontSettings?.font
+            })
             let pos = new Point(total_insets.left, total_insets.top+ y)
             y += lineHeight
             return new GRenderNode({
@@ -362,7 +370,10 @@ export class TextElement implements GElement {
     }
 
     private calcMetrics(rc: RenderContext):[Size,number] {
-        return rc.surface.measureText(this.settings.fontSettings as FontSettings, this.settings.text)
+        return rc.surface.measureText(this.settings.text, {
+            fontFamily: this.settings.fontSettings?.font || 'sans-serif',
+            fontSize: this.settings.fontSettings?.fontSize || 16,
+        })
     }
 
     private layout_single_line_no_wrapping(rc: RenderContext, _cons: LayoutConstraints) {
@@ -405,18 +416,10 @@ class TextInputElement implements GElement {
     }
 
     private calcMetrics(rc: RenderContext, text:string):[Size,number] {
-        return rc.surface.measureText(this.settings.fontSettings as FontSettings,text)
-        // rc.ctx.font = calcCanvasFont(this.settings.fontSettings)
-        // let metrics = rc.ctx.measureText(text)
-        // let size = new Size(
-        //     Math.floor(metrics.width),
-        //     Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
-        // let baseline = metrics.fontBoundingBoxAscent
-        // if(!metrics.fontBoundingBoxAscent) {
-        //     size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
-        //     baseline = metrics.emHeightAscent
-        // }
-        // return [size, baseline]
+        return rc.surface.measureText(text, {
+            fontSize: this.settings.fontSettings?.fontSize,
+            fontFamily: this.settings.fontSettings?.font
+        })
     }
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {

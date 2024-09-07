@@ -43,6 +43,9 @@ export function calcCanvasFont2(settings:RenderNodeSettings|undefined) {
     }
     return `${settings.fontSize}px ${settings.font}`
 }
+export function calcCanvasFont3(fontSize:number, font:string) {
+    return `${fontSize}px ${font}`
+}
 
 
 export function getTotalInsets(settings: ElementSettings): Insets {

@@ -1,16 +1,23 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
-import {FontSettings, GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
+import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
 
 import {bdsSubInsets} from "./util.js";
 
+export type TextOpts = {
+    valign?: 'top' | 'middle' | 'bottom'
+    halign?: 'left' | 'center' | 'right'
+    fontSize?:number,
+    fontFamily?:string,
+    color?:string,
+}
 export type RenderingSurface = {
     save():void
     scale(s1:number,s2:number):void
     translate(off:Point):void
     restore():void
     fillRect(bounds: Bounds, color: string): void;
-    measureText(fontSettings: FontSettings, text: string): [Size, number];
-    fillText(settings: RenderNodeSettings, text: string, color: string): void;
+    measureText(text: string, opts:TextOpts): [Size, number];
+    fillText(text: string, pos:Point, opts?:TextOpts): void;
     clipRect(bounds: Bounds): void;
     strokeBounds(bounds: Bounds, color: string, thickness: number): void;
 }
@@ -41,31 +48,25 @@ export function sizeWithPadding(ss: Size, padding: Insets) {
     )
 }
 
-export function debugText(rc: RenderContext, id: string, pos: Point) {
-    rc.ctx.font = '10px sans-serif'
-    rc.ctx.fillStyle = 'aqua'
-    rc.ctx.fillText(id, pos.x, pos.y)
-}
-
 // export function strokeBounds(rc: RenderContext, size: Bounds, color: string) {
 //     rc.ctx.strokeStyle = color
 //     rc.ctx.strokeRect(size.x, size.y, size.w, size.h)
 // }
 
-function fillRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, fill: string) {
-    ctx.fillStyle = fill
-    ctx.beginPath()
-    ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
-    ctx.fill()
-}
+// function fillRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, fill: string) {
+//     ctx.fillStyle = fill
+//     ctx.beginPath()
+//     ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
+//     ctx.fill()
+// }
 
-function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, color: string, borderWidth: Insets) {
-    ctx.strokeStyle = color
-    ctx.lineWidth = borderWidth.left
-    ctx.beginPath()
-    ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
-    ctx.stroke()
-}
+// function strokeRoundRect(ctx: CanvasRenderingContext2D, bounds: Bounds, radius: Insets, color: string, borderWidth: Insets) {
+//     ctx.strokeStyle = color
+//     ctx.lineWidth = borderWidth.left
+//     ctx.beginPath()
+//     ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
+//     ctx.stroke()
+// }
 
 function isInsetsEmpty(insets: Insets | undefined) {
     if(!insets) return true
@@ -124,7 +125,14 @@ function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
 function doDrawText(rc: RenderContext, n: GRenderNode) {
     if(!n.settings.text) return
     // console.log("drawing text",n.settings.text)
-    rc.surface.fillText(n.settings,n.settings.text,n.settings.visualStyle.textColor || 'magenta')
+    rc.surface.fillText(
+        n.settings.text,
+        n.settings.contentOffset.add(new Point(0,n.settings.baseline)),
+        {
+            fontSize: n.settings.fontSize || 16,
+            fontFamily: n.settings.font,
+            color: n.settings.visualStyle.textColor || 'magenta',
+        })
 }
 
 function validateNode(n: GRenderNode) {
