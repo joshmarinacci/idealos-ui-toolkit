@@ -285,7 +285,6 @@ export abstract class Scene {
 
     private dispatchEvent(evt: CEvent, keys: string[]) {
         keys = keys.slice()
-        // console.log("===\nevt",evt.type)
         let used = false
         evt.use = () => {
             // console.log("using it")
@@ -319,7 +318,7 @@ export abstract class Scene {
         console.log("SCENE",str)
     }
 
-    setComponentFunction(doit: () => GElement) {
-        this.makeTree = doit
+    setComponentFunction(compFunc: () => GElement) {
+        this.makeTree = compFunc
     }
 }

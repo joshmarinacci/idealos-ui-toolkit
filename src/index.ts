@@ -113,9 +113,6 @@ class CanvasScene extends Scene {
     setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas
     }
-    getCanvas() {
-        return this.canvas
-    }
     protected makeRc(): RenderContext {
         return {
             size: this.opts.size,

@@ -1,7 +1,6 @@
 import {
     CEvent,
     ElementSettings,
-    FontSettings,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -30,7 +29,7 @@ type TextInputElementSettings = {
 } & ElementSettings
 
 class TextModel {
-    private lines: string[];
+    private readonly lines: string[];
     constructor(text: string) {
         this.lines = text.split('\n')
     }
@@ -399,7 +398,7 @@ export class TextElement implements GElement {
 }
 
 class TextInputElement implements GElement {
-    private settings: TextInputElementSettings
+    private readonly settings: TextInputElementSettings
 
     constructor(opts: TextInputElementSettings) {
         this.settings = {

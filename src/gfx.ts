@@ -36,12 +36,6 @@ function drawBorder(rc: RenderContext, b: Bounds, color: string, w: Insets) {
     rc.surface.fillRect(new Bounds(b.x, b.y2-w.bottom, b.w, w.bottom),color);
 }
 
-export function withPadding(ss: Bounds, padding: Insets) {
-    return new Bounds(ss.x, ss.y,
-        ss.w + padding.left + padding.right,
-        ss.h + padding.top + padding.bottom,
-    )
-}
 export function sizeWithPadding(ss: Size, padding: Insets) {
     return new Size(    ss.w + padding.left + padding.right,
         ss.h + padding.top + padding.bottom,
@@ -211,10 +205,6 @@ export function drawDebug(n: GRenderNode, rc: RenderContext, debug:string|undefi
     let bds2;
     if (n.settings.key === debug || force) {
         tab = tab?tab:""
-        // console.log(tab,n.settings.kind, n.settings.children.length)
-        // console.log(tab,'-','size',n.settings.size)
-        // console.log(tab,'-','bdrw',n.settings.borderWidth)
-        // console.log(tab,'-','padd',n.settings.padding)
         let bds = Bounds.fromPointSize(n.settings.pos.floor(), n.settings.size)
         rc.surface.strokeBounds(bds, 'red',1)
         bds2 = bdsSubInsets(bds, n.settings.borderWidth as Insets)

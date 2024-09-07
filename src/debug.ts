@@ -3,9 +3,6 @@ import {RenderContext} from "./gfx.js";
 import {GRenderNode, ZERO_INSETS} from "./base.js";
 import {BoxConstraints} from "./layout.js";
 
-export type TextValign = "top" | "middle" | "bottom"
-export type TextHalign = "left" | 'center' | "right"
-
 export function drawInsets(rc:RenderContext, b: Bounds, ins: Insets, color: string) {
     rc.surface.fillRect(b, color)
     const s = {
