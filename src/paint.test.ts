@@ -5,7 +5,6 @@ import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox} from "./layout.js";
-import {ZERO_INSETS} from "./base.js";
 
 class HeadlessRenderingSurface implements RenderingSurface {
     private logger: Logger;
@@ -64,7 +63,7 @@ class HeadlessScene extends Scene {
 describe("scene repainting", () => {
     it("should paint the scene", async () => {
         const l = make_logger("test")
-        const scene = new HeadlessScene({})
+        const scene = new HeadlessScene({size:new Size(100,100)})
         scene.setComponentFunction(() => Square(50, 'red'))
         l.info("made scene")
         scene.layout()
