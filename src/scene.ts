@@ -20,7 +20,6 @@ export abstract class Scene {
     private debug_path: GRenderNode[];
     private renderMap: Map<string, GRenderNode>;
     private should_redraw_callback?: () => void;
-    private devicePixelRatio: number;
     private should_just_redraw_callback?: () => void;
     protected opts: Required<SceneOpts>;
 
@@ -32,7 +31,6 @@ export abstract class Scene {
         this.makeTree = () => {
             throw new Error("component building function not set in Scene")
         }
-        this.devicePixelRatio = 1
         this.renderMap = new Map<string, GRenderNode>();
         this.keyboard_path = []
         this.debug_path = []
@@ -270,10 +268,6 @@ export abstract class Scene {
     }
     onShouldJustRedraw(cb: () => void) {
         this.should_just_redraw_callback = cb
-    }
-
-    setDPI(devicePixelRatio: number) {
-        this.devicePixelRatio = devicePixelRatio
     }
 
     private request_just_redraw() {

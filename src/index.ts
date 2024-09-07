@@ -149,7 +149,6 @@ loadFont().then(() => {
     return scene.init()
 }).then(() => {
     const canvas = makeCanvas(size)
-    scene.setDPI(window.devicePixelRatio)
     canvas.addEventListener('mousemove', (e) => {
         // @ts-ignore
         let rect = e.target.getBoundingClientRect()
