@@ -6,7 +6,7 @@ import {Label, WrappingLabel} from "./text.js";
 import {Icon, Icons} from "./icons.js";
 import {ObjAtom, Schema} from "rtds-core"
 import {CEvent, StateHandler} from "./base.js";
-import {GridBox} from "./grid.js";
+import {GridBox} from "./gridbox.js"
 import {withInsets} from "./gfx.js";
 
 

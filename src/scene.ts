@@ -5,7 +5,7 @@ import {KEY_VENDOR} from "./keys.js";
 import {drawDebugCompInfo} from "./debug.js";
 
 export type SceneOpts = {
-    size?: Size;
+    size: Size;
     debug_enabled?:boolean
 }
 export abstract class Scene {
@@ -26,7 +26,7 @@ export abstract class Scene {
     constructor(opts:SceneOpts) {
         this.opts = {
             debug_enabled: opts.debug_enabled || false,
-            size:opts.size || new Size(100,100)
+            size:opts.size
         }
         this.makeTree = () => {
             throw new Error("component building function not set in Scene")
