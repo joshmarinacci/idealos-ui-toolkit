@@ -4,6 +4,8 @@ import {Square} from "./comps2.js";
 import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
+import {HBox} from "./layout.js";
+import {ZERO_INSETS} from "./base.js";
 
 class HeadlessRenderingSurface implements RenderingSurface {
     private logger: Logger;
@@ -76,7 +78,7 @@ describe("scene repainting", () => {
     })
     it("should paint a button", () => {
         const l = make_logger("test")
-        const scene = new HeadlessScene({})
+        const scene = new HeadlessScene({size:new Size(100,100)})
         scene.setComponentFunction(() => Button({text: "hi"}))
         l.info("made scene")
         scene.layout()
@@ -88,6 +90,38 @@ describe("scene repainting", () => {
         expect(text.settings.text).toBe("hi")
         expect(text.settings.pos).toEqual(new Point(8, 8))
         expect(text.settings.size).toEqual(new Size(20 + 2, 10 + 2))
+    })
+})
+describe("layout", () => {
+    function expand(size: Size, point: Point) {
+        return new Size(
+            size.w + point.x,
+            size.h + point.y
+        )
+    }
 
+    it("should shrink HBox with one button", () => {
+        const scene = new HeadlessScene({size:new Size(100,100)})
+        scene.setComponentFunction(() => HBox({
+            mainAxisSelfLayout:'shrink',
+            children:[Button({
+                text: "hi",
+            })]}))
+        scene.layout()
+        console.log(scene.renderRoot)
+        expect(scene.renderRoot).toBeTruthy()
+        expect(scene.renderRoot.settings.children.length).toBe(1)
+        expect(scene.renderRoot.settings.kind).toBe("hbox")
+        // const hbox = scene.renderRoot
+
+        // 10 * chars + 1* 2 for border
+        let text_size = new Size(10*2+2, 10*1+2)
+        // 7 for padding and 1 for border
+        let button_size = expand(text_size, new Point(7*2 + 1*2, 7*2 + 1*2))
+        const button = scene.renderRoot.settings.children[0]
+        // console.log("button",button, button_width)
+        expect(button.settings.size).toEqual(button_size)
+        const text = button.settings.children[0]
+        expect(text.settings.size).toEqual(text_size)
     })
 })
