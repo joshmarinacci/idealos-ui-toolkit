@@ -36,6 +36,9 @@ export abstract class Scene {
         this.debug_path = []
     }
 
+    getSize() {
+        return this.opts.size
+    }
     setSize(size: Size) {
         this.opts.size = size
     }

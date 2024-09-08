@@ -53,6 +53,7 @@ class BoxElementBase {
     constructor(settings: BoxRequirements) {
         this.settings = settings
         this.log = make_logger(this.settings.kind)
+        this.log.setEnabled(false)
     }
 
     protected getConstraints():BoxConstraints {
