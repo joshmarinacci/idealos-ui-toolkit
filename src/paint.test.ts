@@ -5,6 +5,8 @@ import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox} from "./layout.js";
+import {expandSize} from "./util.js";
+import {AxisLayout, AxisSelfLayout, ZERO_INSETS} from "./base.js";
 
 class HeadlessRenderingSurface implements RenderingSurface {
     private logger: Logger;
@@ -63,7 +65,7 @@ class HeadlessScene extends Scene {
 describe("scene repainting", () => {
     it("should paint the scene", async () => {
         const l = make_logger("test")
-        const scene = new HeadlessScene({size:new Size(100,100)})
+        const scene = new HeadlessScene({size: new Size(100, 100)})
         scene.setComponentFunction(() => Square(50, 'red'))
         l.info("made scene")
         scene.layout()
@@ -77,7 +79,7 @@ describe("scene repainting", () => {
     })
     it("should paint a button", () => {
         const l = make_logger("test")
-        const scene = new HeadlessScene({size:new Size(100,100)})
+        const scene = new HeadlessScene({size: new Size(100, 100)})
         scene.setComponentFunction(() => Button({text: "hi"}))
         l.info("made scene")
         scene.layout()
@@ -92,35 +94,118 @@ describe("scene repainting", () => {
     })
 })
 describe("layout", () => {
-    function expand(size: Size, point: Point) {
-        return new Size(
-            size.w + point.x,
-            size.h + point.y
-        )
-    }
 
     it("should shrink HBox with one button", () => {
-        const scene = new HeadlessScene({size:new Size(100,100)})
+        const scene = new HeadlessScene({size: new Size(100, 100)})
         scene.setComponentFunction(() => HBox({
-            mainAxisSelfLayout:'shrink',
-            children:[Button({
+            mainAxisSelfLayout: 'shrink',
+            children: [Button({
                 text: "hi",
-            })]}))
+            })]
+        }))
         scene.layout()
-        console.log(scene.renderRoot)
         expect(scene.renderRoot).toBeTruthy()
         expect(scene.renderRoot.settings.children.length).toBe(1)
         expect(scene.renderRoot.settings.kind).toBe("hbox")
-        // const hbox = scene.renderRoot
 
         // 10 * chars + 1* 2 for border
-        let text_size = new Size(10*2+2, 10*1+2)
+        let text_size = new Size(10 * 2 + 2, 10 * 1 + 2)
         // 7 for padding and 1 for border
-        let button_size = expand(text_size, new Point(7*2 + 1*2, 7*2 + 1*2))
+        let button_size = expandSize(text_size, new Point(7 * 2 + 1 * 2, 7 * 2 + 1 * 2))
         const button = scene.renderRoot.settings.children[0]
         // console.log("button",button, button_width)
         expect(button.settings.size).toEqual(button_size)
         const text = button.settings.children[0]
         expect(text.settings.size).toEqual(text_size)
+    })
+    it("should shrink HBox with two buttons", () => {
+        const scene = new HeadlessScene({size: new Size(100, 100)})
+        scene.setComponentFunction(() => HBox({
+            mainAxisSelfLayout: 'shrink',
+            borderWidth:ZERO_INSETS,
+            padding:ZERO_INSETS,
+            children: [
+                Button({
+                    padding: ZERO_INSETS,
+                    borderWidth: ZERO_INSETS,
+                    text: "hi",
+                }),
+                Button({
+                    padding: ZERO_INSETS,
+                    borderWidth: ZERO_INSETS,
+                    text: "mi",
+                }),
+            ]
+        }))
+        scene.layout()
+        expect(scene.renderRoot.settings.children.length).toBe(2)
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(22*2,12))
+
+    })
+    it("should grow HBox with space between two buttons", () => {
+        const scene = new HeadlessScene({size: new Size(100, 100)})
+        function makeBox(masl:AxisSelfLayout ,mal:AxisLayout) {
+            return function () {
+                return HBox({
+                    mainAxisSelfLayout: masl,
+                    mainAxisLayout: mal,
+                    borderWidth: ZERO_INSETS,
+                    padding: ZERO_INSETS,
+                    children: [
+                        Button({
+                            padding: ZERO_INSETS,
+                            borderWidth: ZERO_INSETS,
+                            text: "hi",
+                        }),
+                        Button({
+                            padding: ZERO_INSETS,
+                            borderWidth: ZERO_INSETS,
+                            text: "mi",
+                        }),
+                    ]
+                })
+            }
+        }
+
+        // start
+        scene.setComponentFunction(makeBox('grow',"start"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(100,12))
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(22,0))
+
+        // center
+        scene.setComponentFunction(makeBox('grow',"center"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(100,12))
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(100/2-22,0))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(100/2,0))
+
+        // end
+        scene.setComponentFunction(makeBox('grow',"end"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(100,12))
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(100-44,0))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(100-22,0))
+
+        // between
+        scene.setComponentFunction(makeBox('grow',"between"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(100,12))
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(100-22,0))
     })
 })

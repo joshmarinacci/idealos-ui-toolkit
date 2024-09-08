@@ -139,3 +139,10 @@ export function AtomAsState<T>(atom: ObjAtom<T>): StateHandler<T> {
         }
     }
 }
+
+export function expandSize(size: Size, point: Point) {
+    return new Size(
+        size.w + point.x,
+        size.h + point.y
+    )
+}
