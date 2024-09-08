@@ -414,10 +414,42 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         KEY_VENDOR.endElement(this)
 
         // position children
-        let pos = contentBounds.position()
-        for (let ch of children) {
-            ch.settings.pos = pos
-            pos = pos.add(new Point(0,ch.settings.size.h))
+        if(this.settings.mainAxisLayout === 'start') {
+            let pos = contentBounds.position()
+            for (let ch of children) {
+                ch.settings.pos = pos
+                pos = pos.add(new Point(0,ch.settings.size.h))
+            }
+        }
+        let total_height = 0
+        for(let ch of children) {
+            total_height += ch.settings.size.h
+        }
+        if(this.settings.mainAxisLayout === 'center') {
+            let pos = contentBounds.left_midpoint()
+            pos.y -= total_height/2
+            for (let ch of children) {
+                ch.settings.pos = pos
+                pos = pos.add(new Point(0,ch.settings.size.h))
+            }
+        }
+        if(this.settings.mainAxisLayout === 'end') {
+            let pos = contentBounds.bottom_left()
+            pos.y -= total_height
+            for (let ch of children) {
+                ch.settings.pos = pos
+                pos = pos.add(new Point(0,ch.settings.size.h))
+            }
+        }
+
+        if (this.settings.mainAxisLayout === 'between' && chs.length >= 2) {
+            let leftover = contentBounds.h - total_height
+            let leftover_per_child = leftover / (chs.length - 1)
+            let pos = contentBounds.top_left()
+            for (let ch of children) {
+                ch.settings.pos = pos
+                pos = pos.add(new Point(0,ch.settings.size.h + leftover_per_child))
+            }
         }
 
         //resize myself back out

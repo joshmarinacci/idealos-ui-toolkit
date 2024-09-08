@@ -4,7 +4,7 @@ import {Square} from "./comps2.js";
 import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
-import {HBox} from "./layout.js";
+import {HBox, VBox} from "./layout.js";
 import {expandSize} from "./util.js";
 import {AxisLayout, AxisSelfLayout, ZERO_INSETS} from "./base.js";
 
@@ -143,7 +143,7 @@ describe("layout", () => {
         expect(scene.renderRoot.settings.size).toEqual(new Size(22*2,12))
 
     })
-    it("should grow HBox with space between two buttons", () => {
+    it("should grow HBox with different main axis layouts", () => {
         const scene = new HeadlessScene({size: new Size(100, 100)})
         function makeBox(masl:AxisSelfLayout ,mal:AxisLayout) {
             return function () {
@@ -207,5 +207,74 @@ describe("layout", () => {
         expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
         expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
         expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(100-22,0))
+    })
+    it('should grow VBox with different main axis layouts ', () => {
+        const scene = new HeadlessScene({size: new Size(100, 100)})
+        function makeBox(masl:AxisSelfLayout ,mal:AxisLayout) {
+            return function () {
+                return VBox({
+                    mainAxisSelfLayout: masl,
+                    mainAxisLayout: mal,
+                    borderWidth: ZERO_INSETS,
+                    padding: ZERO_INSETS,
+                    children: [
+                        Button({
+                            padding: ZERO_INSETS,
+                            borderWidth: ZERO_INSETS,
+                            text: "hi",
+                        }),
+                        Button({
+                            padding: ZERO_INSETS,
+                            borderWidth: ZERO_INSETS,
+                            text: "mi",
+                        }),
+                    ]
+                })
+            }
+        }
+
+        // vbox start
+        scene.setComponentFunction(makeBox('grow',"start"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(0,12))
+
+        // vbox center
+        scene.setComponentFunction(makeBox('grow',"center"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
+        console.log(scene.renderRoot.settings.children[0].settings.pos)
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,100/2-12))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(0,100/2))
+
+        // vbox end
+        scene.setComponentFunction(makeBox('grow',"end"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
+        console.log(scene.renderRoot.settings.children[0].settings.pos)
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,100-24))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(0,100-12))
+
+        // vbox between
+        scene.setComponentFunction(makeBox('grow',"between"))
+        scene.layout()
+        // a two letter button with zero padding & borders is 22x12
+        expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
+        console.log(scene.renderRoot.settings.children[0].settings.pos)
+        expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
+        expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
+        expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(0,100-12))
+
     })
 })
