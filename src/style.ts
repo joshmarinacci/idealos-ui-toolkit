@@ -1,6 +1,6 @@
-import {withInsets} from "./gfx.js";
 import {Insets} from "josh_js_util";
 import {TRANSPARENT, ZERO_INSETS} from "./base.js";
+import {withInsets} from "./util.js";
 // @ts-ignore
 
 const Colors = {

@@ -124,7 +124,7 @@ class CanvasScene extends Scene {
 
 setup_common_keybindings()
 const scene = new CanvasScene({
-    debug_enabled:true
+    size:size
 })
 scene.setComponentFunction(makeTabs)
 

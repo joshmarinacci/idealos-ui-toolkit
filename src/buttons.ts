@@ -15,11 +15,12 @@ import {HBox, MHBoxElement, VBox} from "./layout.js";
 import {Style} from "./style.js";
 import {Insets} from "josh_js_util";
 import {TextElement} from "./text.js";
-import {RenderContext, withInsets} from "./gfx.js";
+import {RenderContext} from "./gfx.js";
 import {KEY_VENDOR} from "./keys.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {PopupContainer} from "./popup.js";
 import {ObjList} from "rtds-core";
+import {withInsets} from "./util.js";
 
 type ButtonParameters = {
     text?:string

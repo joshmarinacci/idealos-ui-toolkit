@@ -2,11 +2,11 @@ import {Obj, ObjMap, Schema} from "rtds-core";
 import {Point, Size} from "josh_js_util";
 import {ListViewItem} from "./listView.js";
 import {GElement, GRenderNode, LayoutConstraints, StateHandler} from "./base.js";
-import {RenderContext, withInsets} from "./gfx.js";
+import {RenderContext} from "./gfx.js";
 import {Label} from "./text.js";
 import {ToggleIconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
-import {AtomAsState} from "./util.js";
+import {AtomAsState, withInsets} from "./util.js";
 
 const S = new Schema()
 

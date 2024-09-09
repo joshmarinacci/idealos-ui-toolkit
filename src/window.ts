@@ -1,12 +1,12 @@
 import {GElement, GRenderNode, LayoutConstraints, MGlobals, MMouseEvent, ZERO_INSETS, ZERO_POINT} from "./base.js";
-import {RenderContext, withInsets} from "./gfx.js";
+import {RenderContext} from "./gfx.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {KEY_VENDOR} from "./keys.js";
-import {bdsSubInsets} from "./util.js";
+import {bdsSubInsets, withInsets} from "./util.js";
 
 
 type MWindowOptions = {

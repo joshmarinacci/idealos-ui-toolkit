@@ -1,11 +1,12 @@
 import {AxisLayout, CEvent, EventHandler, GElement, GRenderNode, LayoutConstraints, StateHandler, useState} from "./base.js";
 import {MHBoxElement, MVBoxElement} from "./layout.js";
 import {Style} from "./style.js";
-import {RenderContext, withInsets} from "./gfx.js";
+import {RenderContext} from "./gfx.js";
 import {Label} from "./text.js";
 import {KEY_VENDOR} from "./keys.js";
 import {ObjList} from "rtds-core";
 import {Insets} from "josh_js_util";
+import {withInsets} from "./util.js";
 
 type ListViewItemParameters = {
     children: GElement[],

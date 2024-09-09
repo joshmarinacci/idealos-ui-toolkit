@@ -11,10 +11,10 @@ import {
     ZERO_INSETS,
     ZERO_POINT
 } from "./base.js";
-import {RenderContext, sizeWithPadding, withInsets} from "./gfx.js";
+import {RenderContext} from "./gfx.js";
 import {Style} from "./style.js";
 import {Point, Size} from "josh_js_util";
-import {getTotalInsets} from "./util.js";
+import {getTotalInsets, sizeWithPadding, withInsets} from "./util.js";
 import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.js";
 import {KEY_VENDOR} from "./keys.js";
 

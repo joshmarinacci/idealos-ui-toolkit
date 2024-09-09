@@ -1,6 +1,5 @@
 import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
-import {ElementSettings, FontSettings, MGlobals, RenderNodeSettings, StateHandler} from "./base.js";
-import {withInsets} from "./gfx.js";
+import {ElementSettings, MGlobals, StateHandler} from "./base.js";
 import {Obj, ObjAtom} from "rtds-core";
 import {Scene} from "./scene.js";
 
@@ -31,22 +30,14 @@ export function insetsHeight(insets: Insets) {
     return insets.top + insets.bottom
 }
 
-export function calcCanvasFont(settings: FontSettings | undefined) {
-    if (!settings) {
-        return "16px sans-serif"
-    }
-    return `${settings.fontSize}px ${settings.font}`
-}
-export function calcCanvasFont2(settings:RenderNodeSettings|undefined) {
-    if (!settings) {
-        return "16px sans-serif"
-    }
-    return `${settings.fontSize}px ${settings.font}`
-}
 export function calcCanvasFont3(fontSize:number, font:string) {
     return `${fontSize}px ${font}`
 }
 
+
+export function withInsets(number: number) {
+    return new Insets(number, number, number, number)
+}
 
 export function getTotalInsets(settings: ElementSettings): Insets {
     let ins = withInsets(0)
@@ -86,6 +77,7 @@ export function withFallback<T>(value: T | undefined, fallback: T): T {
 export class DebugPoint extends Point {
     private log: Logger;
     private _x:number
+    // @ts-ignore
     get x(): number {
         return this._x;
     }
@@ -95,6 +87,7 @@ export class DebugPoint extends Point {
         this._x = value;
     }
     private _y:number
+    // @ts-ignore
     get y(): number {
         return this._y;
     }
@@ -108,7 +101,7 @@ export class DebugPoint extends Point {
         this._x = x
         this._y = y
         this.log = make_logger("DEBUG_POINT")
-        const stack = new Error().stack;
+        // const stack = new Error().stack;
         // this.log.info("createed with",this._x,this._y,'\n',stack)
     }
     toString(): string {
@@ -145,4 +138,15 @@ export function expandSize(size: Size, point: Point) {
         size.w + point.x,
         size.h + point.y
     )
+}
+
+export function sizeWithPadding(ss: Size, padding: Insets) {
+    return new Size(ss.w + padding.left + padding.right,
+        ss.h + padding.top + padding.bottom,
+    )
+}
+
+export function isInsetsEmpty(insets: Insets | undefined) {
+    if (!insets) return true
+    return insets.left <= 0 && insets.right <= 0 && insets.top <= 0 && insets.bottom <= 0
 }

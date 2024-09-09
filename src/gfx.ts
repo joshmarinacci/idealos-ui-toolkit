@@ -1,7 +1,7 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
 
-import {bdsSubInsets} from "./util.js";
+import {bdsSubInsets, isInsetsEmpty, withInsets} from "./util.js";
 
 export type TextOpts = {
     valign?: 'top' | 'middle' | 'bottom'
@@ -36,12 +36,6 @@ function drawBorder(rc: RenderContext, b: Bounds, color: string, w: Insets) {
     rc.surface.fillRect(new Bounds(b.x, b.y2-w.bottom, b.w, w.bottom),color);
 }
 
-export function sizeWithPadding(ss: Size, padding: Insets) {
-    return new Size(    ss.w + padding.left + padding.right,
-        ss.h + padding.top + padding.bottom,
-    )
-}
-
 // export function strokeBounds(rc: RenderContext, size: Bounds, color: string) {
 //     rc.ctx.strokeStyle = color
 //     rc.ctx.strokeRect(size.x, size.y, size.w, size.h)
@@ -61,11 +55,6 @@ export function sizeWithPadding(ss: Size, padding: Insets) {
 //     ctx.roundRect(bounds.x,bounds.y,bounds.w, bounds.h, [radius.top, radius.right, radius.bottom, radius.left])
 //     ctx.stroke()
 // }
-
-function isInsetsEmpty(insets: Insets | undefined) {
-    if(!insets) return true
-    return insets.left <= 0 && insets.right <= 0 && insets.top <= 0 && insets.bottom <= 0
-}
 
 function calculateBorderRadius(settings: RenderNodeSettings) {
     if(!settings.borderRadius) return undefined
@@ -134,10 +123,6 @@ function validateNode(n: GRenderNode) {
         console.log(n.settings)
         throw new Error(`missing padding on ${n.settings.kind}`)
     }
-}
-
-export function withInsets(number: number) {
-    return new Insets(number, number, number, number)
 }
 
 export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void {
