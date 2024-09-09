@@ -20,7 +20,6 @@ import {KEY_VENDOR} from "./keys.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {PopupContainer} from "./popup.js";
 import {ObjList} from "rtds-core";
-import {withInsets} from "./util.js";
 
 type ButtonParameters = {
     text?:string
@@ -95,7 +94,7 @@ export const Button = (opts: ButtonParameters) => {
         borderWidth: opts.borderWidth || Style.button().borderWidth,
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [new TextElement({
-            padding: withInsets(1),
+            padding: Insets.from(1),
             fontSettings: {
                 font: Style.button().font,
                 fontSize: Style.button().fontSize,
@@ -128,7 +127,7 @@ export function Tag(opts: { text: string }) {
             textColor: Style.button().textColor,
         },
         borderWidth: Style.button().borderWidth,
-        borderRadius: withInsets(Style.button().fontSize),
+        borderRadius: Insets.from(Style.button().fontSize),
         children: [new TextElement({
             padding: ZERO_INSETS,
             fontSettings: {
@@ -185,7 +184,7 @@ class DropdownButtonElement implements GElement {
                 mainAxisSelfLayout: 'shrink',
                 crossAxisLayout: 'center',
                 children: this.props.children,
-                borderWidth: withInsets(10),
+                borderWidth: Insets.from(10),
             })
         })
         if (open) {
@@ -283,7 +282,7 @@ export function ToggleGroup<T>(opts: ToggleGroupParameters<T>) {
     const key = KEY_VENDOR.getKey()
     let [selected, setSelected] = useState(key, "selected", opts.selected, () => 0)
     return HBox({
-        borderWidth: withInsets(1),
+        borderWidth: Insets.from(1),
         visualStyle: {
             borderColor: Style.button().borderColor,
         },

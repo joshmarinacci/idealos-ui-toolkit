@@ -1,12 +1,10 @@
-import {AxisLayout, CEvent, EventHandler, GElement, GRenderNode, LayoutConstraints, StateHandler, useState} from "./base.js";
+import {AxisLayout, CEvent, EventHandler, GElement, StateHandler, useState} from "./base.js";
 import {MHBoxElement, MVBoxElement} from "./layout.js";
 import {Style} from "./style.js";
-import {RenderContext} from "./gfx.js";
 import {Label} from "./text.js";
 import {KEY_VENDOR} from "./keys.js";
 import {ObjList} from "rtds-core";
 import {Insets} from "josh_js_util";
-import {withInsets} from "./util.js";
 
 type ListViewItemParameters = {
     children: GElement[],
@@ -104,7 +102,7 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
             textColor: Style.base().textColor,
             background: Style.panel().backgroundColor
         },
-        borderWidth: withInsets(1),
+        borderWidth: Insets.from(1),
         handleEvent: (e) => {
             if (e.type === 'keyboard-typed') {
                 if (e.key === 'ArrowUp') return navUp(e)
@@ -115,16 +113,5 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
             return renderer(item, selected, index, (s, e) => navTo(s, e))
         })
     })
-}
-
-export class TreeView implements GElement {
-    constructor(param: {}) {
-
-    }
-
-    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        throw new Error("Method not implemented.");
-    }
-
 }
 

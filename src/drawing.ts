@@ -1,12 +1,12 @@
 import {Obj, ObjMap, Schema} from "rtds-core";
-import {Point, Size} from "josh_js_util";
+import {Insets, Point, Size} from "josh_js_util";
 import {ListViewItem} from "./listView.js";
 import {GElement, GRenderNode, LayoutConstraints, StateHandler} from "./base.js";
 import {RenderContext} from "./gfx.js";
 import {Label} from "./text.js";
 import {ToggleIconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
-import {AtomAsState, withInsets} from "./util.js";
+import {AtomAsState} from "./util.js";
 
 const S = new Schema()
 
@@ -123,7 +123,7 @@ class TreeView2Element implements GElement {
         return new GRenderNode({
             baseline: 0,
             children: children,
-            padding: withInsets(5),
+            padding: Insets.from(5),
             contentOffset: new Point(0,0),
             font: "",
             key: "",

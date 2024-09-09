@@ -5,7 +5,6 @@ import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 import {KEY_VENDOR} from "./keys.js";
 import {Style} from "./style.js";
-import {bdsSubInsets} from "./util.js";
 
 export type ScrollContainerSettings = {
     fixedWidth?: number,
@@ -30,7 +29,7 @@ class ScrollContainerElement implements GElement {
         if(this.param.fixedHeight) h = this.param.fixedHeight
         const fullBounds = new Bounds(0, 0, w, h)
         KEY_VENDOR.startElement(this)
-        const contentBounds = bdsSubInsets(fullBounds, borderInsets)
+        const contentBounds = fullBounds.shrinkInsets(borderInsets)
         const barInsets = new Insets(0,10,10,0)
         const child_size = contentBounds.size()
         child_size.w -= barInsets.right

@@ -1,8 +1,6 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
 
-import {bdsSubInsets, isInsetsEmpty, withInsets} from "./util.js";
-
 export type TextOpts = {
     valign?: 'top' | 'middle' | 'bottom'
     halign?: 'left' | 'center' | 'right'
@@ -61,10 +59,10 @@ function calculateBorderRadius(settings: RenderNodeSettings) {
     if(typeof settings.borderRadius === 'number') {
         let num = settings.borderRadius as number
         if(num === 0) return undefined
-        return withInsets(num)
+        return Insets.from(num)
     }
     let insets = settings.borderRadius as Insets
-    if(isInsetsEmpty(insets)) {
+    if(!insets || insets.isEmpty()) {
         return undefined
     }
     return insets
@@ -91,7 +89,7 @@ function doDrawBorder(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
     if(!n.settings.visualStyle.borderColor) return
     if(n.settings.visualStyle.borderColor === TRANSPARENT) return
     let color = n.settings.visualStyle.borderColor || "magenta"
-    if(isInsetsEmpty(n.settings.borderWidth)) return
+    if(!n.settings.borderWidth || n.settings.borderWidth.isEmpty()) return
     if(n.focused && n.settings.focusedStyle?.borderColor) {
         color = n.settings.focusedStyle.borderColor
     }
@@ -153,9 +151,9 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     }
 
     // account for the border
-    bounds = bdsSubInsets(bounds, n.settings.borderWidth)
+    if(n.settings.borderWidth) bounds = bounds.shrinkInsets(n.settings.borderWidth)
     // account for the padding
-    bounds = bdsSubInsets(bounds,n.settings.padding)
+    if(n.settings.padding) bounds = bounds.shrinkInsets(n.settings.padding)
 
     // draw text
     if (draw_node && n.settings.text && n.settings.text.trim().length > 0) {
@@ -192,8 +190,8 @@ export function drawDebug(n: GRenderNode, rc: RenderContext, debug:string|undefi
         tab = tab?tab:""
         let bds = Bounds.fromPointSize(n.settings.pos.floor(), n.settings.size)
         rc.surface.strokeBounds(bds, 'red',1)
-        bds2 = bdsSubInsets(bds, n.settings.borderWidth as Insets)
-        bds2 = bdsSubInsets(bds, n.settings.padding)
+        bds2 = bds.shrinkInsets(n.settings.borderWidth as Insets)
+        bds2 = bds.shrinkInsets(n.settings.padding as Insets)
         rc.surface.strokeBounds(bds2, 'green',1)
         rc.surface.translate(n.settings.pos)
         n.settings.children.forEach((ch, _i)=> drawDebug(ch, rc, debug, true, tab + "  "))

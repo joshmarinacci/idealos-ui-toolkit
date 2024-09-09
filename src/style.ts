@@ -1,6 +1,5 @@
 import {Insets} from "josh_js_util";
 import {TRANSPARENT, ZERO_INSETS} from "./base.js";
-import {withInsets} from "./util.js";
 // @ts-ignore
 
 const Colors = {
@@ -64,9 +63,9 @@ const darkBaseComponentStyle:ComponentStyle = {
 const lightButtonStyle:ComponentStyle = {
     backgroundColor: Colors.lightBackground,
     borderColor: 'black',
-    borderRadius: withInsets(4),
-    borderWidth: withInsets(1),
-    padding: withInsets(7),
+    borderRadius: Insets.from(4),
+    borderWidth: Insets.from(1),
+    padding: Insets.from(7),
     textColor: 'black',
     hoverBackgroundColor: '#ccc',
     ...FontInfo
@@ -74,10 +73,10 @@ const lightButtonStyle:ComponentStyle = {
 const darkButtonStyle:ComponentStyle = {
     backgroundColor: Colors.darkBackground,
     borderColor: 'white',
-    borderRadius: withInsets(4),
-    borderWidth: withInsets(1),
+    borderRadius: Insets.from(4),
+    borderWidth: Insets.from(1),
     ...FontInfo,
-    padding: withInsets(7),
+    padding: Insets.from(7),
     textColor: 'white',
     hoverBackgroundColor: '#ccc',
 }
@@ -85,20 +84,20 @@ const darkButtonStyle:ComponentStyle = {
 const lightPanelStyle:ComponentStyle = {
     backgroundColor: Colors.lightBackground,
     borderColor: TRANSPARENT,
-    borderRadius: withInsets(4),
-    borderWidth: withInsets(1),
+    borderRadius: Insets.from(4),
+    borderWidth: Insets.from(1),
     ...FontInfo,
-    padding: withInsets(0),
+    padding: Insets.from(0),
     textColor: 'black',
     hoverBackgroundColor: '#ccc',
 }
 const darkPanelStyle:ComponentStyle = {
     backgroundColor: Colors.darkBackground,
     borderColor: TRANSPARENT,
-    borderRadius: withInsets(4),
-    borderWidth: withInsets(0),
+    borderRadius: Insets.from(4),
+    borderWidth: Insets.from(0),
     ...FontInfo,
-    padding: withInsets(0),
+    padding: Insets.from(0),
     textColor: 'white',
     hoverBackgroundColor: '#ccc',
 }
@@ -109,10 +108,10 @@ const lightSelectedButtonStyle:ComponentStyle = {
     // hoverBackgroundColor: 'hsl(35,100%,70%)',
     hoverBackgroundColor:'#FFBF66',
     borderColor: 'black',
-    borderRadius: withInsets(4),
-    borderWidth: withInsets(1),
+    borderRadius: Insets.from(4),
+    borderWidth: Insets.from(1),
     ...FontInfo,
-    padding: withInsets(7),
+    padding: Insets.from(7),
     textColor: 'black',
 }
 

@@ -5,7 +5,6 @@ import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
-import {expandSize} from "./util.js";
 import {AxisLayout, AxisSelfLayout, ZERO_INSETS} from "./base.js";
 
 class HeadlessRenderingSurface implements RenderingSurface {
@@ -111,7 +110,7 @@ describe("layout", () => {
         // 10 * chars + 1* 2 for border
         let text_size = new Size(10 * 2 + 2, 10 * 1 + 2)
         // 7 for padding and 1 for border
-        let button_size = expandSize(text_size, new Point(7 * 2 + 1 * 2, 7 * 2 + 1 * 2))
+        let button_size = text_size.addPoint(new Point(7 * 2 + 1 * 2, 7 * 2 + 1 * 2))
         const button = scene.renderRoot.settings.children[0]
         // console.log("button",button, button_width)
         expect(button.settings.size).toEqual(button_size)

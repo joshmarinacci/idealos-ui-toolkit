@@ -1,10 +1,8 @@
 import {GElement, GRenderNode, LayoutConstraints, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {RenderContext} from "./gfx.js";
-import {Point, Size} from "josh_js_util";
+import {Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {KEY_VENDOR} from "./keys.js";
-import {withInsets} from "./util.js";
-
 
 class SquareElement implements GElement {
     private size: number;
@@ -60,7 +58,7 @@ export function FilledRect(size:Size, fill:string):GRenderNode {
         baseline: 0,
         font: Style.base().font,
         children: [],
-        borderWidth: withInsets(1),
+        borderWidth: Insets.from(1),
         padding: ZERO_INSETS,
         contentOffset: ZERO_POINT,
         key: key

@@ -13,10 +13,10 @@ import {
 } from "./base.js";
 import {RenderContext} from "./gfx.js";
 import {Style} from "./style.js";
-import {Point, Size} from "josh_js_util";
-import {getTotalInsets, sizeWithPadding, withInsets} from "./util.js";
+import {Insets, Point, Size} from "josh_js_util";
 import {ACTION_MAP, KeyActionArgs, META_KEYS} from "./actions.js";
 import {KEY_VENDOR} from "./keys.js";
+import {getTotalInsets} from "./util.js";
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 
@@ -263,7 +263,7 @@ export class TextElement implements GElement {
             })
         })
 
-        size = sizeWithPadding(size,total_insets)
+        size = size.growInsets(total_insets)
         return new GRenderNode({
             ... this.settings,
             key:key,
@@ -349,7 +349,7 @@ export class TextElement implements GElement {
         })
 
         size.h = y
-        size = sizeWithPadding(size,total_insets)
+        size = size.growInsets(total_insets)
         return new GRenderNode({
             key:key,
             kind: "text-multiline-element",
@@ -379,7 +379,7 @@ export class TextElement implements GElement {
         let key = KEY_VENDOR.getKey()
         let [size,baseline] = this.calcMetrics(rc)
         let ins = getTotalInsets(this.settings)
-        size = sizeWithPadding(size, ins)
+        size = size.growInsets(ins)
         return new GRenderNode({
             ...this.settings,
             kind: "text-singleline-element",
@@ -404,7 +404,7 @@ class TextInputElement implements GElement {
         this.settings = {
             ...opts,
             multiline: opts.multiline?opts.multiline:false,
-            borderWidth: withInsets(1),
+            borderWidth: Insets.from(1),
             padding: Style.button().padding,
             fontSettings: {
                 font: Style.base().font,
@@ -483,7 +483,7 @@ class TextInputElement implements GElement {
             visualStyle: visualStyle,
             focusedStyle:focusedStyle,
             baseline: baseline,
-            borderWidth: withInsets(1),
+            borderWidth: Insets.from(1),
             children: [text_node, cursor_node],
             contentOffset: new Point(total_insets.left, total_insets.top),
             font: Style.base().font,
@@ -543,7 +543,7 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
             borderColor: TRANSPARENT,
             background: TRANSPARENT,
         },
-        padding: withInsets(5),
+        padding: Insets.from(5),
         fontSettings: {
             font: Style.base().font,
             fontSize: Style.base().fontSize,

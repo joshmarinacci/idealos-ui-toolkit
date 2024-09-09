@@ -1,12 +1,11 @@
 import {GElement, GRenderNode, LayoutConstraints, MGlobals, MMouseEvent, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {RenderContext} from "./gfx.js";
-import {Bounds, Point, Size} from "josh_js_util";
+import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {KEY_VENDOR} from "./keys.js";
-import {bdsSubInsets, withInsets} from "./util.js";
 
 
 type MWindowOptions = {
@@ -32,8 +31,8 @@ class MWindowElement implements GElement {
         const [down,setDown] = state.useState("window-size-down",() => false)
 
 
-        const borderWidth = withInsets(5)
-        let contentBounds = bdsSubInsets(Bounds.fromPointSize(new Point(0,0),size),borderWidth)
+        const borderWidth = Insets.from(5)
+        let contentBounds = Bounds.fromPointSize(new Point(0,0),size).shrinkInsets(borderWidth)
         let child = this.child.layout(rc, {
             space: contentBounds.size(),
             layout: 'grow',

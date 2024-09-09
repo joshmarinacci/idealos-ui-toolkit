@@ -8,7 +8,7 @@ import {ObjAtom, Schema} from "rtds-core"
 import {CEvent, StateHandler} from "./base.js";
 import {GridBox} from "./gridbox.js"
 
-import {withInsets} from "./util.js";
+import {Insets} from "josh_js_util";
 
 
 const S = new Schema()
@@ -99,7 +99,7 @@ const onMouseDown = (cb: (e: CEvent) => void) => {
 const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected, index, onSelectedChanged) => {
     return ListViewItem({
         selected: index === selected,
-        padding: withInsets(0),
+        padding: Insets.from(0),
         mainAxisLayout: 'start',
         handleEvent: onMouseDown((e) => onSelectedChanged(index, e)),
         children: [
@@ -107,7 +107,7 @@ const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected
                 shadow: true,
                 mainAxisSelfLayout: 'shrink',
                 crossAxisSelfLayout:'grow',
-                padding: withInsets(4),
+                padding: Insets.from(4),
                 visualStyle: {
                     background: index == selected ? 'orange' : 'white',
                 },
@@ -126,7 +126,7 @@ const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected
 const EmailFolderRenderer: ListItemRenderer<EmailFolder> = (item, selected, index, onSelectedChanged) => {
     return ListViewItem({
         selected: index == selected,
-        padding: withInsets(8),
+        padding: Insets.from(8),
         mainAxisLayout: 'between',
         handleEvent: (e) => {
             if (e.type === 'mouse-down') {

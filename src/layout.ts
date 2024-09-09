@@ -12,8 +12,8 @@ import {
 import {RenderContext} from "./gfx.js";
 import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
-import {bdsAddInsets, bdsSubInsets, getTotalInsets, insetsHeight, insetsWidth, withFallback} from "./util.js";
 import {KEY_VENDOR} from "./keys.js";
+import {getTotalInsets, withFallback} from "./util.js";
 
 export type BoxRequirements = {
     kind:string,
@@ -163,7 +163,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         }
 
         // account for insets
-        contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
+        contentBounds = contentBounds.shrinkInsets(getTotalInsets(this.settings))
         // contentBounds = this.subtractInsets(contentBounds)
         this.log.info("started content bounds", contentBounds)
 
@@ -229,7 +229,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             this.layout_between(chs, map, contentBounds)
         }
         let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
-        fullBounds = bdsAddInsets(contentBounds, getTotalInsets(this.settings))
+        fullBounds = contentBounds.growInsets(getTotalInsets(this.settings))
         // fullBounds = this.addInsets(contentBounds)
         this.log.info(`content bounds ${contentBounds}`)
         this.log.info   (`full bounds ${fullBounds}`)
@@ -264,7 +264,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             contentBounds.w = this.settings.fixedWidth
             fullBounds.w = this.settings.fixedWidth
         }
-        contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
+        contentBounds = contentBounds.shrinkInsets(getTotalInsets(this.settings))
         // contentBounds = this.subtractInsets(contentBounds)
         this.log.info("started content bounds", contentBounds)
         // layout all children.
@@ -290,7 +290,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         })
         contentBounds.w = child_total_width
         contentBounds.h = max_child_height
-        fullBounds = bdsAddInsets(contentBounds, getTotalInsets(this.settings))
+        fullBounds = contentBounds.growInsets(getTotalInsets(this.settings))
         // fullBounds = this.addInsets(contentBounds)
         this.log.info(`content bounds ${contentBounds}`)
         this.log.info(`full bounds ${fullBounds}`)
@@ -401,7 +401,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             fullBounds.w = this.settings.fixedWidth
         }
         let contentBounds = fullBounds.copy()
-        contentBounds = bdsSubInsets(contentBounds, getTotalInsets(this.settings))
+        contentBounds = contentBounds.shrinkInsets(getTotalInsets(this.settings))
         this.log.info(this.settings.kind, fullBounds, contentBounds)
 
         KEY_VENDOR.startElement(this)
@@ -462,10 +462,10 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         }
         let total_insets = getTotalInsets(this.settings)
         if (this.settings.mainAxisSelfLayout === 'shrink') {
-            fullBounds.h = total_children_length + insetsHeight(total_insets)
+            fullBounds.h = total_children_length + total_insets.height()
         }
         if (this.settings.crossAxisSelfLayout === 'shrink') {
-            fullBounds.w = max_child_size + insetsWidth(total_insets)
+            fullBounds.w = max_child_size + total_insets.width()
         }
         if (this.settings.fixedWidth) {
             fullBounds.w = this.settings.fixedWidth

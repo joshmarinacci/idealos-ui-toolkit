@@ -1,4 +1,4 @@
-import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
+import {Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {ElementSettings, MGlobals, StateHandler} from "./base.js";
 import {Obj, ObjAtom} from "rtds-core";
 import {Scene} from "./scene.js";
@@ -13,61 +13,61 @@ export function makeCanvas(size: Size) {
     return canvas
 }
 
-export function addInsets(a: Insets, b: Insets) {
-    return new Insets(
-        a.top + b.top,
-        a.right + b.right,
-        a.bottom + b.bottom,
-        a.left + b.left
-    )
-}
+// export function addInsets(a: Insets, b: Insets) {
+//     return new Insets(
+//         a.top + b.top,
+//         a.right + b.right,
+//         a.bottom + b.bottom,
+//         a.left + b.left
+//     )
+// }
 
-export function insetsWidth(insets: Insets) {
-    return insets.left + insets.right
-}
-
-export function insetsHeight(insets: Insets) {
-    return insets.top + insets.bottom
-}
+// export function insetsWidth(insets: Insets) {
+//     return insets.left + insets.right
+// }
+//
+// export function insetsHeight(insets: Insets) {
+//     return insets.top + insets.bottom
+// }
 
 export function calcCanvasFont3(fontSize:number, font:string) {
     return `${fontSize}px ${font}`
 }
 
 
-export function withInsets(number: number) {
-    return new Insets(number, number, number, number)
-}
+// export function Insets.from(number: number) {
+//     return new Insets(number, number, number, number)
+// }
 
 export function getTotalInsets(settings: ElementSettings): Insets {
-    let ins = withInsets(0)
+    let ins = Insets.from(0)
     if (settings.borderWidth) {
-        ins = addInsets(ins, settings.borderWidth)
+        ins = ins.add(settings.borderWidth)
     }
     if (settings.padding) {
-        ins = addInsets(ins, settings.padding)
+        ins = ins.add(settings.padding)
     }
     return ins
 }
 
-export function bdsSubInsets(bds: Bounds, insets?: Insets) {
-    if(!insets) return bds.copy()
-    return new Bounds(
-        bds.x + insets.left,
-        bds.y + insets.top,
-        bds.w - insets.left - insets.right,
-        bds.h - insets.top - insets.bottom,
-    )
-}
+// export function bdsSubInsets(bds: Bounds, insets?: Insets) {
+//     if(!insets) return bds.copy()
+//     return new Bounds(
+//         bds.x + insets.left,
+//         bds.y + insets.top,
+//         bds.w - insets.left - insets.right,
+//         bds.h - insets.top - insets.bottom,
+//     )
+// }
 
-export function bdsAddInsets(bds: Bounds, insets: Insets) {
-    return new Bounds(
-        bds.x - insets.left,
-        bds.y - insets.top,
-        bds.w + insets.left + insets.right,
-        bds.h + insets.top + insets.bottom,
-    )
-}
+// export function bdsAddInsets(bds: Bounds, insets: Insets) {
+//     return new Bounds(
+//         bds.x - insets.left,
+//         bds.y - insets.top,
+//         bds.w + insets.left + insets.right,
+//         bds.h + insets.top + insets.bottom,
+//     )
+// }
 
 export function withFallback<T>(value: T | undefined, fallback: T): T {
     return value || fallback
@@ -133,18 +133,18 @@ export function AtomAsState<T>(atom: ObjAtom<T>): StateHandler<T> {
     }
 }
 
-export function expandSize(size: Size, point: Point) {
-    return new Size(
-        size.w + point.x,
-        size.h + point.y
-    )
-}
+// export function expandSize(size: Size, point: Point) {
+//     return new Size(
+//         size.w + point.x,
+//         size.h + point.y
+//     )
+// }
 
-export function sizeWithPadding(ss: Size, padding: Insets) {
-    return new Size(ss.w + padding.left + padding.right,
-        ss.h + padding.top + padding.bottom,
-    )
-}
+// export function sizeWithPadding(ss: Size, padding: Insets) {
+//     return new Size(ss.w + padding.left + padding.right,
+//         ss.h + padding.top + padding.bottom,
+//     )
+// }
 
 export function isInsetsEmpty(insets: Insets | undefined) {
     if (!insets) return true
