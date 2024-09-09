@@ -6,7 +6,6 @@ import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
 import {AxisLayout, AxisSelfLayout, ZERO_INSETS} from "./base.js";
-
 class HeadlessRenderingSurface implements RenderingSurface {
     private logger: Logger;
 
@@ -93,7 +92,6 @@ describe("scene repainting", () => {
     })
 })
 describe("layout", () => {
-
     it("should shrink HBox with one button", () => {
         const scene = new HeadlessScene({size: new Size(100, 100)})
         scene.setComponentFunction(() => HBox({
