@@ -5,7 +5,7 @@ import {Scene, SceneOpts} from "./scene.js";
 import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {makeCompsDemo} from "./demo.js";
+import {makeListDemo, makeTabs} from "./demo.js";
 // @ts-ignore
 import * as process from "node:process";
 import {Style} from "./style.js";
@@ -174,7 +174,7 @@ class SDLScene extends Scene {
 
 setup_common_keybindings()
 const scene = new SDLScene({size:new Size(1200,600)})
-scene.setComponentFunction(makeCompsDemo)
+scene.setComponentFunction(makeListDemo)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())

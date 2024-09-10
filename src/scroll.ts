@@ -1,7 +1,7 @@
 import {CEvent, GElement, GRenderNode, LayoutConstraints, TRANSPARENT, useState, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {RenderContext} from "./gfx.js";
-import {IconButton} from "./buttons.js";
+import {Button, IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 import {KEY_VENDOR} from "./keys.js";
 import {Style} from "./style.js";
@@ -22,6 +22,8 @@ class ScrollContainerElement implements GElement {
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         let key = KEY_VENDOR.getKey()
         const [scrollOffset, setScrollOffset] = useState(key,"scrollOffset",undefined, () => new Point(0,0))
+        const [down,setDown] = useState(key,"window-size-down",undefined,() => false)
+
         let borderInsets = Style.panel().borderWidth
         let w = cons.space.w
         if(this.param.fixedWidth) w = this.param.fixedWidth
@@ -47,8 +49,8 @@ class ScrollContainerElement implements GElement {
         }
         ;//this.param.onScrollChanged
         let children = [child]
+        // bottom scroll bar
         {
-            // bottom scroll bar
             let key =  KEY_VENDOR.getKey()
             let bar = new GRenderNode({
                 key:key,
@@ -59,19 +61,60 @@ class ScrollContainerElement implements GElement {
                 children: [],
                 contentOffset: ZERO_POINT,
                 font: "",
-                kind: "",
+                kind: "scroll-bar",
                 padding: ZERO_INSETS,
                 text: "",
                 visualStyle: {
                     borderColor: TRANSPARENT,
                     background: 'magenta',
                     textColor: 'magenta'
+                },
+            })
+            children.push(bar)
+        }
+        //bottom scroll thumb
+        {
+            let key = KEY_VENDOR.getKey()
+            let bar = new GRenderNode({
+                key:key,
+                size: new Size(20,barInsets.bottom),
+                pos: contentBounds.bottom_left().subtract(new Point(-10-scrollOffset.x,barInsets.bottom)),
+                baseline: 0,
+                borderWidth: ZERO_INSETS,
+                children: [],
+                contentOffset: ZERO_POINT,
+                font: "",
+                kind: "thumb",
+                padding: ZERO_INSETS,
+                text: "",
+                visualStyle: {
+                    borderColor: TRANSPARENT,
+                    background: 'cyan',
+                    textColor: 'magenta'
+                },
+                handleEvent:(e) => {
+                    if(e.type === 'mouse-down') {
+                        setDown(true)
+                        e.redraw()
+                        return
+                    }
+                    if(e.type === 'mouse-move' && down) {
+                        let so = scrollOffset.copy()
+                        so.x = -e.position.x
+                        if(so.x > 0) so.x = 0
+                        if(so.x < -contentBounds.w) {
+                            so.x = -contentBounds.w
+                        }
+                        setScrollOffset(so)
+                        e.use()
+                        e.redraw()
+                    }
                 }
             })
             children.push(bar)
         }
+        // right scroll bar
         {
-            // right scroll bar
             let key =  KEY_VENDOR.getKey()
             let bar = new GRenderNode({
                 key:key,
@@ -82,7 +125,7 @@ class ScrollContainerElement implements GElement {
                 children: [],
                 contentOffset: ZERO_POINT,
                 font: "",
-                kind: "",
+                kind: "scroll-bar",
                 padding: ZERO_INSETS,
                 text: "",
                 visualStyle: {
@@ -93,60 +136,61 @@ class ScrollContainerElement implements GElement {
             })
             children.push(bar)
         }
+        // right thumb
+        {
+            let key = KEY_VENDOR.getKey()
+            let thumb = new GRenderNode({
+                key:key,
+                size: new Size(barInsets.right,20),
+                pos: contentBounds.top_right()
+                    .subtract(new Point(barInsets.right,0))
+                    .add(new Point(0,-scrollOffset.y - 10 )),
+                baseline:0,
+                borderWidth: ZERO_INSETS,
+                children: [],
+                contentOffset: ZERO_POINT,
+                font: "",
+                kind: "scroll-thumb",
+                padding: ZERO_INSETS,
+                text: "",
+                visualStyle:{
+                    borderColor: TRANSPARENT,
+                    background: 'cyan',
+                    textColor: 'magenta'
+                },
+                handleEvent:(e) => {
+                    if(e.type === 'mouse-down') {
+                        setDown(true)
+                        e.redraw()
+                        return
+                    }
+                    if(e.type === 'mouse-move' && down) {
+                        console.log("doing a drag", scrollOffset, e.position)
+                        let so = scrollOffset.copy()
+                        so.y = -e.position.y
+                        if(so.y > 0) so.y = 0
+                        if(so.y < -contentBounds.h) {
+                            so.y = -contentBounds.h
+                        }
+                        setScrollOffset(so)
+                        e.use()
+                        e.redraw()
+                    }
+                }
+            })
+            children.push(thumb)
+        }
+        {
+            // debug overlay
+            children.push(Button({text:""+scrollOffset.toString()}).layout(rc,cons))
+        }
 
-        const iconSettings = {
-            fontSize: 14,
-            ghost: false,
-            padding: ZERO_INSETS,
-            borderRadius: ZERO_INSETS,
-        }
-        {
-            // left button
-            let button = IconButton({
-                icon: Icons.KeyboardArrowLeft,
-                handleEvent: (e) => os(this.addToOffset(scrollOffset, new Point(10, 0), child.settings.size, contentBounds), e),
-                ...iconSettings,
-            })
-            let node = button.layout(rc, cons)
-            node.settings.size = new Size(barInsets.right, barInsets.bottom)
-            node.settings.pos.x = contentBounds.left()
-            node.settings.pos.y = contentBounds.bottom() - node.settings.size.h
-            children.push(node)
-        }
-        {
-            // right button
-            let button = IconButton({icon: Icons.KeyboardArrowRight,
-                ...iconSettings,
-            })
-            let node = button.layout(rc, cons)
-            node.settings.size = new Size(barInsets.right, barInsets.bottom)
-            node.settings.pos.x = contentBounds.right() - node.settings.size.w - barInsets.right
-            node.settings.pos.y = contentBounds.bottom() - node.settings.size.h
-            children.push(node)
-            node.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(-10, 0), child.settings.size, contentBounds), e)
-        }
-        {
-            let button = IconButton({icon: Icons.KeyboardArrowUp,
-                ...iconSettings,
-            })
-            let node = button.layout(rc, cons)
-            node.settings.size = new Size(barInsets.right, barInsets.bottom)
-            node.settings.pos.x = contentBounds.right() - node.settings.size.w
-            node.settings.pos.y = contentBounds.top()
-            children.push(node)
-            node.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(0, 10), child.settings.size, contentBounds), e)
-        }
-        {
-            let button = IconButton({icon: Icons.KeyboardArrowDown,
-                ...iconSettings,
-            })
-            let node = button.layout(rc, cons)
-            node.settings.size = new Size(barInsets.right, barInsets.bottom)
-            node.settings.pos.x = contentBounds.right() - node.settings.size.w
-            node.settings.pos.y = contentBounds.bottom() - node.settings.size.h - barInsets.bottom
-            children.push(node)
-            node.settings.handleEvent = (e) => os(this.addToOffset(scrollOffset,new Point(0, -10), child.settings.size, contentBounds), e)
-        }
+        // const iconSettings = {
+        //     fontSize: 14,
+        //     ghost: false,
+        //     padding: ZERO_INSETS,
+        //     borderRadius: ZERO_INSETS,
+        // }
 
         child.settings.pos = scrollOffset.add(contentBounds.position())
         KEY_VENDOR.endElement(this)
