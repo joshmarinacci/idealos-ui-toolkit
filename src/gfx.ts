@@ -176,7 +176,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     })
 
     // if (rc.debug.metrics) {
-    rc.surface.strokeBounds(Bounds.fromPointSize(new Point(0,0), n.settings.size),'cyan',1)
+    // rc.surface.strokeBounds(Bounds.fromPointSize(new Point(0,0), n.settings.size),'cyan',1)
     // }
     rc.surface.restore()
 }

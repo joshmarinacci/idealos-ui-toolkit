@@ -218,14 +218,8 @@ export function makePanelDemo() {
         mainAxisSelfLayout: 'grow',
         crossAxisSelfLayout: 'grow',
         crossAxisLayout:'start',
-        visualStyle: {
-            borderColor:'red',
-        },
         children: [
             new MVBoxElement({
-                visualStyle: {
-                    borderColor:'green',
-                },
                 children: [
                     Label({text: 'hbox'}),
                     new MHBoxElement({
