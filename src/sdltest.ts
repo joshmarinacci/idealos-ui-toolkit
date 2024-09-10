@@ -5,7 +5,7 @@ import {Scene, SceneOpts} from "./scene.js";
 import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {baselineRow, makeCompsDemo, makeTabs} from "./demo.js";
+import {makeCompsDemo} from "./demo.js";
 // @ts-ignore
 import * as process from "node:process";
 import {Style} from "./style.js";

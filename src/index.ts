@@ -5,7 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {baselineRow, makeCompsDemo, makePanelDemo, makeTabs} from "./demo.js";
+import {makeTabs} from "./demo.js";
 
 // const state = {
 //     toggle: false,
