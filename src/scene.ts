@@ -1,6 +1,6 @@
 import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MouseButton, MWheelEvent, ZERO_POINT,} from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
-import {Bounds, Point, Size} from "josh_js_util";
+import {Bounds, Point, Size, make_logger, Logger} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 import {drawDebugCompInfo} from "./debug.js";
 
@@ -22,8 +22,11 @@ export abstract class Scene {
     private should_redraw_callback?: () => void;
     private should_just_redraw_callback?: () => void;
     protected opts: Required<SceneOpts>;
+    private log: Logger;
 
     constructor(opts:SceneOpts) {
+        this.log = make_logger("SCENE")
+        this.log.setEnabled(true)
         this.opts = {
             debug_enabled: opts.debug_enabled || false,
             size:opts.size
@@ -49,7 +52,7 @@ export abstract class Scene {
     protected abstract makeRc():RenderContext
 
     layout() {
-        this.log("layout")
+        this.log.info("layout")
         if(!this.renderMap) this.renderMap = new Map()
         KEY_VENDOR.reset()
         // this.log("layout phase")
@@ -57,6 +60,7 @@ export abstract class Scene {
         let rc = this.makeRc()
         KEY_VENDOR.start()
         this.elementRoot = this.makeTree()
+        this.log.info("constraints space",rc.size,)
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
         // console.log(`final render root ${this.renderRoot.settings.pos} `)
         // console.log(`final zero point ${ZERO_POINT}`)
@@ -66,7 +70,7 @@ export abstract class Scene {
     }
 
     redraw() {
-        this.log("redraw")
+        this.log.info("redraw")
         let rc = this.makeRc()
         rc.surface.save()
         rc.surface.scale(rc.scale, rc.scale)
@@ -315,10 +319,6 @@ export abstract class Scene {
                 break;
             }
         }
-    }
-
-    private log(str: string) {
-        console.log("SCENE",str)
     }
 
     setComponentFunction(compFunc: () => GElement) {

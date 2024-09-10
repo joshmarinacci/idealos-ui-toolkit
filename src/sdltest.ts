@@ -5,7 +5,7 @@ import {Scene, SceneOpts} from "./scene.js";
 import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Point, Size} from "josh_js_util";
-import {makeTabs} from "./demo.js";
+import {baselineRow, makeCompsDemo, makeTabs} from "./demo.js";
 // @ts-ignore
 import * as process from "node:process";
 import {Style} from "./style.js";
@@ -51,7 +51,7 @@ class SDLRenderingSurface implements RenderingSurface {
         this.ctx.font = calcCanvasFont3(opts.fontSize || 12, opts.fontFamily ||
             'sans-serif')
         let metrics:TextMetrics = this.ctx.measureText(text)
-        console.log("metrics",metrics)
+        // console.log("metrics",metrics)
         let size = new Size(
             Math.floor(metrics.width),
             Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
@@ -149,7 +149,7 @@ class SDLScene extends Scene {
 
     protected makeRc(): RenderContext {
         return {
-            size:this.opts.size,
+            size:this.opts.size.scale(0.5),
             scale: 2,
             surface: new SDLRenderingSurface(this.canvas)
         }
@@ -174,7 +174,7 @@ class SDLScene extends Scene {
 
 setup_common_keybindings()
 const scene = new SDLScene({size:new Size(1200,600)})
-scene.setComponentFunction(makeTabs)
+scene.setComponentFunction(makeCompsDemo)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())

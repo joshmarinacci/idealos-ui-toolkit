@@ -5,7 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {makeTabs} from "./demo.js";
+import {baselineRow, makeCompsDemo, makePanelDemo, makeTabs} from "./demo.js";
 
 // const state = {
 //     toggle: false,
@@ -124,9 +124,10 @@ class CanvasScene extends Scene {
 
 setup_common_keybindings()
 const scene = new CanvasScene({
-    size:size
+    size:size,
+    debug_enabled:true,
 })
-scene.setComponentFunction(makeTabs)
+scene.setComponentFunction(makePanelDemo)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

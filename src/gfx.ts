@@ -176,9 +176,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     })
 
     // if (rc.debug.metrics) {
-    //     rc.ctx.fillStyle = 'cyan'
-    //     rc.ctx.fillRect(n.settings.contentOffset.x, n.settings.contentOffset.y + n.settings.baseline, n.settings.size.w, 1)
-    //     debugText(rc, n.settings.kind, new Point(5, 10))
+    rc.surface.strokeBounds(Bounds.fromPointSize(new Point(0,0), n.settings.size),'cyan',1)
     // }
     rc.surface.restore()
 }

@@ -20,6 +20,7 @@ const state = {
 
 export function baselineRow() {
     return HBox({
+        mainAxisSelfLayout:"grow",
         crossAxisLayout: 'center',
         children: [
             Label({text: 'simple components'}),
@@ -60,6 +61,7 @@ export function baselineRow() {
 
 export function makeCompsDemo() {
     return new MVBoxElement({
+        mainAxisLayout:'start',
         children: [
             HBox({
                 crossAxisLayout: 'center',
@@ -173,6 +175,8 @@ export function makeCompsDemo() {
 export function makeListDemo() {
     return new MHBoxElement({
         kind: "list view demo",
+        mainAxisLayout:"center",
+        crossAxisLayout: 'center',
         fixedWidth: 200,
         children: [
             ListView({
@@ -213,8 +217,15 @@ export function makePanelDemo() {
         mainAxisLayout: 'between',
         mainAxisSelfLayout: 'grow',
         crossAxisSelfLayout: 'grow',
+        crossAxisLayout:'start',
+        visualStyle: {
+            borderColor:'red',
+        },
         children: [
             new MVBoxElement({
+                visualStyle: {
+                    borderColor:'green',
+                },
                 children: [
                     Label({text: 'hbox'}),
                     new MHBoxElement({

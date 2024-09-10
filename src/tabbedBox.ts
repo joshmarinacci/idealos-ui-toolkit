@@ -16,7 +16,7 @@ export function TabbedBox(opts: TabbedBoxOptions) {
     return new MVBoxElement({
         key:key,
         mainAxisSelfLayout: "grow",
-        mainAxisLayout: "center",
+        mainAxisLayout: "start",
         crossAxisLayout: "center",
         crossAxisSelfLayout: "grow",
         children: [

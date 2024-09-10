@@ -11,6 +11,7 @@ class HeadlessRenderingSurface implements RenderingSurface {
 
     constructor() {
         this.logger = make_logger("HeadlessRenderingSurface");
+        this.logger.setEnabled(false)
     }
 
     measureText(text: string, opts: TextOpts): [Size, number] {
@@ -63,6 +64,7 @@ class HeadlessScene extends Scene {
 describe("scene repainting", () => {
     it("should paint the scene", async () => {
         const l = make_logger("test")
+        l.setEnabled(false)
         const scene = new HeadlessScene({size: new Size(100, 100)})
         scene.setComponentFunction(() => Square(50, 'red'))
         l.info("made scene")
@@ -77,15 +79,16 @@ describe("scene repainting", () => {
     })
     it("should paint a button", () => {
         const l = make_logger("test")
+        l.setEnabled(false)
         const scene = new HeadlessScene({size: new Size(100, 100)})
         scene.setComponentFunction(() => Button({text: "hi"}))
         l.info("made scene")
         scene.layout()
-        console.log(scene.renderRoot)
+        // console.log(scene.renderRoot)
         expect(scene.renderRoot).toBeTruthy()
         expect(scene.renderRoot.settings.children.length).toBe(1)
         let text = scene.renderRoot.settings.children[0]
-        console.log(text)
+        // console.log(text)
         expect(text.settings.text).toBe("hi")
         expect(text.settings.pos).toEqual(new Point(8, 8))
         expect(text.settings.size).toEqual(new Size(20 + 2, 10 + 2))
@@ -245,7 +248,7 @@ describe("layout", () => {
         scene.layout()
         // a two letter button with zero padding & borders is 22x12
         expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
-        console.log(scene.renderRoot.settings.children[0].settings.pos)
+        // console.log(scene.renderRoot.settings.children[0].settings.pos)
         expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
         expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,100/2-12))
         expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
@@ -256,7 +259,7 @@ describe("layout", () => {
         scene.layout()
         // a two letter button with zero padding & borders is 22x12
         expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
-        console.log(scene.renderRoot.settings.children[0].settings.pos)
+        // console.log(scene.renderRoot.settings.children[0].settings.pos)
         expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
         expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,100-24))
         expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
@@ -267,7 +270,7 @@ describe("layout", () => {
         scene.layout()
         // a two letter button with zero padding & borders is 22x12
         expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
-        console.log(scene.renderRoot.settings.children[0].settings.pos)
+        // console.log(scene.renderRoot.settings.children[0].settings.pos)
         expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))
         expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
         expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
