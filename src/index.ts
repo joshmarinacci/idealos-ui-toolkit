@@ -127,7 +127,7 @@ const scene = new CanvasScene({
     size:size,
     debug_enabled:true,
 })
-scene.setComponentFunction(makePanelDemo)
+scene.setComponentFunction(makeTabs)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

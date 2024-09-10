@@ -367,7 +367,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             mainAxisSelfLayout: withFallback(param.mainAxisSelfLayout, 'shrink'),
             crossAxisSelfLayout: withFallback(param.crossAxisSelfLayout, 'shrink'),
             crossAxisLayout: withFallback(param.crossAxisLayout, 'start'),
-            mainAxisLayout: withFallback(param.mainAxisLayout, 'center'),
+            mainAxisLayout: withFallback(param.mainAxisLayout, 'start'),
             visualStyle: param.visualStyle || {
                 background: Style.panel().backgroundColor,
                 textColor: Style.base().textColor,
