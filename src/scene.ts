@@ -1,8 +1,10 @@
 import {CEvent, GElement, GRenderNode, MKeyboardEvent, MMouseEvent, MouseButton, MWheelEvent, ZERO_POINT,} from "./base.js";
 import {doDraw, drawDebug, RenderContext} from "./gfx.js";
-import {Bounds, Point, Size, make_logger, Logger} from "josh_js_util";
+import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {KEY_VENDOR} from "./keys.js";
 import {drawDebugCompInfo} from "./debug.js";
+
+import {findPathToNodeAtPoint, findPathToNodeByKey, findPathToScrollTargetAtPoint} from "./nodepath.js";
 
 export type SceneOpts = {
     size: Size;
@@ -85,62 +87,6 @@ export abstract class Scene {
         rc.surface.restore()
     }
 
-    private findTarget(pos: Point, node: GRenderNode): GRenderNode | undefined {
-        const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
-        if (bounds.contains(pos)) {
-            if (node.settings.children) {
-                // go backwards
-                for(let i=node.settings.children.length-1; i>=0; i--) {
-                    let ch = node.settings.children[i]
-                    // console.log("ch under mouse is",ch)
-                    if (ch.settings.shadow) continue
-                    let p2 = pos.subtract(bounds.top_left())
-                    let found = this.findTarget(p2, ch)
-                    if (found) return found
-                }
-            }
-            return node
-        }
-    }
-    private findTargetStack(pos: Point, node: GRenderNode): GRenderNode[]|undefined {
-        const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
-        if (bounds.contains(pos)) {
-            if (node.settings.children) {
-                // go backwards
-                for(let i=node.settings.children.length-1; i>=0; i--) {
-                    let ch = node.settings.children[i]
-                    // console.log("ch under mouse is",ch)
-                    if (ch.settings.shadow) continue
-                    let p2 = pos.subtract(bounds.top_left())
-                    let found = this.findTargetStack(p2, ch)
-                    if (found) {
-                        return [node].concat(found)
-                    }
-                }
-            }
-            return [node]
-        }
-        return undefined
-    }
-    private findScrollTarget(pos: Point, node: GRenderNode):GRenderNode | undefined {
-        const bounds = Bounds.fromPointSize(node.settings.pos, node.settings.size)
-        if (bounds.contains(pos)) {
-            if (node.settings.children) {
-                // go backwards
-                for(let i=node.settings.children.length-1; i>=0; i--) {
-                    let ch = node.settings.children[i]
-                    // console.log("ch under mouse is",ch)
-                    if (ch.settings.shadow) continue
-                    let p2 = pos.subtract(bounds.top_left())
-                    let found = this.findScrollTarget(p2, ch)
-                    if (found) return found
-                }
-            }
-            if(node.settings.canScroll === true) {
-                return node
-            }
-        }
-    }
     private syncRenderMap(renderRoot: GRenderNode) {
         if(renderRoot.settings.key) this.renderMap.set(renderRoot.settings.key, renderRoot)
         renderRoot.settings.children.forEach(child => {
@@ -155,66 +101,75 @@ export abstract class Scene {
         }
     }
 
-    public handleMouseMove(pos: Point, button:MouseButton, shift:boolean) {
-        let evt:MMouseEvent = {
-            type:'mouse-move',
-            redraw: () => this.request_layout_and_redraw(),
-            position:pos,
-            shift:shift,
-            button:button,
-            use: () => {}
-        }
-        this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
-            if(comp.settings.handleEvent) comp.settings.handleEvent(evt)
-        })
-        let found = this.findTarget(pos, this.renderRoot)
-        if (found) {
-            // debug overlay
-            // if(found.settings.key !== this.debug_target) {
-                // console.log("swap",found.settings.key, this.debug_target)
-                // this.ifTarget(this.debug_target,(comp) => comp.debug = false)
-                // found.debug = true
-                // this.debug_target = found.settings.key
-                // this.request_just_redraw()
-            // }
-
-            // hover effect
-            if(found.settings.key !== this.current_hover) {
+    public handleMouseMove(pointer: Point, button:MouseButton, shift:boolean) {
+        let path = findPathToNodeAtPoint(pointer,this.renderRoot)
+        if(path) {
+            let target = path.target()
+            // console.log("target",target.settings.kind, target.settings.key)
+            // hover code
+            if(target.settings.key !== this.current_hover) {
                 this.ifTarget(this.current_hover, (comp) => comp.hover = false)
-                found.hover = true
-                this.current_hover = found.settings.key
+                target.hover = true
+                this.current_hover = target.settings.key
                 this.request_just_redraw()
+            }
+
+            // dispatch mouse move
+            let evt:MMouseEvent = {
+                type:'mouse-move',
+                redraw: () => this.request_layout_and_redraw(),
+                position:pointer,
+                shift:shift,
+                button:button,
+                use: () => {}
+            }
+
+            if(this.current_mouse_target) {
+                let path = findPathToNodeByKey(this.current_mouse_target,this.renderRoot)
+                if(path) {
+                    console.log('sending drag event')
+                    path.dispatch(evt)
+                }
+            } else {
+                path.dispatch(evt)
             }
         }
     }
-    handleMouseDown(pos: Point,button:MouseButton,shift:boolean) {
-        let evt:MMouseEvent = {
-            type:'mouse-down',
-            redraw: () => this.request_layout_and_redraw(),
-            use: () => {},
-            position:pos,
-            shift:shift,
-            button:button
-        }
-        let found = this.findTargetStack(pos, this.renderRoot)
-        if(found) {
-            let last = found[found.length - 1]
-            this.current_mouse_target = last.settings.key
-            // if (last.settings.handleEvent) last.settings.handleEvent(evt)
-            if(last.settings.key !== this.debug_target && shift) {
+    handleMouseDown(pointer: Point,button:MouseButton,shift:boolean) {
+        let path = findPathToNodeAtPoint(pointer,this.renderRoot)
+        if(path) {
+            // swap keyboard focus
+            if(path.target().settings.key !== this.keyboard_target) {
+                this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
+                path.target().focused = true
+                this.keyboard_target = path.target().settings.kind
+                console.log("swapping keyboard target to ", this.keyboard_target)
+                this.request_just_redraw()
+                this.keyboard_path = path.nodes.map(n => n.settings.key)
+            }
+
+            // set the current mouse target
+            this.current_mouse_target = path.target().settings.key
+            console.log("current mouse target set to",this.current_mouse_target)
+
+            // swap the debug target
+            if(path.target().settings.key !== this.debug_target && shift) {
                 this.ifTarget(this.debug_target,(comp) => comp.debug = false)
-                this.debug_target = last.settings.key
+                this.debug_target = path.target().settings.key
+                this.debug_path = path.nodes
                 this.request_just_redraw()
             }
-            //swap focus
-            this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
-            last.focused = true
-            this.keyboard_target = last.settings.key
-            this.keyboard_path = found.map(n => n.settings.key)
-            this.debug_path = found
-            // dispatch event
-            this.dispatchEvent(evt,this.keyboard_path)
-            this.request_just_redraw()
+
+            // send mouse event
+            let evt:MMouseEvent = {
+                type:'mouse-down',
+                redraw: () => this.request_layout_and_redraw(),
+                use: () => {},
+                position:pointer,
+                shift:shift,
+                button:button
+            }
+            path.dispatch(evt)
         }
     }
     handleMouseUp(pos:Point, button:MouseButton, shift:boolean) {
@@ -226,9 +181,14 @@ export abstract class Scene {
             button: button,
             shift:shift,
         }
-        this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
-            if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
-        })
+        let path = findPathToNodeByKey(this.current_mouse_target,this.renderRoot)
+        if(path) {
+            this.ifTarget(this.current_mouse_target, (comp:GRenderNode) => {
+                if(comp.settings.handleEvent)  comp.settings.handleEvent(evt)
+            })
+            path.dispatch(evt)
+        }
+        this.current_mouse_target = undefined
     }
     handleKeydownEvent(key:string, control:boolean, shift:boolean) {
         let evt: MKeyboardEvent = {
@@ -242,8 +202,8 @@ export abstract class Scene {
         this.dispatchEvent(evt,this.keyboard_path)
     }
     public handleWheelEvent(pos: Point, delta:Point) {
-        let found = this.findScrollTarget(pos, this.renderRoot)
-        if(found) {
+        let path = findPathToScrollTargetAtPoint(pos, this.renderRoot)
+        if(path) {
             // console.log("scroll target",found)
             const evt:MWheelEvent = {
                 type: 'wheel',
@@ -259,7 +219,7 @@ export abstract class Scene {
                 },
                 use: () => {}
             }
-            if(found.settings.handleEvent) found.settings.handleEvent(evt)
+            path.dispatch(evt)
         }
     }
 

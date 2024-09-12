@@ -8,7 +8,7 @@ import {HBox} from "./layout.ts";
 import {KEY_VENDOR} from "./keys.ts";
 import {Square} from "./comps2.ts";
 
-function makeHeadlessRc() {
+export function makeHeadlessRc() {
     const canvas = pureimage.make(500, 500)
     const ctx = canvas.getContext('2d')
 

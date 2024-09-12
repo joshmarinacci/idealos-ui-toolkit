@@ -18,7 +18,7 @@ const state = {
     toggle:false
 }
 
-export function baselineRow() {
+export function makeBaselineRow() {
     return HBox({
         mainAxisSelfLayout:"grow",
         crossAxisLayout: 'center',
@@ -59,6 +59,11 @@ export function baselineRow() {
     })
 }
 
+export function makeButton() {
+    return ToggleButton({
+        text:"hi there"
+    })
+}
 export function makeCompsDemo() {
     return new MVBoxElement({
         mainAxisLayout:'start',
