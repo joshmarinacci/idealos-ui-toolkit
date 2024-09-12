@@ -29,7 +29,7 @@ export class NodePath {
 
     dispatch(evt: MMouseEvent | MWheelEvent): void {
         let he = this.target().settings.handleEvent
-        console.log("sending to",this.target().settings.kind,this.target().settings.key)
+        // console.log("sending to",this.target().settings.kind,this.target().settings.key)
         if(evt.type === 'mouse-move' || evt.type === 'mouse-down' || evt.type === 'mouse-up') {
             evt.position = this.toTargetPoint(evt.position)
         }

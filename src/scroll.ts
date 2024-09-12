@@ -1,8 +1,7 @@
 import {CEvent, GElement, GRenderNode, LayoutConstraints, TRANSPARENT, useState, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {RenderContext} from "./gfx.js";
-import {Button, IconButton} from "./buttons.js";
-import {Icons} from "./icons.js";
+import {Button} from "./buttons.js";
 import {KEY_VENDOR} from "./keys.js";
 import {Style} from "./style.js";
 
@@ -100,7 +99,7 @@ class ScrollContainerElement implements GElement {
                     }
                     if(e.type === 'mouse-move' && down) {
                         let so = scrollOffset.copy()
-                        so.x = -e.position.x
+                        so.x -= e.delta.x
                         if(so.x > 0) so.x = 0
                         if(so.x < -contentBounds.w) {
                             so.x = -contentBounds.w
@@ -108,6 +107,9 @@ class ScrollContainerElement implements GElement {
                         setScrollOffset(so)
                         e.use()
                         e.redraw()
+                    }
+                    if(e.type === 'mouse-up') {
+                        setDown(false)
                     }
                 }
             })
@@ -165,9 +167,8 @@ class ScrollContainerElement implements GElement {
                         return
                     }
                     if(e.type === 'mouse-move' && down) {
-                        console.log("doing a drag", scrollOffset, e.position)
                         let so = scrollOffset.copy()
-                        so.y = -e.position.y
+                        so.y -= e.delta.y
                         if(so.y > 0) so.y = 0
                         if(so.y < -contentBounds.h) {
                             so.y = -contentBounds.h
@@ -175,6 +176,9 @@ class ScrollContainerElement implements GElement {
                         setScrollOffset(so)
                         e.use()
                         e.redraw()
+                    }
+                    if(e.type === 'mouse-up') {
+                        setDown(false)
                     }
                 }
             })

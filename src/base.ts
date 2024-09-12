@@ -45,6 +45,7 @@ export type MMouseEvent = {
     type: 'mouse-move' | 'mouse-down' | 'mouse-up'
     position:Point
     button: MouseButton
+    delta:Point,
     redraw:()=>void
     shift: boolean
 } & BaseEvent

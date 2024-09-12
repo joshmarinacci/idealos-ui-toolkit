@@ -25,10 +25,11 @@ export abstract class Scene {
     private should_just_redraw_callback?: () => void;
     protected opts: Required<SceneOpts>;
     private log: Logger;
+    private prev_point: Point;
 
     constructor(opts:SceneOpts) {
         this.log = make_logger("SCENE")
-        this.log.setEnabled(true)
+        this.log.setEnabled(false)
         this.opts = {
             debug_enabled: opts.debug_enabled || false,
             size:opts.size
@@ -39,6 +40,7 @@ export abstract class Scene {
         this.renderMap = new Map<string, GRenderNode>();
         this.keyboard_path = []
         this.debug_path = []
+        this.prev_point = new Point(0,0)
     }
 
     getSize() {
@@ -119,6 +121,7 @@ export abstract class Scene {
                 type:'mouse-move',
                 redraw: () => this.request_layout_and_redraw(),
                 position:pointer,
+                delta: pointer.subtract(this.prev_point),
                 shift:shift,
                 button:button,
                 use: () => {}
@@ -127,13 +130,13 @@ export abstract class Scene {
             if(this.current_mouse_target) {
                 let path = findPathToNodeByKey(this.current_mouse_target,this.renderRoot)
                 if(path) {
-                    console.log('sending drag event')
                     path.dispatch(evt)
                 }
             } else {
                 path.dispatch(evt)
             }
         }
+        this.prev_point = pointer
     }
     handleMouseDown(pointer: Point,button:MouseButton,shift:boolean) {
         let path = findPathToNodeAtPoint(pointer,this.renderRoot)
@@ -166,18 +169,21 @@ export abstract class Scene {
                 redraw: () => this.request_layout_and_redraw(),
                 use: () => {},
                 position:pointer,
+                delta: pointer.subtract(this.prev_point),
                 shift:shift,
                 button:button
             }
             path.dispatch(evt)
         }
+        this.prev_point = pointer
     }
-    handleMouseUp(pos:Point, button:MouseButton, shift:boolean) {
+    handleMouseUp(pointer:Point, button:MouseButton, shift:boolean) {
         let evt:MMouseEvent = {
             type:'mouse-up',
             redraw: () => this.request_layout_and_redraw(),
             use: () => {},
-            position:pos,
+            position:pointer,
+            delta: pointer.subtract(this.prev_point),
             button: button,
             shift:shift,
         }
@@ -189,6 +195,7 @@ export abstract class Scene {
             path.dispatch(evt)
         }
         this.current_mouse_target = undefined
+        this.prev_point = pointer
     }
     handleKeydownEvent(key:string, control:boolean, shift:boolean) {
         let evt: MKeyboardEvent = {

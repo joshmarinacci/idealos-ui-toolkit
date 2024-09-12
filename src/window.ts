@@ -45,11 +45,7 @@ class MWindowElement implements GElement {
         }
         const doResize = (e: MMouseEvent) => {
             if(down) {
-                // console.log("do resize",e.position)
-                let size2 = size.copy()
-                size2.w = e.position.x
-                size2.h = e.position.y
-                setSize(size2)
+                setSize(size.addPoint(e.delta))
                 e.redraw()
             }
         }

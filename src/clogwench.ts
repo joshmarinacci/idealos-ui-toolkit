@@ -5,7 +5,7 @@ import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {Socket} from "node:net";
-import {baselineRow} from "./demo.js";
+import {makeBaselineRow} from "./demo.js";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {calcCanvasFont3} from "./util.js";
 
@@ -269,7 +269,7 @@ function toARGB(value: any) {
 }
 
 function start() {
-    return baselineRow()
+    return makeBaselineRow()
 }
 
 class ImageWrapper implements BufferImage {
@@ -399,7 +399,7 @@ async function doit() {
     await app.send_and_wait({AppConnect: {HelloApp: {}}})
     let bounds = new Bounds(50,50,200,200)
     let win = await app.open_window(bounds)
-    win.scene.setComponentFunction(baselineRow)
+    win.scene.setComponentFunction(makeBaselineRow)
     MGlobals.set(Scene.name, win.scene)
     MGlobals.set(SYMBOL_FONT_ENABLED, true)
     MGlobals.set(STATE_CACHE, new StateCache())
