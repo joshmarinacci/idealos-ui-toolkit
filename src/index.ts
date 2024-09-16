@@ -6,6 +6,7 @@ import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {makeTabs, makeTextInput} from "./demo.js";
+import {DrawingApp} from "./drawing.js";
 
 // const state = {
 //     toggle: false,
@@ -127,7 +128,7 @@ const scene = new CanvasScene({
     size:size,
     debug_enabled:true,
 })
-scene.setComponentFunction(makeTabs)
+scene.setComponentFunction(DrawingApp)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

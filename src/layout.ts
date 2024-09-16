@@ -206,6 +206,10 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             contentBounds.h = max_child_height
         }
 
+        if(this.settings.fixedHeight) {
+            contentBounds.h = this.settings.fixedHeight
+        }
+
         // position all children
         let x = contentBounds.x
         if (this.settings.mainAxisLayout === 'start') {

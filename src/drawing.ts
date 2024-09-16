@@ -7,56 +7,65 @@ import {Button} from "./buttons.js";
 import {AtomAsState, useRefresh} from "./util.js";
 import {HBox, VBox} from "./layout.js";
 import {KEY_VENDOR} from "./keys.js";
+import {PropSheet} from "./propsheet.js";
 
 const S = new Schema()
 
-const SPoint = S.jsobj(new Point(0,0))
-const SSize = S.jsobj(new Size(0,0))
+// const SPoint = S.jsobj(new Point(0,0))
+const Position = S.jsobj(new Point(50, 50), {
+    typeName: 'Position',
+    fromJson: (j) => Point.fromJSON(j),
+})
+const SizeAtom = S.jsobj(new Size(25, 25), {
+    typeName: 'Size',
+    fromJson: (j) => Size.fromJSON(j),
+})
+type SizeType = typeof SizeAtom
 
 const Color = S.map({
-    r:S.number(0),
-    g:S.number(0),
-    b:S.number(0),
+    r: S.number(0),
+    g: S.number(0),
+    b: S.number(0),
 })
 const Rect = S.map({
-    position:SPoint,
-    size:SSize,
+    position: Position,
+    size: SizeAtom,
     name: S.string('unnamed rect'),
-    fill:Color,
-},{typeName:'Rect'})
+    fill: Color,
+}, {typeName: 'Rect'})
 type RectType = typeof Rect
 
 const Circle = S.map({
-    position:SPoint,
+    position: Position,
     radius: S.number(),
     name: S.string('unnamed circle'),
-    fill:Color,
-},{typeName:'Circle'})
+    fill: Color,
+}, {typeName: 'Circle'})
 
 const Doc = S.map({
     open: S.boolean(),
     selected: S.number(),
     shapes: S.list(Rect),
-},{ typeName:'Doc'})
+}, {typeName: 'Doc'})
 type DocType = typeof Doc
 
 const doc = Doc.clone()
 doc.get('open').set(true)
 
-const RED = Color.cloneWith({ r:1, g:0, b:0,})
-const WHITE = Color.cloneWith({ r:1, g:1, b:1,})
-const BLACK = Color.cloneWith({ r:0, g:0, b:0,})
+const RED = Color.cloneWith({r: 1, g: 0, b: 0,})
+const WHITE = Color.cloneWith({r: 1, g: 1, b: 1,})
+const BLACK = Color.cloneWith({r: 0, g: 0, b: 0,})
 const rect = Rect.cloneWith({
-    position: new Point(50,50),
-    size: new Size(50,50),
-    fill:RED,
+    position: new Point(50, 50),
+    size: new Size(50, 50),
+    fill: RED,
 })
 doc.get('shapes').push(rect)
 
-const RenderShapeNode:ListItemRenderer<RectType> = (item, selected,index,onSelectedChanged):GElement => {
+const RenderShapeNode: ListItemRenderer<RectType> = (item, selected, index, onSelectedChanged): GElement => {
     return ListViewItem({
         children: [
-            Label({text: item.get('name').get(), shadow:true}),
+            Label({text: item.get('name').get(), shadow: true}),
         ],
         selected: selected == index,
         mainAxisLayout: 'end',
@@ -74,6 +83,7 @@ function addRect(doc: DocType) {
     rect.get('name').set('next rect')
     doc.get('shapes').pushLast(rect)
 }
+
 function addCircle(doc: DocType) {
     const circle = Circle.clone()
     circle.get('name').set('next circle')
@@ -82,17 +92,21 @@ function addCircle(doc: DocType) {
 
 function Toolbar() {
     return HBox({
-        children:[
-            Button({text:'add rect', handleEvent:(e) => {
-                if(e.type === 'mouse-down') {
-                    addRect(doc)
+        children: [
+            Button({
+                text: 'add rect', handleEvent: (e) => {
+                    if (e.type === 'mouse-down') {
+                        addRect(doc)
+                    }
                 }
-                }}),
-            Button({text:'add circle', handleEvent:(e) => {
-                    if(e.type === 'mouse-down') {
+            }),
+            Button({
+                text: 'add circle', handleEvent: (e) => {
+                    if (e.type === 'mouse-down') {
                         addCircle(doc)
                     }
-                }}),
+                }
+            }),
         ]
     })
 }
@@ -143,11 +157,14 @@ function DocTree() {
     // })
     return VBox({
         fixedWidth: 200,
-        fixedHeight: 200,
-        children:[
+        borderWidth: Insets.from(1),
+        visualStyle: {
+            borderColor: "black",
+        },
+        children: [
             ListView({
-                data:doc.get('shapes'),
-                renderItem:RenderShapeNode,
+                data: doc.get('shapes'),
+                renderItem: RenderShapeNode,
                 selected: AtomAsState(doc.get('selected')),
             })
         ]
@@ -156,35 +173,15 @@ function DocTree() {
 
 function CanvasArea() {
     return HBox({
-        fixedWidth: 200,
+        fixedWidth: 400,
         fixedHeight: 200,
         borderWidth: Insets.from(5),
         visualStyle: {
             background: '#f0f0f0',
             borderColor: 'green'
         },
-        children:[
-            Label({text:"canvas area"})
-        ]
-    })
-}
-
-function PropSheet() {
-    const sel_index = doc.get('selected').get()
-    const rect = doc.get('shapes').get(sel_index)
-    if(rect) {
-        console.log("selected rect is",rect)
-    }
-    return VBox({
-        fixedWidth: 200,
-        fixedHeight: 200,
-        borderWidth: Insets.from(5),
-        visualStyle: {
-            background: '#f0f0f0',
-            borderColor: 'green'
-        },
-        children:[
-            Label({text:'hi ther'})
+        children: [
+            Label({text: "canvas area"})
         ]
     })
 }
@@ -192,16 +189,20 @@ function PropSheet() {
 export function DrawingApp() {
     const key = KEY_VENDOR.getKey()
     useRefresh(key, doc.get('shapes'))
+    const sel_index = doc.get('selected').get()
+    const rect = doc.get('shapes').get(sel_index)
     return VBox({
-        mainAxisSelfLayout:'grow',
-        crossAxisSelfLayout:'grow',
-        children:[
+        mainAxisSelfLayout: 'grow',
+        crossAxisSelfLayout: 'grow',
+        children: [
             Toolbar(),
             HBox({
-                children:[
+                crossAxisSelfLayout:'grow',
+                // crossAxisLayout:'center',
+                children: [
                     DocTree(),
                     CanvasArea(),
-                    PropSheet(),
+                    PropSheet(rect),
                 ]
             })
         ]
