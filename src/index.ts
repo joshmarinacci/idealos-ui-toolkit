@@ -5,7 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {makeTabs} from "./demo.js";
+import {makeTabs, makeTextInput} from "./demo.js";
 
 // const state = {
 //     toggle: false,
@@ -127,7 +127,7 @@ const scene = new CanvasScene({
     size:size,
     debug_enabled:true,
 })
-scene.setComponentFunction(makeTabs)
+scene.setComponentFunction(makeTextInput)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

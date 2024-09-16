@@ -1,5 +1,5 @@
 import {HBox, HSpacer, MHBoxElement, MVBoxElement} from "./layout.js";
-import {Label, TextBox, WrappingLabel} from "./text.js";
+import {Label, WrappingLabel} from "./text.js";
 import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "./buttons.js";
 import {IconElement, Icons} from "./icons.js";
 import {HSeparator, Square} from "./comps2.js";
@@ -11,6 +11,8 @@ import {TabbedBox} from "./tabbedBox.js";
 import {MWindow} from "./window.js";
 import {TodoListDemo} from "./todolist.js";
 import {Size} from "josh_js_util";
+import {TextBox} from "./textinput.js";
+import {Style} from "./style.js";
 
 
 const state = {
@@ -301,3 +303,15 @@ export function makeTabs(): GElement {
     return MWindow({child: tabs, initSize: new Size(700,400)})
 }
 
+export function makeTextInput() {
+    return TextBox({
+        multiline:false,
+        fixedWidth: 300,
+        fixedHeight: 300,
+        fontSettings: {
+            font:Style.base().font,
+            fontSize: 50,
+            fontWeight: Style.base().fontWeight,
+        }
+    })
+}
