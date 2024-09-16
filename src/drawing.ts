@@ -4,9 +4,12 @@ import {ListViewItem} from "./listView.js";
 import {GElement, GRenderNode, LayoutConstraints, StateHandler} from "./base.js";
 import {RenderContext} from "./gfx.js";
 import {Label} from "./text.js";
-import {ToggleIconButton} from "./buttons.js";
+import {Button, ToggleIconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
-import {AtomAsState} from "./util.js";
+import {AtomAsState, useRefresh} from "./util.js";
+import {HBox, VBox} from "./layout.js";
+import {Square} from "./comps2.js";
+import {KEY_VENDOR} from "./keys.js";
 
 const S = new Schema()
 
@@ -21,12 +24,15 @@ const Color = S.map({
 const Rect = S.map({
     position:SPoint,
     size:SSize,
+    name: S.string('unnamed rect'),
     fill:Color,
 },{typeName:'Rect'})
+type RectType = typeof Rect
 
 const Circle = S.map({
     position:SPoint,
     radius: S.number(),
+    name: S.string('unnamed circle'),
     fill:Color,
 },{typeName:'Circle'})
 
@@ -41,6 +47,7 @@ const Doc = S.map({
     open: S.boolean(),
     pages:S.list(Page)
 },{ typeName:'Doc'})
+type DocType = typeof Doc
 
 const doc = Doc.clone()
 doc.get('open').set(true)
@@ -81,6 +88,9 @@ function renderNode(item:unknown) {
     if(it.typeName() === 'Rect') {
         text = 'rect'
     }
+    if(it.typeName() === 'Circle') {
+        text = 'circle'
+    }
     return ListViewItem({
         selected: false,
         children: [
@@ -93,7 +103,7 @@ function renderNode(item:unknown) {
             Label({text:text})
         ],
         handleEvent:(e) => {
-            console.log("event happened",e)
+            // console.log("event happened",e)
         }
     })
 }
@@ -145,7 +155,7 @@ class TreeView2Element implements GElement {
         item_node.settings.pos = pos.copy()
         children.push(item_node)
 
-        console.log("is open",root,this.opts.isOpen(root))
+        // console.log("is open",root,this.opts.isOpen(root))
         if(this.opts.isOpen(root)) {
             let ch = this.opts.getChildren(root)
             let y = item_node.settings.size.h
@@ -169,7 +179,38 @@ function TreeView2(opts: TreeViewOptions) {
     return new TreeView2Element(opts)
 }
 
-export function DrawingApp() {
+function addRect(doc: DocType) {
+    const rect = Rect.clone()
+    rect.get('name').set('next rect')
+    doc.get('pages').get(0).get('shapes').pushLast(rect)
+    console.log("added rect to doc")
+}
+function addCircle(doc: DocType) {
+    const circle = Circle.clone()
+    circle.get('name').set('next circle')
+    doc.get('pages').get(0).get('shapes').pushLast(circle)
+    console.log("added circle to doc")
+}
+
+
+function Toolbar() {
+    return HBox({
+        children:[
+            Button({text:'add rect', handleEvent:(e) => {
+                if(e.type === 'mouse-down') {
+                    addRect(doc)
+                }
+                }}),
+            Button({text:'add circle', handleEvent:(e) => {
+                    if(e.type === 'mouse-down') {
+                        addCircle(doc)
+                    }
+                }}),
+        ]
+    })
+}
+
+function DocTree() {
     return TreeView2({
         root:doc,
         fixedWidth: 200,
@@ -212,5 +253,36 @@ export function DrawingApp() {
             return []
         },
         nodeRenderer:renderNode
+    })
+}
+
+function CanvasArea() {
+    return Square(300,'red')
+}
+
+function PropSheet() {
+    return VBox({
+        children:[
+            Label({text:"properties"})
+        ]
+    })
+}
+
+export function DrawingApp() {
+    const key = KEY_VENDOR.getKey()
+    useRefresh(key, doc)
+    return VBox({
+        mainAxisSelfLayout:'grow',
+        crossAxisSelfLayout:'grow',
+        children:[
+            Toolbar(),
+            HBox({
+                children:[
+                    DocTree(),
+                    CanvasArea(),
+                    PropSheet(),
+                ]
+            })
+        ]
     })
 }
