@@ -470,6 +470,9 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         if (this.settings.fixedWidth) {
             fullBounds.w = this.settings.fixedWidth
         }
+        if(this.settings.fixedHeight) {
+            fullBounds.h = this.settings.fixedHeight
+        }
 
         return new GRenderNode({
             ...this.settings,
@@ -510,7 +513,6 @@ export function VBox(param: BoxOptions) {
         mainAxisLayout: param.mainAxisLayout || 'start',
         crossAxisSelfLayout: param.crossAxisSelfLayout || 'shrink',
         crossAxisLayout: param.crossAxisLayout || 'start',
-        padding: param.padding
     })
 }
 

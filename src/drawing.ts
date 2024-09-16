@@ -1,14 +1,11 @@
-import {Obj, ObjMap, Schema} from "rtds-core";
+import {Schema} from "rtds-core";
 import {Insets, Point, Size} from "josh_js_util";
-import {ListViewItem} from "./listView.js";
-import {GElement, GRenderNode, LayoutConstraints, StateHandler} from "./base.js";
-import {RenderContext} from "./gfx.js";
+import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
+import {GElement} from "./base.js";
 import {Label} from "./text.js";
-import {Button, ToggleIconButton} from "./buttons.js";
-import {Icons} from "./icons.js";
+import {Button} from "./buttons.js";
 import {AtomAsState, useRefresh} from "./util.js";
 import {HBox, VBox} from "./layout.js";
-import {Square} from "./comps2.js";
 import {KEY_VENDOR} from "./keys.js";
 
 const S = new Schema()
@@ -36,28 +33,16 @@ const Circle = S.map({
     fill:Color,
 },{typeName:'Circle'})
 
-const Page = S.map({
-    title: S.string(),
-    open: S.boolean(),
-    shapes: S.list(Rect),
-    background: Color,
-},{typeName:'Page'})
-
 const Doc = S.map({
     open: S.boolean(),
-    pages:S.list(Page)
+    selected: S.number(),
+    shapes: S.list(Rect),
 },{ typeName:'Doc'})
 type DocType = typeof Doc
 
 const doc = Doc.clone()
 doc.get('open').set(true)
-const page1 = Page.cloneWith({
-    title: "page 1",
-})
-doc.get('pages').push(page1)
-const page2 = Page.cloneWith({
-    title: "page 2",
-})
+
 const RED = Color.cloneWith({ r:1, g:0, b:0,})
 const WHITE = Color.cloneWith({ r:1, g:1, b:1,})
 const BLACK = Color.cloneWith({ r:0, g:0, b:0,})
@@ -66,132 +51,34 @@ const rect = Rect.cloneWith({
     size: new Size(50,50),
     fill:RED,
 })
-page2.get('shapes').push(rect)
-page2.set('background',BLACK)
-doc.get('pages').push(page2)
+doc.get('shapes').push(rect)
 
-function renderNode(item:unknown) {
-    let it = item as Obj<any>
-    let text = "???"
-    let opened:StateHandler<boolean> = {
-        get:() => false,
-        set:(v) => {},
-    }
-    if(it.typeName() === 'Doc') {
-        text = "doc"
-        opened = AtomAsState((it as typeof Doc).get('open'))
-    }
-    if(it.typeName() === 'Page') {
-        text = 'page'
-        opened = AtomAsState((it as typeof Page).get('open'))
-    }
-    if(it.typeName() === 'Rect') {
-        text = 'rect'
-    }
-    if(it.typeName() === 'Circle') {
-        text = 'circle'
-    }
+const RenderShapeNode:ListItemRenderer<RectType> = (item, selected,index,onSelectedChanged):GElement => {
     return ListViewItem({
-        selected: false,
         children: [
-            ToggleIconButton({
-                selectedIcon:Icons.KeyboardArrowDown,
-                unselectedIcon: Icons.KeyboardArrowRight,
-                selected:opened,
-                text:""
-            }),
-            Label({text:text})
+            Label({text: item.get('name').get(), shadow:true}),
         ],
-        handleEvent:(e) => {
-            // console.log("event happened",e)
+        selected: selected == index,
+        mainAxisLayout: 'end',
+        handleEvent: (e) => {
+            if (e.type === 'mouse-down') {
+                onSelectedChanged(index, e)
+            }
         }
     })
-}
 
-type TreeViewOptions = {
-    fixedWidth: number
-    isOpen: (item:unknown) => boolean
-    root: unknown
-    canOpen: (item:unknown) => boolean
-    // isChildren:(item:unknown, name:string) => boolean
-    getChildren:(item:unknown) => unknown[]
-    nodeRenderer: (item:unknown) => GElement
-}
-
-class TreeView2Element implements GElement {
-    private opts: TreeViewOptions;
-    constructor(opts:TreeViewOptions) {
-        this.opts = opts
-    }
-    layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
-        const root = this.opts.root as ObjMap<any>
-        let children = this.make_child(root, rc, {
-            layout:'grow',
-            space: new Size(this.opts.fixedWidth,200)
-        }, new Point(0,0))
-        console.log("child count",children.length)
-        return new GRenderNode({
-            baseline: 0,
-            children: children,
-            padding: Insets.from(5),
-            contentOffset: new Point(0,0),
-            font: "",
-            key: "",
-            kind: "tree-view",
-            pos: new Point(0,0),
-            size: new Size(this.opts.fixedWidth,200),
-            visualStyle: {
-                background: "green",
-                borderColor: "blue",
-                textColor:"black"
-            }
-        })
-    }
-
-    private make_child(root: ObjMap<any>, rc: RenderContext, cons: LayoutConstraints, pos:Point):GRenderNode[] {
-        let children:GRenderNode[] = []
-        const item_elem = this.opts.nodeRenderer(root)
-        let item_node = item_elem.layout(rc, cons)
-        item_node.settings.pos = pos.copy()
-        children.push(item_node)
-
-        // console.log("is open",root,this.opts.isOpen(root))
-        if(this.opts.isOpen(root)) {
-            let ch = this.opts.getChildren(root)
-            let y = item_node.settings.size.h
-            let x = 20
-            ch.forEach(it2 => {
-                let pos2 = pos.add(new Point(x, y))
-                let chs = this.make_child(it2, rc, {
-                    space: new Size(cons.space.w - 21, 200),
-                    layout: 'grow',
-                }, pos2)
-                for (let ch of chs) {
-                    y += ch.settings.size.h
-                }
-                children = children.concat(chs)
-            })
-        }
-        return children
-    }
-}
-function TreeView2(opts: TreeViewOptions) {
-    return new TreeView2Element(opts)
 }
 
 function addRect(doc: DocType) {
     const rect = Rect.clone()
     rect.get('name').set('next rect')
-    doc.get('pages').get(0).get('shapes').pushLast(rect)
-    console.log("added rect to doc")
+    doc.get('shapes').pushLast(rect)
 }
 function addCircle(doc: DocType) {
     const circle = Circle.clone()
     circle.get('name').set('next circle')
-    doc.get('pages').get(0).get('shapes').pushLast(circle)
-    console.log("added circle to doc")
+    doc.get('shapes').pushLast(circle as RectType)
 }
-
 
 function Toolbar() {
     return HBox({
@@ -211,66 +98,100 @@ function Toolbar() {
 }
 
 function DocTree() {
-    return TreeView2({
-        root:doc,
+    // return TreeView2({
+    //     root:doc,
+    //     fixedWidth: 200,
+    //     canOpen:(item:unknown) => {
+    //         let obj = item as Obj<unknown>
+    //         if(obj.typeName() === 'page') {
+    //             return true
+    //         }
+    //         if(obj.typeName() === 'doc') {
+    //             return true
+    //         }
+    //         return false
+    //     },
+    //     isOpen:(item:unknown) => {
+    //         let obj = item as Obj<unknown>
+    //         if(obj.typeName() === 'Page') {
+    //             return (obj as typeof Page).get('open').get()
+    //         }
+    //         if(obj.typeName() === 'Doc') {
+    //             return (obj as typeof Doc).get('open').get()
+    //         }
+    //         return false
+    //     },
+    //     getChildren:(item:unknown):unknown[] => {
+    //         let obj = item as Obj<unknown>
+    //         if(obj.typeName() === 'Doc') {
+    //             let arr:unknown[] = [];
+    //             (obj as typeof Doc).get('shapes').forEach(item => {
+    //                 arr.push(item)
+    //             })
+    //             return arr
+    //         }
+    //         if(obj.typeName() === 'Page') {
+    //             let arr:unknown[] = [];
+    //             (obj as typeof Page).get('shapes').forEach(item => {
+    //                 arr.push(item)
+    //             })
+    //             return arr
+    //         }
+    //         return []
+    //     },
+    //     nodeRenderer:RenderShapeNode
+    // })
+    return VBox({
         fixedWidth: 200,
-        canOpen:(item:unknown) => {
-            let obj = item as Obj<unknown>
-            if(obj.typeName() === 'page') {
-                return true
-            }
-            if(obj.typeName() === 'doc') {
-                return true
-            }
-            return false
-        },
-        isOpen:(item:unknown) => {
-            let obj = item as Obj<unknown>
-            if(obj.typeName() === 'Page') {
-                return (obj as typeof Page).get('open').get()
-            }
-            if(obj.typeName() === 'Doc') {
-                return (obj as typeof Doc).get('open').get()
-            }
-            return false
-        },
-        getChildren:(item:unknown):unknown[] => {
-            let obj = item as Obj<unknown>
-            if(obj.typeName() === 'Doc') {
-                let arr:unknown[] = [];
-                (obj as typeof Doc).get('pages').forEach(item => {
-                    arr.push(item)
-                })
-                return arr
-            }
-            if(obj.typeName() === 'Page') {
-                let arr:unknown[] = [];
-                (obj as typeof Page).get('shapes').forEach(item => {
-                    arr.push(item)
-                })
-                return arr
-            }
-            return []
-        },
-        nodeRenderer:renderNode
+        fixedHeight: 200,
+        children:[
+            ListView({
+                data:doc.get('shapes'),
+                renderItem:RenderShapeNode,
+                selected: AtomAsState(doc.get('selected')),
+            })
+        ]
     })
 }
 
 function CanvasArea() {
-    return Square(300,'red')
+    return HBox({
+        fixedWidth: 200,
+        fixedHeight: 200,
+        borderWidth: Insets.from(5),
+        visualStyle: {
+            background: '#f0f0f0',
+            borderColor: 'green'
+        },
+        children:[
+            Label({text:"canvas area"})
+        ]
+    })
 }
 
 function PropSheet() {
+    const sel_index = doc.get('selected').get()
+    const rect = doc.get('shapes').get(sel_index)
+    if(rect) {
+        console.log("selected rect is",rect)
+    }
     return VBox({
+        fixedWidth: 200,
+        fixedHeight: 200,
+        borderWidth: Insets.from(5),
+        visualStyle: {
+            background: '#f0f0f0',
+            borderColor: 'green'
+        },
         children:[
-            Label({text:"properties"})
+            Label({text:'hi ther'})
         ]
     })
 }
 
 export function DrawingApp() {
     const key = KEY_VENDOR.getKey()
-    useRefresh(key, doc)
+    useRefresh(key, doc.get('shapes'))
     return VBox({
         mainAxisSelfLayout:'grow',
         crossAxisSelfLayout:'grow',
