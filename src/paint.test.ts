@@ -5,8 +5,9 @@ import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
-import {AxisLayout, AxisSelfLayout, RenderNodeSettings, ZERO_INSETS} from "./base.js";
+import {AxisLayout, AxisSelfLayout, MGlobals, RenderNodeSettings, ZERO_INSETS} from "./base.js";
 import {TextBox} from "./textinput.js";
+import {STATE_CACHE, StateCache} from "./state.js";
 class HeadlessRenderingSurface implements RenderingSurface {
     private logger: Logger;
 
@@ -418,6 +419,7 @@ describe("layout", () => {
     })
 
     it("should grow textbox inside of HBox", () => {
+        MGlobals.set(STATE_CACHE, new StateCache())
         const scene = new HeadlessScene({size: new Size(100,100)})
         function makeBox() {
             return function () {
