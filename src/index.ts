@@ -160,7 +160,7 @@ loadFont().then(() => {
         scene.handleMouseUp(pos,toMouseButton(e),e.shiftKey)
     })
     window.addEventListener('keydown', (e) => {
-        scene.handleKeydownEvent(e.key, e.ctrlKey, e.shiftKey)
+        scene.handleKeydownEvent(e.key, e.ctrlKey, e.shiftKey, e.altKey, e.metaKey)
     })
     window.addEventListener('wheel', (e) => {
         // @ts-ignore

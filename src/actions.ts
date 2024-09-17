@@ -1,7 +1,7 @@
 import {Point} from "josh_js_util";
 
 export const META_KEYS = ['Shift', 'Control', 'Alt', 'Meta']
-type KeyStrokeDef = { key: string, control?: boolean, shift?:boolean }
+type KeyStrokeDef = { key: string, control?: boolean, shift?:boolean, meta?:boolean, alt?:boolean }
 export class TextSelection {
     start: Point;
     end: Point;
@@ -64,12 +64,16 @@ class ActionMap {
     keystrokes: Map<any, any>;
     controls: Map<string, string>
     shifts: Map<string, string>
+    alts: Map<string, string>
+    metas: Map<string, string>
 
     constructor() {
         this.actions = new Map()
         this.keystrokes = new Map()
         this.controls = new Map()
         this.shifts = new Map()
+        this.alts = new Map()
+        this.metas = new Map()
     }
 
     addAction(name: string, cb: KeyAction) {
@@ -79,12 +83,22 @@ class ActionMap {
     match(e: KeyStrokeDef): string | undefined {
         if (e.shift) return this.shifts.get(e.key)
         if (e.control) return this.controls.get(e.key)
+        if (e.alt) return this.alts.get(e.key)
+        if (e.meta) return this.metas.get(e.key)
         return this.keystrokes.get(e.key)
     }
 
     registerKeystroke(def: KeyStrokeDef, action: string) {
         if(def.shift) {
             this.shifts.set(def.key, action)
+            return
+        }
+        if(def.meta) {
+            this.metas.set(def.key, action)
+            return
+        }
+        if(def.alt) {
+            this.alts.set(def.key, action)
             return
         }
         if (def.control) {
@@ -116,5 +130,6 @@ export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key: 'Enter'}, 'insert-newline')
     ACTION_MAP.registerKeystroke({key: 'Backspace'}, 'delete-backward')
     ACTION_MAP.registerKeystroke({key: 'd', control: true}, 'delete-forward')
-    // ACTION_MAP.registerKeystroke({key: 'a', control: true, }, 'select-all')
+
+    ACTION_MAP.registerKeystroke({key: 'a', meta: true, }, 'select-all')
 }

@@ -305,6 +305,7 @@ function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent, s
     // console.log('TEXT_INPUT: action:',action_name, 'pos',cursorPosition, 'sel',selection)
     if (action_name) {
         let action_impl = ACTION_MAP.actions.get(action_name)
+        // console.log("TEXT_INPUT: ",action_name)
         if (action_impl) {
             let res = ACTION_MAP.actions.get(action_name)({text, pos: cursorPosition, selection:selection})
             return [res.text, res.pos, res.selection]
@@ -412,6 +413,11 @@ export class TextInputElement implements GElement {
             selection_rect.settings.visualStyle.background = TRANSPARENT
         }
 
+        const children = [selection_rect, text_node]
+        if(focused) {
+            children.push(cursor_node)
+        }
+
         const focusedStyle = {
             background: 'hsl(47,100%,79%)',
             borderColor: 'magenta'
@@ -429,7 +435,7 @@ export class TextInputElement implements GElement {
             focusedStyle: focusedStyle,
             baseline: baseline,
             borderWidth: Insets.from(1),
-            children: [selection_rect, text_node, cursor_node],
+            children: children,
             contentOffset: new Point(total_insets.left, total_insets.top),
             font: Style.base().font,
             padding: this.settings.padding,

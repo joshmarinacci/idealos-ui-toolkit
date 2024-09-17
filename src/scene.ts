@@ -197,14 +197,12 @@ export abstract class Scene {
         this.current_mouse_target = undefined
         this.prev_point = pointer
     }
-    handleKeydownEvent(key:string, control:boolean, shift:boolean) {
+    handleKeydownEvent(key:string, control:boolean, shift:boolean, alt:boolean, meta:boolean) {
         let evt: MKeyboardEvent = {
             type: 'keyboard-typed',
             redraw: () => this.request_layout_and_redraw(),
             use: () => {},
-            key: key,
-            control: control,
-            shift:shift,
+            key, control, shift, alt, meta
         }
         this.dispatchEvent(evt,this.keyboard_path)
     }

@@ -51,9 +51,11 @@ export type MMouseEvent = {
 } & BaseEvent
 export type MKeyboardEvent = {
     type: 'keyboard-typed'
-    key:string,
-    control:boolean,
-    shift:boolean,
+    key:string
+    control:boolean
+    shift:boolean
+    meta: boolean
+    alt: boolean
     redraw:()=>void
 } & BaseEvent
 export type MWheelEvent = {
