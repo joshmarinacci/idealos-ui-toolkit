@@ -203,7 +203,7 @@ export class TextElement implements GElement {
     }
 }
 
-export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean, bold?:boolean }) {
+export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean, bold?:boolean, fixedWidth?:number }) {
     return new TextElement({
         text: opts.text,
         visualStyle: {
@@ -220,7 +220,8 @@ export function Label(opts: { text: string, shadow?: boolean, multiline?:boolean
         borderWidth: ZERO_INSETS,
         shadow: opts.shadow ? opts.shadow : false,
         multiline: opts.multiline ? opts.multiline : false,
-        bold: opts.bold
+        bold: opts.bold,
+        fixedWidth: opts.fixedWidth,
     })
 }
 

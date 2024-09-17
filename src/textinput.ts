@@ -234,7 +234,7 @@ type OnChangeCallback<T> = (value: T, e: CEvent) => void
 export type TextInputElementSettings = {
     text?: StateHandler<string>
     onChange?: OnChangeCallback<[string, Point]>
-    multiline: boolean
+    multiline?: boolean
     fixedWidth?: number,
     fixedHeight?: number,
 } & ElementSettings

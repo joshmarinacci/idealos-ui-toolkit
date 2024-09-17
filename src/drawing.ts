@@ -1,4 +1,4 @@
-import {Schema} from "rtds-core";
+import {ObjMap, Schema} from "rtds-core";
 import {Insets, Point, Size} from "josh_js_util";
 import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
 import {GElement} from "./base.js";
@@ -202,7 +202,7 @@ export function DrawingApp() {
                 children: [
                     DocTree(),
                     CanvasArea(),
-                    PropSheet(rect),
+                    PropSheet(rect as ObjMap<any>),
                 ]
             })
         ]
