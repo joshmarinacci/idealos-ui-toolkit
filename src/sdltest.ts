@@ -143,14 +143,14 @@ class SDLScene extends Scene {
                 key = SDL_TO_CANVAS_MAP.get(key) as string
             }
             // for some reason the types of ctrl and shift are number, but really booleans
-            scene.handleKeydownEvent(key, e.ctrl as unknown as boolean, e.shift as unknown as boolean)
+            scene.handleKeydownEvent(key, e.ctrl as unknown as boolean, e.shift as unknown as boolean, e.alt as unknown as boolean, e.super as unknown as boolean)
         })
     }
 
     protected makeRc(): RenderContext {
         return {
             size:this.opts.size.scale(0.5),
-            scale: 2,
+            scale: 1,
             surface: new SDLRenderingSurface(this.canvas)
         }
     }
@@ -174,7 +174,7 @@ class SDLScene extends Scene {
 
 setup_common_keybindings()
 const scene = new SDLScene({size:new Size(1200,600)})
-scene.setComponentFunction(makeListDemo)
+scene.setComponentFunction(makeTabs)
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
