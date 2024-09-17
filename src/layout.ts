@@ -14,6 +14,7 @@ import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {KEY_VENDOR} from "./keys.js";
 import {getTotalInsets, withFallback} from "./util.js";
+import {TextInputElement} from "./textinput.js";
 
 export type BoxRequirements = {
     kind:string,
@@ -143,8 +144,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let contentBounds = new Bounds(0, 0, 0, 0)
 
         let chs = this.settings.children
-        let expanders = chs.filter(ch => ch instanceof HExpander)
-        let non_expanders = chs.filter(ch => !(ch instanceof HExpander))
+        let expanders = chs.filter(ch => ch instanceof HExpander || ch instanceof TextInputElement)
+        let non_expanders = chs.filter(ch => !(ch instanceof HExpander || ch instanceof TextInputElement))
         this.log.info(`exp ${expanders.length} non = ${non_expanders.length}`)
         let map = new Map<GElement, GRenderNode>()
 
@@ -177,7 +178,7 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             non_expander_total_width += node.settings.size.w
             map.set(ch, node)
         })
-        this.log.info(`non ex-ch total width ${non_expander_total_width}`)
+        this.log.info(`non expander child total width ${non_expander_total_width}`)
         let leftover = contentBounds.w - non_expander_total_width
         let leftover_per_child = leftover / expanders.length
         this.log.info(`leftover ${leftover}`)

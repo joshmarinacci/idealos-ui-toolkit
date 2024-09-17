@@ -378,7 +378,7 @@ export class TextInputElement implements GElement {
             total_insets.top + cursorPosition.y * baseline
         )
         cursor_node.settings.size.h = metrics_before.h
-        const size = new Size(100, 100)
+        const size = new Size(_cons.space.w, 100)
         if (this.settings.fixedWidth) {
             size.w = this.settings.fixedWidth
         }

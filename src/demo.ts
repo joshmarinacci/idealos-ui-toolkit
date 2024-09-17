@@ -165,7 +165,7 @@ export function makeCompsDemo() {
                             get: () => state.textInputValue,
                             set: (value) => state.textInputValue = value,
                         },
-                        multiline:false,
+                        fixedWidth: 200,
                     }),
                     TextBox({
                         // text:'multi-line text area',
@@ -316,17 +316,19 @@ export function makeTextInput() {
     })
 }
 export function LayoutTest() {
-    const child =  VBox({
-        fixedWidth: 200,
-        fixedHeight: 300,
-        mainAxisLayout:"center",
+    const child =  HBox({
+        // fixedWidth: 200,
+        // fixedHeight: 300,
+        mainAxisLayout:"start",
         borderWidth: ZERO_INSETS,
         padding: ZERO_INSETS,
         children: [
             Button({text:"hi"}),
+            TextBox({}),
             Button({text:"hi"}),
         ]
     })
+    child.log.setEnabled(true)
     return MWindow({child: child, initSize: new Size(700,400)})
 
 }

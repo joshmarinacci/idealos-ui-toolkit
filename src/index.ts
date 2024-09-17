@@ -5,21 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {makeTabs, makeTextInput} from "./demo.js";
 import {DrawingApp} from "./drawing.js";
-
-// const state = {
-//     toggle: false,
-//     checked: true,
-//     radioed: false,
-//     selectedTab: 0,
-//     selectedListItem1: 0,
-//     selectedListItem2: 0,
-//     scrollOffset1: new Point(0, 0),
-//     scrollOffset2: new Point(0, 0),
-//     textInputValue: "some long text",
-//     textInputCursorPosition: new Point(5, 0)
-// }
 
 const size = new Size(1000, 600)
 
