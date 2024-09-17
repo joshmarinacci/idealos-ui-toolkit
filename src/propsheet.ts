@@ -3,8 +3,10 @@ import {Insets, Point, Size} from "josh_js_util";
 import {HBox, VBox} from "./layout.js";
 import {Label} from "./text.js";
 import {TextBox} from "./textinput.js";
-import {GElement} from "./base.js";
+import {GElement, TRANSPARENT} from "./base.js";
 import {AtomAsState} from "./util.js";
+import {CheckBox} from "./buttons.js";
+import {Style} from "./style.js";
 
 export function PointEditor(atom: ObjAtom<Point>) {
     const updatePointX = {
@@ -29,14 +31,18 @@ export function PointEditor(atom: ObjAtom<Point>) {
     }
     return VBox({
         mainAxisSelfLayout: 'shrink',
+        crossAxisSelfLayout: 'shrink',
+        visualStyle: {
+            background:TRANSPARENT
+        },
         children: [
             EditorRow([
-                Label({text: "x", fixedWidth:50}),
-                TextBox({text: updatePointX})
+                Label({text: "x", fixedWidth: 50}),
+                TextBox({text: updatePointX, fixedWidth: 100}),
             ]),
             EditorRow([
-                Label({text: "y", fixedWidth:50}),
-                TextBox({text: updatePointY})
+                Label({text: "y", fixedWidth: 50}),
+                TextBox({text: updatePointY, fixedWidth: 100})
             ]),
         ]
     })
@@ -65,48 +71,65 @@ export function SizeEditor(atom: ObjAtom<Size>) {
     }
     return VBox({
         mainAxisSelfLayout: 'shrink',
+        padding: Insets.from(3),
+        visualStyle: {
+            background:TRANSPARENT
+        },
         children: [
             EditorRow([
-                Label({text: "w", fixedWidth:50}),
-                TextBox({text: updateW})
+                Label({text: "w", fixedWidth: 50}),
+                TextBox({text: updateW, fixedWidth: 100}),
             ]),
             EditorRow([
-                Label({text: "h", fixedWidth:50}),
-                TextBox({text: updateH})
+                Label({text: "h", fixedWidth: 50}),
+                TextBox({text: updateH, fixedWidth: 100}),
             ]),
         ]
     })
 }
 
 export function GetEditorForAtom(obj: ObjAtom<unknown>): GElement {
-    if (obj.getAtomType() === 'object') {
-        if (obj.typeName() === 'Position') return PointEditor(obj as ObjAtom<Point>)
-        if (obj.typeName() === 'Size') return SizeEditor(obj as ObjAtom<Size>)
-    }
-    if (obj.getAtomType() === 'number') {
-        let atom = obj as ObjAtom<number>
-        return TextBox({
-            multiline: false,
-            text: {
-                get: () => atom.get() + "",
-                set: (v) => atom.set(parseInt(v))
+    switch (obj.getAtomType()) {
+        case "string":
+            return TextBox({
+                text: AtomAsState(obj as ObjAtom<string>),
+            })
+        case "object": {
+            switch (obj.typeName()) {
+                case "Position":
+                    return PointEditor(obj as ObjAtom<Point>)
+                case "Size":
+                    return SizeEditor(obj as ObjAtom<Size>)
             }
-        })
-    }
-    if (obj.getAtomType() === 'string') {
-        return TextBox({
-            multiline: false,
-            text: AtomAsState(obj as ObjAtom<string>),
-        })
+            break;
+        }
+        case "number": {
+            let atom = obj as ObjAtom<number>
+            return TextBox({
+                text: {
+                    get: () => atom.get() + "",
+                    set: (v) => atom.set(parseInt(v))
+                }
+            })
+        }
+        case "boolean": {
+            let atom = obj as ObjAtom<boolean>
+            return CheckBox({
+                selected: AtomAsState(atom),
+                text: "on?",
+            });
+        }
+        default:
+            break;
     }
     return Label({text: "unknown type"})
 }
 
 function EditorRow(chs: GElement[]) {
     return HBox({
-        borderWidth: Insets.from(1),
+        borderWidth: Insets.from(0),
         visualStyle: {
-            background: "aqua",
+            background: TRANSPARENT,
             borderColor: "red",
             textColor: "black",
         },
