@@ -130,6 +130,9 @@ export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key: 'Enter'}, 'insert-newline')
     ACTION_MAP.registerKeystroke({key: 'Backspace'}, 'delete-backward')
     ACTION_MAP.registerKeystroke({key: 'd', control: true}, 'delete-forward')
+    ACTION_MAP.registerKeystroke({key: 'Delete'}, 'delete-forward')
+    ACTION_MAP.registerKeystroke({key: 'End'}, 'cursor-line-end')
+    ACTION_MAP.registerKeystroke({key: 'Home'}, 'cursor-line-start')
 
     ACTION_MAP.registerKeystroke({key: 'a', meta: true, }, 'select-all')
 }

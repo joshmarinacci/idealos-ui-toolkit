@@ -443,6 +443,11 @@ export class TextInputElement implements GElement {
             size: size,
             clip: false,
             handleEvent: (e) => {
+                if (e.type === 'mouse-down') {
+                    if (!focused) setFocused(true)
+                    e.use()
+                    e.redraw()
+                }
                 if (e.type === 'keyboard-typed') {
                     if (!focused) setFocused(true)
                     let kbe = e as MKeyboardEvent;
