@@ -395,6 +395,9 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         if (this.settings.mainAxisSelfLayout === 'shrink') {
             fullBounds.h = cons.space.h
         }
+        if (this.settings.fixedHeight) {
+            fullBounds.h = this.settings.fixedHeight
+        }
         if (this.settings.crossAxisSelfLayout === 'grow') {
             fullBounds.w = cons.space.w
         }

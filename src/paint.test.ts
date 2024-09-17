@@ -1,11 +1,12 @@
 import {Scene} from "./scene.js";
 import {describe, expect, it} from "vitest";
 import {Square} from "./comps2.js";
-import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
+import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
-import {AxisLayout, AxisSelfLayout, ZERO_INSETS} from "./base.js";
+import {AxisLayout, AxisSelfLayout, RenderNodeSettings, ZERO_INSETS} from "./base.js";
+import {TextBox} from "./textinput.js";
 class HeadlessRenderingSurface implements RenderingSurface {
     private logger: Logger;
 
@@ -94,6 +95,23 @@ describe("scene repainting", () => {
         expect(text.settings.size).toEqual(new Size(20 + 2, 10 + 2))
     })
 })
+
+function BoxButton(text: string) {
+    return Button({
+        padding:ZERO_INSETS,
+        borderWidth:ZERO_INSETS,
+        text:text,
+    })
+}
+
+function filterProps(settings: RenderNodeSettings, strings: (keyof RenderNodeSettings)[]) {
+    return strings.map(key => {
+        if(settings[key]){
+            return `${key}: ${settings[key]}`
+        }
+    }).join("\n")
+}
+
 describe("layout", () => {
     it("should shrink HBox with one button", () => {
         const scene = new HeadlessScene({size: new Size(100, 100)})
@@ -275,6 +293,159 @@ describe("layout", () => {
         expect(scene.renderRoot.settings.children[0].settings.pos).toEqual(new Point(0,0))
         expect(scene.renderRoot.settings.children[1].settings.size).toEqual(new Size(22,12))
         expect(scene.renderRoot.settings.children[1].settings.pos).toEqual(new Point(0,100-12))
+
+    })
+    it('should make HBox with fixed size', () => {
+        const scene = new HeadlessScene({size: new Size(100,100)})
+        function makeBox(layout:AxisLayout) {
+            return function () {
+                return HBox({
+                    fixedWidth: 80,
+                    fixedHeight: 80,
+                    mainAxisLayout: layout,
+                    borderWidth: ZERO_INSETS,
+                    padding: ZERO_INSETS,
+                    children: [
+                        BoxButton("hi"),
+                        BoxButton("hi"),
+                    ]
+                })
+            }
+        }
+
+        // start
+        {
+            scene.setComponentFunction(makeBox("start"))
+            scene.layout()
+            expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
+            let first_child = scene.renderRoot.settings.children[0]
+            expect(first_child.settings.size).toEqual(new Size(22, 12))
+            expect(first_child.settings.pos).toEqual(new Point(0,0))
+            let second_child = scene.renderRoot.settings.children[1]
+            expect(second_child.settings.size).toEqual(new Size(22, 12))
+            expect(second_child.settings.pos).toEqual(new Point(0+22,0))
+        }
+
+        // center
+        {
+            scene.setComponentFunction(makeBox("center"))
+            scene.layout()
+            expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
+            let first_child = scene.renderRoot.settings.children[0]
+            expect(first_child.settings.size).toEqual(new Size(22, 12))
+            expect(first_child.settings.pos).toEqual(new Point(40-22,0))
+            let second_child = scene.renderRoot.settings.children[1]
+            expect(second_child.settings.size).toEqual(new Size(22, 12))
+            expect(second_child.settings.pos).toEqual(new Point(40,0))
+        }
+
+        // end
+        {
+            scene.setComponentFunction(makeBox("end"))
+            scene.layout()
+            expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
+            let first_child = scene.renderRoot.settings.children[0]
+            expect(first_child.settings.size).toEqual(new Size(22, 12))
+            expect(first_child.settings.pos).toEqual(new Point(80-22-22,0))
+            let second_child = scene.renderRoot.settings.children[1]
+            expect(second_child.settings.size).toEqual(new Size(22, 12))
+            expect(second_child.settings.pos).toEqual(new Point(80-22,0))
+        }
+
+
+
+    })
+    it('should make VBox with fixed size', () => {
+        const scene = new HeadlessScene({size: new Size(100,100)})
+        function makeBox(layout:AxisLayout) {
+            return function () {
+                return VBox({
+                    fixedWidth: 80,
+                    fixedHeight: 80,
+                    mainAxisLayout:layout,
+                    borderWidth: ZERO_INSETS,
+                    padding: ZERO_INSETS,
+                    children: [
+                        BoxButton("hi"),
+                        BoxButton("hi"),
+                    ]
+                })
+            }
+        }
+
+        // start
+        {
+            scene.setComponentFunction(makeBox("start"))
+            scene.layout()
+            expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
+            let first_child = scene.renderRoot.settings.children[0]
+            expect(first_child.settings.size).toEqual(new Size(22, 12))
+            expect(first_child.settings.pos).toEqual(new Point(0,0))
+            let second_child = scene.renderRoot.settings.children[1]
+            expect(second_child.settings.size).toEqual(new Size(22, 12))
+            expect(second_child.settings.pos).toEqual(new Point(0,0+12))
+        }
+
+        // center
+        {
+            scene.setComponentFunction(makeBox("center"))
+            scene.layout()
+            expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
+            let first_child = scene.renderRoot.settings.children[0]
+            expect(first_child.settings.size).toEqual(new Size(22, 12))
+            expect(first_child.settings.pos).toEqual(new Point(0,40-12))
+            let second_child = scene.renderRoot.settings.children[1]
+            expect(second_child.settings.size).toEqual(new Size(22, 12))
+            expect(second_child.settings.pos).toEqual(new Point(0,40))
+        }
+
+
+        // end
+        {
+            scene.setComponentFunction(makeBox("end"))
+            scene.layout()
+            expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
+            console.log(filterProps(scene.renderRoot.settings,['pos','size']))
+            let first_child = scene.renderRoot.settings.children[0]
+            console.log(filterProps(first_child.settings,['pos','size']))
+            expect(first_child.settings.size).toEqual(new Size(22, 12))
+            expect(first_child.settings.pos).toEqual(new Point(0,80-12-12))
+            let second_child = scene.renderRoot.settings.children[1]
+            console.log(filterProps(second_child.settings,['pos','size']))
+            expect(second_child.settings.size).toEqual(new Size(22, 12))
+            expect(second_child.settings.pos).toEqual(new Point(0,80-12))
+        }
+    })
+
+    it("should grow textbox inside of HBox", () => {
+        const scene = new HeadlessScene({size: new Size(100,100)})
+        function makeBox() {
+            return function () {
+                return HBox({
+                    fixedWidth: 200,
+                    fixedHeight: 30,
+                    mainAxisLayout:"start",
+                    borderWidth: ZERO_INSETS,
+                    padding: ZERO_INSETS,
+                    children: [
+                        BoxButton("hi"),
+                        TextBox({
+                            multiline:false,
+                            text:{
+                            get:() => "hi",
+                            set:(_v) => undefined,
+                        }}),
+                        BoxButton("hi"),
+                    ]
+                })
+            }
+        }
+        scene.setComponentFunction(makeBox())
+        scene.layout()
+        expect(scene.renderRoot.settings.size).toEqual(new Size(200,30))
+        // first box should be at 0,0 and size 22x12
+        // last box should be at 200-22 and std size
+        // text box should be stretched between 22 and 200-22
 
     })
 })

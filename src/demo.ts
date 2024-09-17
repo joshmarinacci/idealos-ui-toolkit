@@ -1,11 +1,11 @@
-import {HBox, HSpacer, MHBoxElement, MVBoxElement} from "./layout.js";
+import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "./layout.js";
 import {Label, WrappingLabel} from "./text.js";
 import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "./buttons.js";
 import {IconElement, Icons} from "./icons.js";
 import {HSeparator, Square} from "./comps2.js";
 import {ListView, ListViewItem} from "./listView.js";
 import {ScrollContainer} from "./scroll.js";
-import {GElement} from "./base.js";
+import {GElement, ZERO_INSETS} from "./base.js";
 import {EmailDemo} from "./email.js";
 import {TabbedBox} from "./tabbedBox.js";
 import {MWindow} from "./window.js";
@@ -314,4 +314,19 @@ export function makeTextInput() {
             fontWeight: Style.base().fontWeight,
         }
     })
+}
+export function LayoutTest() {
+    const child =  VBox({
+        fixedWidth: 200,
+        fixedHeight: 300,
+        mainAxisLayout:"center",
+        borderWidth: ZERO_INSETS,
+        padding: ZERO_INSETS,
+        children: [
+            Button({text:"hi"}),
+            Button({text:"hi"}),
+        ]
+    })
+    return MWindow({child: child, initSize: new Size(700,400)})
+
 }
