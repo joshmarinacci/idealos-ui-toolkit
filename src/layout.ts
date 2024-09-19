@@ -136,7 +136,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         let chs = this.settings.children
         let expanders = chs.filter(ch => this.isHExpand(ch))
         let non_expanders = chs.filter(ch => !(this.isHExpand(ch)))
-        this.log.info(`exp ${expanders.length} non = ${non_expanders.length}`)
         let map = new Map<GElement, GRenderNode>()
 
         let metrics:LayoutMetrics = {
@@ -157,20 +156,16 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
             metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
         })
-        this.log.info(`non expander child total width ${metrics.non_expander_total_length}`)
-        let leftover = contentBounds.w - metrics.non_expander_total_length
-        let leftover_per_child = leftover / expanders.length
-        this.log.info(`leftover ${leftover}`)
+
         // layout the expander children
+        let leftover_per_child = (contentBounds.w - metrics.non_expander_total_length) / expanders.length
         expanders.map(ch => {
             let node = ch.layout(rc, {
                 space: new Size(leftover_per_child, contentBounds.h),
                 layout: this.settings.mainAxisSelfLayout,
             })
-            leftover -= leftover_per_child
             map.set(ch, node)
         })
-        this.log.info(`final leftover is ${leftover}`)
 
         // calculate the total children length
         chs.map(ch => map.get(ch) as GRenderNode)
