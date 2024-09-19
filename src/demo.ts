@@ -316,15 +316,30 @@ export function makeTextInput() {
     })
 }
 export function LayoutTest() {
-    const child =  HBox({
+    const child =  VBox({
         // fixedWidth: 200,
         // fixedHeight: 300,
-        mainAxisLayout:"start",
+        mainAxisSelfLayout:"grow",
+        mainAxisLayout:"end",
+        // crossAxisLayout:"center",
         borderWidth: ZERO_INSETS,
         padding: ZERO_INSETS,
+        visualStyle: {
+            background: 'cyan'
+        },
         children: [
             Button({text:"hi"}),
-            TextBox({}),
+            // ListView({
+            //    fixedHeight: 100,
+            //    fixedWidth: 100,
+            //    data:["A","B","C"],
+            // }),
+            // Button({text:"hi"}),
+            ListView({
+                // fixedHeight: 100,
+                mainAxisSelfLayout:'grow',
+                data:["A","B","C"],
+            }),
             Button({text:"hi"}),
         ]
     })

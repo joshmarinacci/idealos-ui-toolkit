@@ -1,4 +1,4 @@
-import {AxisLayout, CEvent, EventHandler, GElement, StateHandler, useState} from "./base.js";
+import {AxisLayout, AxisSelfLayout, CEvent, EventHandler, GElement, StateHandler, useState} from "./base.js";
 import {MHBoxElement, MVBoxElement} from "./layout.js";
 import {Style} from "./style.js";
 import {Label} from "./text.js";
@@ -53,6 +53,7 @@ export type ListViewParameters<T> = {
     renderItem?: ListItemRenderer<T>
     fixedWidth?: number
     fixedHeight?: number
+    mainAxisSelfLayout?: AxisSelfLayout
 }
 
 const DefaultItemRenderer: ListItemRenderer<unknown> = (item: unknown, selected: number, index: number, onSelectedChanged) => {
@@ -95,7 +96,7 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         e.redraw()
     }
     return new MVBoxElement({
-        mainAxisSelfLayout: 'shrink',
+        mainAxisSelfLayout: opts.mainAxisSelfLayout || 'shrink',
         crossAxisSelfLayout: 'shrink',
         fixedWidth: opts.fixedWidth,
         fixedHeight: opts.fixedHeight,
