@@ -68,6 +68,16 @@ class BoxElementBase {
             fixedHeight: this.settings.fixedHeight,
         }
     }
+
+    protected isVExpand(ch: GElement) {
+        if (ch instanceof MVBoxElement) {
+            let vbox = ch as MVBoxElement
+            if (vbox.settings.mainAxisSelfLayout === 'grow' && !vbox.settings.fixedHeight) {
+                return true
+            }
+        }
+        return false
+    }
 }
 
 export class MHBoxElement extends BoxElementBase implements GElement {
@@ -362,6 +372,13 @@ export class HExpander implements GElement {
     }
 }
 
+type LayoutMetrics = {
+    non_expander_total_length:number
+    max_child_width: number
+    max_child_height: number
+    total_children_length:number
+}
+
 export class MVBoxElement extends BoxElementBase implements GElement {
 
     constructor(param: BoxOptions) {
@@ -502,20 +519,13 @@ export class MVBoxElement extends BoxElementBase implements GElement {
     private do_grow_layout(rc: RenderContext, cons: LayoutConstraints) {
         let key = this.settings.key || KEY_VENDOR.getKey()
         let fullBounds = new Bounds(0, 0, 0, 0)
-        this.log.info("growing my height")
         fullBounds.h = cons.space.h
-        console.log('laying out', this.getConstraints())
-        if(this.settings.fixedHeight) {
-            fullBounds.h = this.settings.fixedHeight
-        }
+        if(this.settings.fixedHeight) fullBounds.h = this.settings.fixedHeight
         //width always takes up the available space, for now
         fullBounds.w = cons.space.w
-        if(this.settings.fixedWidth) {
-            fullBounds.w = this.settings.fixedWidth
-        }
+        if(this.settings.fixedWidth) fullBounds.w = this.settings.fixedWidth
 
         let contentBounds = fullBounds.shrinkInsets(getTotalInsets(this.settings))
-
 
         // split the children into two groups
         let chs = this.settings.children
@@ -526,18 +536,26 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         // make a lookup table for the children
         let map = new Map<GElement, GRenderNode>()
 
+        let metrics:LayoutMetrics = {
+            non_expander_total_length:0,
+            max_child_width:0,
+            max_child_height:0,
+            total_children_length: 0,
+        }
+
         // layout the non-expander children first
-        let non_expander_total_size = 0
         non_expanders.map(ch => {
             let node = ch.layout(rc, {
                 space: contentBounds.size(),
                 layout: this.settings.mainAxisSelfLayout,
             })
-            non_expander_total_size += node.settings.size.h
+            metrics.non_expander_total_length += node.settings.size.h
             map.set(ch, node)
+            metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
+            metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
         })
-        this.log.info(`non expander child total width ${non_expander_total_size}`)
-        let leftover = contentBounds.h - non_expander_total_size
+        this.log.info(`non expander child total width ${metrics.non_expander_total_length}`)
+        let leftover = contentBounds.h - metrics.non_expander_total_length
         let leftover_per_child = leftover / expanders.length
         this.log.info(`leftover ${leftover}`)
 
@@ -548,32 +566,25 @@ export class MVBoxElement extends BoxElementBase implements GElement {
                 layout: this.settings.mainAxisSelfLayout,
             })
             leftover -= leftover_per_child
-            // non_expander_total_width += node.settings.size.w
             map.set(ch, node)
         })
         this.log.info(`final leftover is ${leftover}`)
 
+        // calculate the total children length
+        chs.map(ch => map.get(ch) as GRenderNode)
+            .forEach(ch => metrics.total_children_length += ch.settings.size.h)
+
+
         // position all the children
-        this.do_main_layout_position(contentBounds, leftover, map)
-        this.do_cross_layout_position(contentBounds, leftover, map)
+        this.do_main_layout_position(contentBounds, map, metrics)
+        this.do_cross_layout_position(contentBounds,  map)
 
         // look up the laid out children
         let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
 
-        // if should be shrink, then
-        console.log("this cross self is",this.settings.crossAxisSelfLayout)
-        console.log("content bounds",contentBounds)
-        console.log("full bounds", fullBounds)
+        // if it should be shrink, then
         if (this.settings.crossAxisSelfLayout === 'shrink' && !this.settings.fixedWidth) {
-            let max_child_size = 0
-            this.settings.children.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                max_child_size = Math.max(node.settings.size.w, max_child_size)
-            })
-            fullBounds.w = max_child_size + getTotalInsets(this.settings).width()
-        }
-        if (this.settings.mainAxisSelfLayout === 'shrink') {
-            // fullBounds.h = total_children_length + total_insets.height()
+            fullBounds.w = metrics.max_child_width + getTotalInsets(this.settings).width()
         }
 
         this.log.info(`content bounds ${contentBounds}`)
@@ -581,65 +592,30 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
         return new GRenderNode({
             ...this.settings,
-            kind:this.settings.kind || "vbox",
             baseline: 0,
             font: Style.panel().font,
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            children: children,
+            children,
             contentOffset: contentBounds.position(),
-            key: key,
+            key,
         }, {
             'constraints': this.getConstraints(),
         })
 
     }
 
-    private isVExpand(ch: GElement) {
-        if(ch instanceof MVBoxElement) {
-            let vbox = ch as MVBoxElement
-            console.log("child grow is", vbox.settings.mainAxisSelfLayout)
-            if(vbox.settings.mainAxisSelfLayout === 'grow' && !vbox.settings.fixedHeight) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private do_main_layout_position(contentBounds: Bounds, leftover: number, map: Map<GElement, GRenderNode>) {
-        if(this.settings.mainAxisLayout === 'between') {
-            let max_child_height = 0
-            let final_children_length = 0
-            let chs = this.settings.children
-            this.settings.children.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                max_child_height = Math.max(node.settings.size.h, max_child_height)
-                final_children_length += node.settings.size.h
-            })
-            let leftover = contentBounds.h - final_children_length
-            let leftover_per_child = leftover / (chs.length - 1)
-            let y = contentBounds.y
-            chs.forEach(ch => {
-                let node = map.get(ch) as GRenderNode
-                node.settings.pos.y = y
-                y += node.settings.size.h
-                y += leftover_per_child
-            })
-            return
-        }
-
+    private do_main_layout_position(contentBounds: Bounds, map: Map<GElement, GRenderNode>, metrics: LayoutMetrics) {
+        let leftover = contentBounds.h - metrics.total_children_length
+        let gap = 0
         let y = contentBounds.y
-        if(this.settings.mainAxisLayout === 'start') {
-            y = contentBounds.y
-        }
-        if(this.settings.mainAxisLayout === 'center') {
-            y = contentBounds.y + leftover / 2
-        }
-        if(this.settings.mainAxisLayout === 'end') {
-            y = contentBounds.y + leftover
-        }
 
+        let main = this.settings.mainAxisLayout
+        if(main === 'start') y = contentBounds.y
+        if(main === 'center') y = contentBounds.y + leftover / 2
+        if(main === 'end') y = contentBounds.y + leftover
+        if(main === 'between') gap = leftover / (this.settings.children.length - 1)
 
         this.log.info(`mainAxisLayout is ${this.settings.mainAxisLayout}`)
         this.log.info("starting y at",y)
@@ -647,17 +623,11 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             let node = map.get(ch) as GRenderNode
             node.settings.pos = withY(node.settings.pos,y)
             y += node.settings.size.h
+            y += gap
         })
     }
 
-    private do_cross_layout_position(contentBounds: Bounds, leftover: number, map: Map<GElement, GRenderNode>) {
-        //find the max child height
-        let max_child_width = 0
-        this.settings.children.forEach(ch => {
-            let node = map.get(ch) as GRenderNode
-            max_child_width = Math.max(node.settings.size.w, max_child_width)
-        })
-
+    private do_cross_layout_position(contentBounds: Bounds, map: Map<GElement, GRenderNode>) {
         let cross = this.settings.crossAxisLayout
         this.settings.children.forEach(ch => {
             let node = map.get(ch) as GRenderNode

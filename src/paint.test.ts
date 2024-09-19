@@ -1,7 +1,7 @@
 import {Scene} from "./scene.js";
 import {describe, expect, it} from "vitest";
 import {Square} from "./comps2.js";
-import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
+import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
@@ -406,13 +406,13 @@ describe("layout", () => {
             scene.setComponentFunction(makeBox("end"))
             scene.layout()
             expect(scene.renderRoot.settings.size).toEqual(new Size(80, 80))
-            console.log(filterProps(scene.renderRoot.settings,['pos','size']))
+            // console.log(filterProps(scene.renderRoot.settings,['pos','size']))
             let first_child = scene.renderRoot.settings.children[0]
-            console.log(filterProps(first_child.settings,['pos','size']))
+            // console.log(filterProps(first_child.settings,['pos','size']))
             expect(first_child.settings.size).toEqual(new Size(22, 12))
             expect(first_child.settings.pos).toEqual(new Point(0,80-12-12))
             let second_child = scene.renderRoot.settings.children[1]
-            console.log(filterProps(second_child.settings,['pos','size']))
+            // console.log(filterProps(second_child.settings,['pos','size']))
             expect(second_child.settings.size).toEqual(new Size(22, 12))
             expect(second_child.settings.pos).toEqual(new Point(0,80-12))
         }
