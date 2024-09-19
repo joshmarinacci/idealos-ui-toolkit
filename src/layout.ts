@@ -123,24 +123,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         throw new Error(`unknown self layout type ${this.settings.mainAxisSelfLayout}`)
     }
 
-    private layout_nodes_cross_axis(chs: GElement[], map: Map<GElement, GRenderNode>, contentBounds: Bounds) {
-        chs.forEach(ch => {
-            let node = map.get(ch) as GRenderNode
-            if (this.settings.crossAxisLayout === 'start') {
-                let y =  contentBounds.y
-                node.settings.pos = new Point(node.settings.pos.x, y)
-            }
-            if (this.settings.crossAxisLayout === 'center') {
-                let y =  contentBounds.y + (contentBounds.h - node.settings.size.h) / 2
-                node.settings.pos = new Point(node.settings.pos.x,y)
-            }
-            if (this.settings.crossAxisLayout === 'end') {
-                let y = contentBounds.y + contentBounds.h - node.settings.size.h
-                node.settings.pos = new Point(node.settings.pos.x,y)
-            }
-        })
-    }
-
     private do_grow_layout(rc: RenderContext, cons: LayoutConstraints) {
         let key = this.settings.key || KEY_VENDOR.getKey()
         let fullBounds = new Bounds(0, 0, 0, 0)
@@ -170,8 +152,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 space: contentBounds.size(),
                 layout: this.settings.mainAxisSelfLayout,
             })
-            metrics.non_expander_total_length += node.settings.size.w
             map.set(ch, node)
+            metrics.non_expander_total_length += node.settings.size.w
             metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
             metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
         })
@@ -223,58 +205,53 @@ export class MHBoxElement extends BoxElementBase implements GElement {
     }
 
     private do_shrink_layout(rc: RenderContext, cons: LayoutConstraints) {
-        let contentBounds = new Bounds(0, 0, 0, 0)
-        let fullBounds = new Bounds(0, 0, 0, 0)
         let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
         let map = new Map<GElement, GRenderNode>()
-        contentBounds.w = cons.space.w
+
+
+        let fullBounds = new Bounds(0, 0, 0, 0)
         fullBounds.w = cons.space.w
-        contentBounds.h = cons.space.h
         fullBounds.h = cons.space.h
-        if (this.settings.fixedWidth) {
-            contentBounds.w = this.settings.fixedWidth
-            fullBounds.w = this.settings.fixedWidth
+        if (this.settings.fixedWidth) fullBounds.w = this.settings.fixedWidth
+        if (this.settings.fixedHeight) fullBounds.h = this.settings.fixedHeight
+        if (this.settings.crossAxisSelfLayout === 'grow') fullBounds.h = cons.space.h
+        if (this.settings.crossAxisSelfLayout === 'shrink') fullBounds.h = cons.space.h
+        let contentBounds = fullBounds.shrinkInsets(getTotalInsets(this.settings))
+
+        let metrics:LayoutMetrics = {
+            non_expander_total_length:0,
+            total_children_length:0,
+            max_child_height:0,
+            max_child_width:0,
         }
-        contentBounds = contentBounds.shrinkInsets(getTotalInsets(this.settings))
-        // layout all children.
+
         KEY_VENDOR.startElement(this)
+        // layout all children.
         chs.forEach(ch => {
             const node = ch.layout(rc, {
                 space: contentBounds.size(),
                 layout: this.settings.mainAxisSelfLayout,
             })
             map.set(ch, node)
+            metrics.non_expander_total_length += node.settings.size.w
+            metrics.total_children_length += node.settings.size.w
+            metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
+            metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
         })
         KEY_VENDOR.endElement(this)
 
-        let max_child_height = 0
-        let child_total_width = 0
-        // get total child bounds
-        chs.forEach(ch => {
-            let node = map.get(ch) as GRenderNode
-            if(!node.settings.popup) {
-                child_total_width += node.settings.size.w
-                max_child_height = Math.max(max_child_height, node.settings.size.h)
-            }
-        })
-        contentBounds.w = child_total_width
-        contentBounds.h = max_child_height
+
+        contentBounds.w = metrics.total_children_length
+        if(this.settings.crossAxisSelfLayout === 'shrink') contentBounds.h = metrics.max_child_height
         fullBounds = contentBounds.growInsets(getTotalInsets(this.settings))
         // fullBounds = this.addInsets(contentBounds)
         this.log.info(`content bounds ${contentBounds}`)
         this.log.info(`full bounds ${fullBounds}`)
 
         // position all children
-        this.layout_nodes_cross_axis(chs, map, contentBounds)
-        let x = contentBounds.x
-        chs.forEach(ch => {
-            let node = map.get(ch) as GRenderNode
-            if(!node.settings.popup) {
-                node.settings.pos.x = x
-                x += node.settings.size.w
-            }
-        })
+        this.do_cross_layout_position(contentBounds, map)
+        this.do_main_layout_position(contentBounds,map,metrics)
 
         let children = chs.map(ch => map.get(ch) as GRenderNode)
         return new GRenderNode({
@@ -284,9 +261,9 @@ export class MHBoxElement extends BoxElementBase implements GElement {
             pos: new Point(0, 0),
             size: fullBounds.size(),
             text: "",
-            children: children,
+            children,
             contentOffset: contentBounds.position(),
-            key: key,
+            key,
         }, {
             'constraints': this.getConstraints(),
         })
@@ -524,110 +501,56 @@ export class MVBoxElement extends BoxElementBase implements GElement {
     private do_shrink_layout(rc: RenderContext, cons: LayoutConstraints) {
         let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
+        let map = new Map<GElement, GRenderNode>()
 
         let fullBounds = new Bounds(0, 0, 0, 0)
-        if (this.settings.mainAxisSelfLayout === 'shrink') {
-            fullBounds.h = cons.space.h
+        fullBounds.h = cons.space.h
+        if (this.settings.fixedWidth) fullBounds.w = this.settings.fixedWidth
+        if (this.settings.fixedHeight) fullBounds.h = this.settings.fixedHeight
+        if (this.settings.crossAxisSelfLayout === 'grow') fullBounds.w = cons.space.w
+        if (this.settings.crossAxisSelfLayout === 'shrink') fullBounds.w = cons.space.w
+        let contentBounds = fullBounds.shrinkInsets(getTotalInsets(this.settings))
+
+        let metrics:LayoutMetrics = {
+            non_expander_total_length:0,
+            total_children_length:0,
+            max_child_height:0,
+            max_child_width:0,
         }
-        if (this.settings.fixedHeight) {
-            fullBounds.h = this.settings.fixedHeight
-        }
-        if (this.settings.crossAxisSelfLayout === 'grow') {
-            fullBounds.w = cons.space.w
-        }
-        if (this.settings.crossAxisSelfLayout === 'shrink') {
-            fullBounds.w = cons.space.w
-        }
-        if (this.settings.fixedWidth) {
-            fullBounds.w = this.settings.fixedWidth
-        }
-        let contentBounds = fullBounds.copy()
-        contentBounds = contentBounds.shrinkInsets(getTotalInsets(this.settings))
-        this.log.info(this.settings.kind, fullBounds, contentBounds)
 
         KEY_VENDOR.startElement(this)
         // layout children
-        let children = chs.map(ch => {
-            return ch.layout(rc, {
+        chs.map(ch => {
+            let node = ch.layout(rc, {
                 space: contentBounds.size(),
                 layout: this.settings.mainAxisSelfLayout
             })
+            map.set(ch,node)
+            metrics.non_expander_total_length += node.settings.size.h
+            metrics.total_children_length += node.settings.size.w
+            metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
+            metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
         })
         KEY_VENDOR.endElement(this)
 
-        // position children
-        if(this.settings.mainAxisLayout === 'start') {
-            let pos = contentBounds.position()
-            for (let ch of children) {
-                ch.settings.pos = pos
-                pos = pos.add(new Point(0,ch.settings.size.h))
-            }
-        }
-        let total_height = 0
-        for(let ch of children) {
-            total_height += ch.settings.size.h
-        }
-        if(this.settings.mainAxisLayout === 'center') {
-            let pos = contentBounds.left_midpoint()
-            pos.y -= total_height/2
-            for (let ch of children) {
-                ch.settings.pos = pos
-                pos = pos.add(new Point(0,ch.settings.size.h))
-            }
-        }
-        if(this.settings.mainAxisLayout === 'end') {
-            let pos = contentBounds.bottom_left()
-            pos.y -= total_height
-            for (let ch of children) {
-                ch.settings.pos = pos
-                pos = pos.add(new Point(0,ch.settings.size.h))
-            }
-        }
+        this.do_main_layout_position(contentBounds, map, metrics)
+        this.do_cross_layout_position(contentBounds,  map)
 
-        if (this.settings.mainAxisLayout === 'between' && chs.length >= 2) {
-            let leftover = contentBounds.h - total_height
-            let leftover_per_child = leftover / (chs.length - 1)
-            let pos = contentBounds.top_left()
-            for (let ch of children) {
-                ch.settings.pos = pos
-                pos = pos.add(new Point(0,ch.settings.size.h + leftover_per_child))
-            }
-        }
 
-        //resize myself back out
-        let total_children_length = 0
-        let max_child_size = 0
-        for (let ch of children) {
-            total_children_length += ch.settings.size.h
-            max_child_size = Math.max(max_child_size, ch.settings.size.w)
-        }
-        let total_insets = getTotalInsets(this.settings)
-        if (this.settings.mainAxisSelfLayout === 'shrink') {
-            fullBounds.h = total_children_length + total_insets.height()
-        }
-        if (this.settings.crossAxisSelfLayout === 'shrink') {
-            fullBounds.w = max_child_size + total_insets.width()
-        }
-        if (this.settings.fixedWidth) {
-            fullBounds.w = this.settings.fixedWidth
-        }
-        if(this.settings.fixedHeight) {
-            fullBounds.h = this.settings.fixedHeight
-        }
+        let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
+        // contentBounds.h = metrics.total_children_length
+        fullBounds = contentBounds.growInsets(getTotalInsets(this.settings))
 
         return new GRenderNode({
             ...this.settings,
             key:key,
             baseline: 0,
-            children: children,
+            children,
             contentOffset: ZERO_POINT.copy(),
             font: "",
-            kind: this.settings.kind,
             pos: ZERO_POINT.copy(),
             size: fullBounds.size(),
             text: "",
-            borderWidth: this.settings.borderWidth,
-            shadow: this.settings.shadow
         },{
             constraints:this.getConstraints()
         })

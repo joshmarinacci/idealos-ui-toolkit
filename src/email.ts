@@ -227,6 +227,7 @@ export function EmailDemo() {
             }),
             ScrollContainer({
                 child: ListView({
+                    mainAxisSelfLayout:'grow',
                     data: messages,
                     selected:atomAsStateHandler(AppState.get('selectedMessage')),
                     renderItem: EmailMessRenderer,
