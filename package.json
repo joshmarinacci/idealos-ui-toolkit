@@ -25,10 +25,11 @@
     "material-symbols": "^0.22.2",
     "rtds-core": "^0.0.19",
     "typescript": "^5.5.4",
-    "vitest": "^1.4.0"
+    "vitest": "^1.4.0",
+    "zeromq": "^6.0.4"
   },
   "devDependencies": {
-    "pureimage": "^0.4.13",
-    "@types/node": "^22.5.2"
+    "@types/node": "^22.5.2",
+    "pureimage": "^0.4.13"
   }
 }

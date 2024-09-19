@@ -92,3 +92,10 @@ export function AtomAsState<T>(atom: ObjAtom<T>): StateHandler<T> {
     }
 }
 
+export function withY(pos: Point, y: number) {
+    return new Point(pos.x, y)
+}
+
+export function withX(pos: Point, x: number) {
+    return new Point(x, pos.y)
+}
