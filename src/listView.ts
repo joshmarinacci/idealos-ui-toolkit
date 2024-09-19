@@ -51,6 +51,8 @@ export type ListViewParameters<T> = {
     data: T[] | ObjList<T>
     selected?: StateHandler<number>
     renderItem?: ListItemRenderer<T>
+    fixedWidth?: number
+    fixedHeight?: number
 }
 
 const DefaultItemRenderer: ListItemRenderer<unknown> = (item: unknown, selected: number, index: number, onSelectedChanged) => {
@@ -95,6 +97,8 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
     return new MVBoxElement({
         mainAxisSelfLayout: 'shrink',
         crossAxisSelfLayout: 'shrink',
+        fixedWidth: opts.fixedWidth,
+        fixedHeight: opts.fixedHeight,
         kind: 'list-view',
         key: key,
         visualStyle: {
