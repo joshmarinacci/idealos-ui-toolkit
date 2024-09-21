@@ -250,12 +250,12 @@ async function doit() {
         }
         if(frames[0].toString() === 'key-down') {
             let keycode = JSON.parse(frames[1].toString("utf-8"))
-            // console.log("keycode is",keycode)
+            console.log("keycode is",keycode)
             let mods = JSON.parse(frames[2].toString("utf-8"))
-            // console.log("mods is",mods)
+            console.log("mods is",mods)
             const ikc:LogicalKeyboardCode = IDEALOS_KEYBOARD_CODE[keycode as string]
-            // console.log("ikc", ikc)
-            scene.handleKeydownEvent(ikc,false,false,false,false)
+            console.log("ikc", ikc)
+            scene.handleKeydownEvent(ikc,mods.ctrl,mods.shift,mods.alt,mods.meta)
             await updateAndRepaint()
         }
         if(frames[0].toString() === 'window-resized') {

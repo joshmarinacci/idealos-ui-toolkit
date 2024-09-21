@@ -1,7 +1,7 @@
 import {Point} from "josh_js_util";
 import {LOGICAL_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 
-export const META_KEYS = ['Shift', 'Control', 'Alt', 'Meta']
+export const META_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CONTROL_RIGHT','CONTROL_LEFT','SHIFT_LEFT','SHIFT_RIGHT']
 type KeyStrokeDef = { key: LogicalKeyboardCode, control?: boolean, shift?:boolean, meta?:boolean, alt?:boolean }
 export class TextSelection {
     start: Point;

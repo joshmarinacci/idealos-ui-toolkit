@@ -317,8 +317,9 @@ export const IDEALOS_KEYBOARD_CODE:Record<string,LogicalKeyboardCode> = {
     'ENTER':LOGICAL_KEYBOARD_CODE.ENTER,
     'ESCAPE':LOGICAL_KEYBOARD_CODE.ESCAPE,
     'TAB':LOGICAL_KEYBOARD_CODE.TAB,
+    'SPACE':LOGICAL_KEYBOARD_CODE.SPACE,
 }
-export const IDEALOS_KEYBOARD_KEY:Record<LogicalKeyboardCode, string> = {
+export const LOGICAL_KEYBOARD_CODE_TO_CHAR:Record<LogicalKeyboardCode, string> = {
     'KEY_A':'a',
     'KEY_B':'b',
     'KEY_C':'c',
@@ -345,5 +346,6 @@ export const IDEALOS_KEYBOARD_KEY:Record<LogicalKeyboardCode, string> = {
     'KEY_X':'x',
     'KEY_Y':'y',
     'KEY_Z':'z',
+    'SPACE':' '
 
 }
