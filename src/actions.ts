@@ -52,11 +52,18 @@ export class TextSelection {
     }
 
 }
+export type KeyboardModifiers = {
+    shift:boolean
+    control:boolean,
+    alt:boolean,
+    meta:boolean,
+}
 export type KeyActionArgs = {
     text: string,
     pos: Point,
     selection: TextSelection
-    key?: LogicalKeyboardCode,
+    key: LogicalKeyboardCode,
+    mods:KeyboardModifiers,
 }
 type KeyAction = (args: KeyActionArgs) => { text: string, pos: Point, selection:TextSelection }
 
@@ -117,10 +124,10 @@ export const ACTION_MAP = new ActionMap()
 export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_F, control: true}, 'cursor-forward')
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_B, control: true}, 'cursor-backward')
-    ACTION_MAP.registerKeystroke({key: 'p', control: true}, 'cursor-previous-line')
-    ACTION_MAP.registerKeystroke({key: 'n', control: true}, 'cursor-next-line')
-    ACTION_MAP.registerKeystroke({key: 'a', control: true, }, 'cursor-line-start')
-    ACTION_MAP.registerKeystroke({key: 'e', control: true, }, 'cursor-line-end')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_P, control: true}, 'cursor-previous-line')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_N, control: true}, 'cursor-next-line')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_A, control: true, }, 'cursor-line-start')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_E, control: true, }, 'cursor-line-end')
 
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_LEFT}, 'cursor-backward')
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_RIGHT}, 'cursor-forward')

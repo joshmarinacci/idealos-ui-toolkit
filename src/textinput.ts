@@ -15,7 +15,7 @@ import {Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {RenderContext} from "./gfx.js";
 import {KEY_VENDOR} from "./keys.js";
-import {ACTION_MAP, KeyActionArgs, META_KEYS, TextSelection} from "./actions.js";
+import {ACTION_MAP, KeyActionArgs, KeyboardModifiers, META_KEYS, TextSelection} from "./actions.js";
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
 import {LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode} from "./keyboard.js";
@@ -194,9 +194,12 @@ ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
 ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
-    let key = args.key as LogicalKeyboardCode
+    let key = args.key
     // console.log("key is",key)
     let char = LOGICAL_KEYBOARD_CODE_TO_CHAR[key]
+    if(args.mods.shift) {
+        char = char.toUpperCase()
+    }
     // console.log("char is",char)
     let sel = args.selection
     if(sel.isActive()) {
@@ -302,21 +305,28 @@ export class TextModel {
     }
 }
 
-function processText(text: string, cursorPosition: Point, kbe: MKeyboardEvent, selection: TextSelection): [string, Point, TextSelection] {
-    if (META_KEYS.includes(kbe.key)) return [text, cursorPosition, selection]
+function processText(text: string, pos: Point, kbe: MKeyboardEvent, selection: TextSelection): [string, Point, TextSelection] {
+    if (META_KEYS.includes(kbe.key)) return [text, pos, selection]
+    const mods:KeyboardModifiers = {
+        shift: kbe.shift,
+        alt: kbe.alt,
+        meta: kbe.meta,
+        control: kbe.control
+    }
+    const key = kbe.key
     let action_name = ACTION_MAP.match(kbe)
     // console.log('TEXT_INPUT: action:',action_name, 'pos',cursorPosition, 'sel',selection)
     if (action_name) {
         let action_impl = ACTION_MAP.actions.get(action_name)
         // console.log("TEXT_INPUT: ",action_name)
         if (action_impl) {
-            let res = ACTION_MAP.actions.get(action_name)({text, pos: cursorPosition, selection:selection})
+            let res = ACTION_MAP.actions.get(action_name)({text, pos, key, selection, mods})
             return [res.text, res.pos, res.selection]
         } else {
             console.warn(`missing action for '${action_name}'`)
         }
     }
-    let res = ACTION_MAP.actions.get('insert-character')({text, pos: cursorPosition, key: kbe.key, selection:selection})
+    let res = ACTION_MAP.actions.get('insert-character')({text, pos, key, selection, mods})
     return [res.text, res.pos, res.selection]
 }
 
