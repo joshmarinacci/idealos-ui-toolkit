@@ -1,7 +1,8 @@
 import {Point} from "josh_js_util";
+import {LOGICAL_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 
 export const META_KEYS = ['Shift', 'Control', 'Alt', 'Meta']
-type KeyStrokeDef = { key: string, control?: boolean, shift?:boolean, meta?:boolean, alt?:boolean }
+type KeyStrokeDef = { key: LogicalKeyboardCode, control?: boolean, shift?:boolean, meta?:boolean, alt?:boolean }
 export class TextSelection {
     start: Point;
     end: Point;
@@ -55,7 +56,7 @@ export type KeyActionArgs = {
     text: string,
     pos: Point,
     selection: TextSelection
-    key?: string,
+    key?: LogicalKeyboardCode,
 }
 type KeyAction = (args: KeyActionArgs) => { text: string, pos: Point, selection:TextSelection }
 
@@ -112,27 +113,28 @@ class ActionMap {
 export const ACTION_MAP = new ActionMap()
 
 
+
 export function setup_common_keybindings() {
-    ACTION_MAP.registerKeystroke({key: 'f', control: true}, 'cursor-forward')
-    ACTION_MAP.registerKeystroke({key: 'b', control: true}, 'cursor-backward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_F, control: true}, 'cursor-forward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_B, control: true}, 'cursor-backward')
     ACTION_MAP.registerKeystroke({key: 'p', control: true}, 'cursor-previous-line')
     ACTION_MAP.registerKeystroke({key: 'n', control: true}, 'cursor-next-line')
     ACTION_MAP.registerKeystroke({key: 'a', control: true, }, 'cursor-line-start')
     ACTION_MAP.registerKeystroke({key: 'e', control: true, }, 'cursor-line-end')
 
-    ACTION_MAP.registerKeystroke({key: 'ArrowLeft'}, 'cursor-backward')
-    ACTION_MAP.registerKeystroke({key: 'ArrowRight'}, 'cursor-forward')
-    ACTION_MAP.registerKeystroke({key: 'ArrowLeft', shift:true}, 'selection-backward-char')
-    ACTION_MAP.registerKeystroke({key: 'ArrowRight', shift:true}, 'selection-forward-char')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_LEFT}, 'cursor-backward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_RIGHT}, 'cursor-forward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_LEFT, shift:true}, 'selection-backward-char')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_RIGHT, shift:true}, 'selection-forward-char')
 
-    ACTION_MAP.registerKeystroke({key: 'ArrowUp'}, 'cursor-previous-line')
-    ACTION_MAP.registerKeystroke({key: 'ArrowDown'}, 'cursor-next-line')
-    ACTION_MAP.registerKeystroke({key: 'Enter'}, 'insert-newline')
-    ACTION_MAP.registerKeystroke({key: 'Backspace'}, 'delete-backward')
-    ACTION_MAP.registerKeystroke({key: 'd', control: true}, 'delete-forward')
-    ACTION_MAP.registerKeystroke({key: 'Delete'}, 'delete-forward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_UP}, 'cursor-previous-line')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_DOWN}, 'cursor-next-line')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ENTER}, 'insert-newline')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.BACKSPACE}, 'delete-backward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_D, control: true}, 'delete-forward')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.DELETE}, 'delete-forward')
     ACTION_MAP.registerKeystroke({key: 'End'}, 'cursor-line-end')
     ACTION_MAP.registerKeystroke({key: 'Home'}, 'cursor-line-start')
 
-    ACTION_MAP.registerKeystroke({key: 'a', meta: true, }, 'select-all')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.KEY_A, meta: true, }, 'select-all')
 }

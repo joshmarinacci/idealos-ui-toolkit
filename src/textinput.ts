@@ -18,6 +18,7 @@ import {KEY_VENDOR} from "./keys.js";
 import {ACTION_MAP, KeyActionArgs, META_KEYS, TextSelection} from "./actions.js";
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
+import {IDEALOS_KEYBOARD_KEY, LOGICAL_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 
 
 ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
@@ -193,15 +194,16 @@ ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
 ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
-    let key = args.key
-    if(key === 'space') key = ' '
+    let key = args.key as LogicalKeyboardCode
+    // console.log("key is",key)
+    // if(key === LOGICAL_KEYBOARD_CODE.SPACE) key = ' '
     let sel = args.selection
     if(sel.isActive()) {
         model.deleteCharsAt(sel)
         pos = sel.getStart()
         sel = TextSelection.makeInactive()
     }
-    model.insertCharAt(pos,key)
+    model.insertCharAt(pos,IDEALOS_KEYBOARD_KEY[key])
     return {
         text:model.toText(),
         selection:sel,

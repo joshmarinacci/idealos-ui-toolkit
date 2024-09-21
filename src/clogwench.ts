@@ -7,7 +7,9 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {calcCanvasFont3} from "./util.js";
 import {EventType, Socket} from "zeromq";
-import {LayoutTest, makeBaselineRow, makeTabs} from "./demo.js";
+import {LayoutTest, makeBaselineRow, makeCompsDemo, makeTabs} from "./demo.js";
+import {IDEALOS_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
+import {setup_common_keybindings} from "./actions.js";
 
 
 export type Color = [r:number, g:number, b:number];
@@ -27,7 +29,6 @@ class PureImageSurface implements RenderingSurface {
         this.size = size
         this.bitmap = pureimage.make(size.w, size.h)
         this.ctx = this.bitmap.getContext('2d')
-        console.log("created context",this.ctx)
     }
     resize(size: Size) {
         this.size = size
@@ -211,41 +212,50 @@ async function doit() {
     // image.fill(COLORS.RED)
 
     const size = new Size(800,600)
+    setup_common_keybindings()
     const scene = new ClogwenchScene({
         size: size,
         debug_enabled:true,
     })
     MGlobals.set(Scene.name, scene)
-    MGlobals.set(SYMBOL_FONT_ENABLED, true)
+    MGlobals.set(SYMBOL_FONT_ENABLED, false)
     MGlobals.set(STATE_CACHE, new StateCache())
 
-    scene.setComponentFunction(() => LayoutTest())
+    scene.setComponentFunction(makeCompsDemo)
     scene.layout()
     scene.redraw()
 
     if(sock.writable) {
-        await sock.send(['open-window',
-            JSON.stringify(size.toJSON())
-            ])
+        await sock.send(['open-window', JSON.stringify(size.toJSON()) ])
     }
 
     async function updateAndRepaint() {
         if (sock.writable) {
             const bitmap = scene.surface.bitmap
             const size = new Size(bitmap.width,bitmap.height)
-            console.log("sending bitmap of size",size)
+            // console.log("sending bitmap of size",size)
             await sock.send(['repaint', JSON.stringify(size.toJSON()), bitmap.data])
         }
     }
 
-    updateAndRepaint()
+    await updateAndRepaint()
     for await (const frames of sock) {
-        console.log("app received msg", frames)
-        console.log("first frame",frames[0].toString("utf-8"))
+        // console.log("app received msg", frames)
+        // console.log("first frame",frames[0].toString("utf-8"))
         if (frames[0].toString() === 'clicked') {
             let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
-            console.log("we were clicked at ", JSON.parse(frames[1].toString("utf-8")))
+            // console.log("we were clicked at ", JSON.parse(frames[1].toString("utf-8")))
             scene.handleMouseDown(pt,"Primary", false)
+            await updateAndRepaint()
+        }
+        if(frames[0].toString() === 'key-down') {
+            let keycode = JSON.parse(frames[1].toString("utf-8"))
+            // console.log("keycode is",keycode)
+            let mods = JSON.parse(frames[2].toString("utf-8"))
+            // console.log("mods is",mods)
+            const ikc:LogicalKeyboardCode = IDEALOS_KEYBOARD_CODE[keycode as string]
+            // console.log("ikc", ikc)
+            scene.handleKeydownEvent(ikc,false,false,false,false)
             await updateAndRepaint()
         }
         if(frames[0].toString() === 'window-resized') {

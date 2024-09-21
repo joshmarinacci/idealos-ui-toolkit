@@ -1,6 +1,7 @@
 import {Insets, Point, Size} from "josh_js_util";
 import {RenderContext} from "./gfx.js";
 import {STATE_CACHE, StateCache} from "./state.js";
+import {LogicalKeyboardCode} from "./keyboard.js";
 
 export type LayoutConstraints = {
     space:Size
@@ -51,7 +52,7 @@ export type MMouseEvent = {
 } & BaseEvent
 export type MKeyboardEvent = {
     type: 'keyboard-typed'
-    key:string
+    key:LogicalKeyboardCode
     control:boolean
     shift:boolean
     meta: boolean

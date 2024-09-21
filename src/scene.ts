@@ -5,6 +5,7 @@ import {KEY_VENDOR} from "./keys.js";
 import {drawDebugCompInfo} from "./debug.js";
 
 import {findPathToNodeAtPoint, findPathToNodeByKey, findPathToScrollTargetAtPoint} from "./nodepath.js";
+import {LogicalKeyboardCode} from "./keyboard.js";
 
 export type SceneOpts = {
     size: Size;
@@ -197,7 +198,7 @@ export abstract class Scene {
         this.current_mouse_target = undefined
         this.prev_point = pointer
     }
-    handleKeydownEvent(key:string, control:boolean, shift:boolean, alt:boolean, meta:boolean) {
+    handleKeydownEvent(key:LogicalKeyboardCode, control:boolean, shift:boolean, alt:boolean, meta:boolean) {
         let evt: MKeyboardEvent = {
             type: 'keyboard-typed',
             redraw: () => this.request_layout_and_redraw(),
