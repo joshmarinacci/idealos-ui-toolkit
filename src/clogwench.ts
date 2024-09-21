@@ -62,12 +62,8 @@ class PureImageSurface implements RenderingSurface {
         let metrics = this.ctx.measureText(text)
         let size = new Size(
             Math.floor(metrics.width),
-            Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
-        let baseline = metrics.fontBoundingBoxAscent
-        if(!metrics.fontBoundingBoxAscent) {
-            size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
-            baseline = metrics.emHeightAscent
-        }
+            Math.floor(metrics.emHeightAscent + metrics.emHeightDescent))
+        let baseline = metrics.emHeightAscent
         return [size, baseline]
     }
     fillText(text: string, pos:Point, opts?:TextOpts): void {
@@ -101,7 +97,6 @@ class PureImageSurface implements RenderingSurface {
         // this.ctx.lineWidth = thickness
         this.ctx.stroke()
     }
-
 
 }
 
@@ -229,7 +224,7 @@ async function doit() {
         await sock.send(['open-window', JSON.stringify(size.toJSON()) ])
     }
 
-    async function updateAndRepaint() {
+    async function sendRepaint() {
         if (sock.writable) {
             const bitmap = scene.surface.bitmap
             const size = new Size(bitmap.width,bitmap.height)
@@ -238,7 +233,7 @@ async function doit() {
         }
     }
 
-    await updateAndRepaint()
+    await sendRepaint()
     for await (const frames of sock) {
         // console.log("app received msg", frames)
         // console.log("first frame",frames[0].toString("utf-8"))
@@ -246,7 +241,7 @@ async function doit() {
             let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
             // console.log("we were clicked at ", JSON.parse(frames[1].toString("utf-8")))
             scene.handleMouseDown(pt,"Primary", false)
-            await updateAndRepaint()
+            await sendRepaint()
         }
         if(frames[0].toString() === 'key-down') {
             let keycode = JSON.parse(frames[1].toString("utf-8"))
@@ -256,7 +251,7 @@ async function doit() {
             const ikc:LogicalKeyboardCode = IDEALOS_KEYBOARD_CODE[keycode as string]
             console.log("ikc", ikc)
             scene.handleKeydownEvent(ikc,mods.ctrl,mods.shift,mods.alt,mods.meta)
-            await updateAndRepaint()
+            await sendRepaint()
         }
         if(frames[0].toString() === 'window-resized') {
             let size = Size.fromJSON(JSON.parse(frames[1].toString("utf-8")))
@@ -264,7 +259,7 @@ async function doit() {
             scene.resize(size)
             scene.layout()
             scene.redraw()
-            await updateAndRepaint()
+            await sendRepaint()
         }
     }
 }
