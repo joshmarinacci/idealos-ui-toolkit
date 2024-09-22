@@ -193,6 +193,12 @@ async function doit() {
     )
     await font.load()
 
+    let symbol_font = pureimage.registerFont(
+        "./MaterialIcons-Regular.ttf",
+        "material-icons"
+    )
+    await symbol_font.load()
+
     const sock = new zmq.Dealer({})
     sock.connect("tcp://127.0.0.1:3000")
     monitor(sock)
@@ -213,7 +219,7 @@ async function doit() {
         debug_enabled:true,
     })
     MGlobals.set(Scene.name, scene)
-    MGlobals.set(SYMBOL_FONT_ENABLED, false)
+    MGlobals.set(SYMBOL_FONT_ENABLED, true)
     MGlobals.set(STATE_CACHE, new StateCache())
 
     scene.setComponentFunction(makeCompsDemo)
