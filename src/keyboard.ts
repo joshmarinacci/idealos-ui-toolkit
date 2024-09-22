@@ -88,7 +88,7 @@ export const LOGICAL_KEYBOARD_CODE = {
     SPACE:'SPACE',
 }
 
-export const DOM_KEYBOARD_CODE_TO_LOGICAL_CODE = {
+export const DOM_KEYBOARD_CODE_TO_LOGICAL_CODE:Record<string,LogicalKeyboardCode> = {
     'KeyA':LOGICAL_KEYBOARD_CODE.KEY_A,
     'KeyB':LOGICAL_KEYBOARD_CODE.KEY_B,
     'KeyC':LOGICAL_KEYBOARD_CODE.KEY_C,

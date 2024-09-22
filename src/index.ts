@@ -6,6 +6,7 @@ import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {makeTabs} from "./apps/demo.js";
+import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
 
 const size = new Size(1000, 600)
 
@@ -160,7 +161,8 @@ loadFont().then(() => {
         scene.handleMouseUp(pos,toMouseButton(e),e.shiftKey)
     })
     window.addEventListener('keydown', (e) => {
-        scene.handleKeydownEvent(e.key, e.ctrlKey, e.shiftKey, e.altKey, e.metaKey)
+        const code = DOM_KEYBOARD_CODE_TO_LOGICAL_CODE[e.code]
+        scene.handleKeydownEvent(code, e.ctrlKey, e.shiftKey, e.altKey, e.metaKey)
     })
     window.addEventListener('wheel', (e) => {
         // @ts-ignore
