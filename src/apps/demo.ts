@@ -1,18 +1,19 @@
-import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "./layout.js";
-import {Label, WrappingLabel} from "./text.js";
-import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "./buttons.js";
-import {IconElement, Icons} from "./icons.js";
-import {HSeparator, Square} from "./comps2.js";
-import {ListView, ListViewItem} from "./listView.js";
-import {ScrollContainer} from "./scroll.js";
-import {GElement, ZERO_INSETS} from "./base.js";
+import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "../layout.js";
+import {Label, WrappingLabel} from "../text.js";
+import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "../buttons.js";
+import {IconElement, Icons} from "../icons.js";
+import {HSeparator, Square} from "../comps2.js";
+import {ListView, ListViewItem} from "../listView.js";
+import {ScrollContainer} from "../scroll.js";
+import {GElement, ZERO_INSETS} from "../base.js";
 import {EmailDemo} from "./email.js";
-import {TabbedBox} from "./tabbedBox.js";
-import {MWindow} from "./window.js";
-import {TodoListDemo} from "./todolist.js";
+import {TabbedBox} from "../tabbedBox.js";
+import {MWindow} from "../window.js";
+import {TodoListDemo} from "../todolist.js";
 import {Size} from "josh_js_util";
-import {TextBox} from "./textinput.js";
-import {Style} from "./style.js";
+import {TextBox} from "../textinput.js";
+import {Style} from "../style.js";
+import {MinesweeperApp} from "./minesweeper.js";
 
 
 const state = {
@@ -283,6 +284,7 @@ export function makeTabs(): GElement {
     const panelDemo = makePanelDemo()
     const emailDemo = EmailDemo()
     const todoDemo = TodoListDemo()
+    const minesweeper = MinesweeperApp()
 
     let tabs = TabbedBox({
         titles: [
@@ -290,7 +292,8 @@ export function makeTabs(): GElement {
             'List View',
             'Panels',
             'Email',
-            'Todo List'
+            'Todo List',
+            'Minesweeper'
         ],
         children: [
             compsDemo,
@@ -298,6 +301,7 @@ export function makeTabs(): GElement {
             panelDemo,
             emailDemo,
             todoDemo,
+            minesweeper,
         ],
     })
     return MWindow({child: tabs, initSize: new Size(700,400)})

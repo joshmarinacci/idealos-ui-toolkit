@@ -1,12 +1,12 @@
-import {HBox, HSpacer, VBox} from "./layout.js";
-import {ScrollContainer} from "./scroll.js";
-import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
-import {Button, DropdownButton, IconButton, ToggleGroup} from "./buttons.js";
-import {Label, WrappingLabel} from "./text.js";
-import {Icon, Icons} from "./icons.js";
+import {HBox, HSpacer, VBox} from "../layout.js";
+import {ScrollContainer} from "../scroll.js";
+import {ListItemRenderer, ListView, ListViewItem} from "../listView.js";
+import {Button, DropdownButton, IconButton, ToggleGroup} from "../buttons.js";
+import {Label, WrappingLabel} from "../text.js";
+import {Icon, Icons} from "../icons.js";
 import {ObjAtom, Schema} from "rtds-core"
-import {CEvent, StateHandler} from "./base.js";
-import {GridBox} from "./gridbox.js"
+import {CEvent, StateHandler} from "../base.js";
+import {GridBox} from "../gridbox.js"
 
 import {Insets} from "josh_js_util";
 

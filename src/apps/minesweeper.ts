@@ -1,10 +1,10 @@
 import {Point} from 'josh_js_util'
 import {AGrid2D, ObjAtom, Schema} from 'rtds-core'
-import {Button} from "./buttons.js";
-import {Grid2DView} from "./grid2d.js";
-import {VBox} from "./layout.js";
-import {Label} from "./text.js";
-import {KEY_VENDOR} from "./keys.js";
+import {Button} from "../buttons.js";
+import {Grid2DView} from "../grid2d.js";
+import {VBox} from "../layout.js";
+import {Label} from "../text.js";
+import {KEY_VENDOR} from "../keys.js";
 
 const S = new Schema()
 const Cell = S.map({

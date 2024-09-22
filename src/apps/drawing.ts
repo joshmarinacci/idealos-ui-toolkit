@@ -1,13 +1,13 @@
 import {ObjMap, Schema} from "rtds-core";
 import {Insets, Point, Size} from "josh_js_util";
-import {ListItemRenderer, ListView, ListViewItem} from "./listView.js";
-import {GElement} from "./base.js";
-import {Label} from "./text.js";
-import {Button} from "./buttons.js";
-import {AtomAsState, useRefresh} from "./util.js";
-import {HBox, VBox} from "./layout.js";
-import {KEY_VENDOR} from "./keys.js";
-import {PropSheet} from "./propsheet.js";
+import {ListItemRenderer, ListView, ListViewItem} from "../listView.js";
+import {GElement} from "../base.js";
+import {Label} from "../text.js";
+import {Button} from "../buttons.js";
+import {AtomAsState, useRefresh} from "../util.js";
+import {HBox, VBox} from "../layout.js";
+import {KEY_VENDOR} from "../keys.js";
+import {PropSheet} from "../propsheet.js";
 
 const S = new Schema()
 
