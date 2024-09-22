@@ -80,7 +80,7 @@ export abstract class Scene {
         rc.surface.save()
         rc.surface.scale(rc.scale, rc.scale)
         // rc.ctx.translate(10,10)
-        // rc.surface.fillRect(Bounds.fromPointSize(ZERO_POINT,rc.size),'#f0f0f0')
+        rc.surface.fillRect(Bounds.fromPointSize(ZERO_POINT,rc.size),'#f0f0f0')
         doDraw(this.renderRoot, rc,false)
         if(this.opts.debug_enabled) {
             drawDebug(this.renderRoot, rc, this.debug_target, false)
