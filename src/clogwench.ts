@@ -1,7 +1,7 @@
 import pureimage, {Bitmap, Context} from "pureimage"
 import * as zmq from "zeromq"
 import {Scene, SceneOpts} from "./scene.js";
-import {MGlobals, SYMBOL_FONT_ENABLED} from "./base.js";
+import {MGlobals, MouseButton, SYMBOL_FONT_ENABLED} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
@@ -222,7 +222,7 @@ async function doit() {
     MGlobals.set(SYMBOL_FONT_ENABLED, true)
     MGlobals.set(STATE_CACHE, new StateCache())
 
-    scene.setComponentFunction(makeCompsDemo)
+    scene.setComponentFunction(makeTabs)
     scene.layout()
     scene.redraw()
 
@@ -243,11 +243,21 @@ async function doit() {
     for await (const frames of sock) {
         // console.log("app received msg", frames)
         // console.log("first frame",frames[0].toString("utf-8"))
-        if (frames[0].toString() === 'clicked') {
+        if (frames[0].toString() === 'mouse-down') {
             let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
-            // console.log("we were clicked at ", JSON.parse(frames[1].toString("utf-8")))
-            scene.handleMouseDown(pt,"Primary", false)
+            const button = frames[2].toString("utf-8") as MouseButton
+            scene.handleMouseDown(pt,button, false)
             await sendRepaint()
+        }
+        if (frames[0].toString() === 'mouse-up') {
+            let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
+            const button = frames[2].toString("utf-8") as MouseButton
+            scene.handleMouseUp(pt,button, false)
+            await sendRepaint()
+        }
+        if (frames[0].toString() === 'mouse-move') {
+            let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
+            scene.handleMouseMove(pt,"Primary", false)
         }
         if(frames[0].toString() === 'key-down') {
             let keycode = JSON.parse(frames[1].toString("utf-8"))
