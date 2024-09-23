@@ -21,7 +21,7 @@ class Grid2DViewElement<T> implements GElement {
 
     layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
         const key = KEY_VENDOR.getKey()
-        useRefresh(key, this.opts.data)
+        // useRefresh(key, this.opts.data)
         let children: GRenderNode[] = []
         this.opts.data.forEach((v, n) => {
             const view = this.opts.renderCell(this.opts.data, v, n, this.opts.scale)

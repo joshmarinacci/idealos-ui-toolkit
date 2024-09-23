@@ -16,7 +16,7 @@ const Cell = S.map({
 type CellType = typeof Cell
 
 const MinesweeperGrid = new AGrid2D(Cell, {
-    width: 5, height: 5
+    width: 15, height: 15
 })
 type MSGridType = typeof MinesweeperGrid
 
@@ -143,6 +143,7 @@ function makeCellView( grid: MSGridType, cell: CellType, index: Point, _size: nu
                     state.get('mode').set("lost")
                 }
                 e.use()
+                e.redraw()
             }
         }
     })
@@ -165,13 +166,14 @@ export function MinesweeperApp() {
                     setupLevel(state.get('grid'))
                     state.get('mode').set("playing")
                     e.use()
+                    e.redraw()
                 }
                 }}),
             Grid2DView({
                 data:state.get('grid'),
                 drawLines:true,
                 renderCell:makeCellView,
-                scale: 40,
+                scale: 30,
             })
         ]
     })
