@@ -30,6 +30,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.2",
-    "pureimage": "^0.4.17"
+    "pureimage": "^0.4.18"
   }
 }

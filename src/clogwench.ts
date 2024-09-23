@@ -7,7 +7,7 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {calcCanvasFont3} from "./util.js";
 import {EventType, Socket} from "zeromq";
-import {LayoutTest, makeBaselineRow, makeCompsDemo, makeTabs} from "./apps/demo.js";
+import {makeTabs} from "./apps/demo.js";
 import {IDEALOS_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 import {setup_common_keybindings} from "./actions.js";
 
@@ -218,6 +218,7 @@ async function doit() {
         size: size,
         debug_enabled:true,
     })
+    scene.log.setEnabled(true)
     MGlobals.set(Scene.name, scene)
     MGlobals.set(SYMBOL_FONT_ENABLED, true)
     MGlobals.set(STATE_CACHE, new StateCache())
@@ -271,7 +272,7 @@ async function doit() {
         }
         if(frames[0].toString() === 'window-resized') {
             let size = Size.fromJSON(JSON.parse(frames[1].toString("utf-8")))
-            console.log("resized to",size)
+            // console.log("resized to",size)
             scene.resize(size)
             scene.layout()
             scene.redraw()

@@ -25,7 +25,7 @@ export abstract class Scene {
     private should_redraw_callback?: () => void;
     private should_just_redraw_callback?: () => void;
     protected opts: Required<SceneOpts>;
-    private log: Logger;
+    log: Logger;
     private prev_point: Point;
 
     constructor(opts:SceneOpts) {
@@ -63,6 +63,7 @@ export abstract class Scene {
         // this.log("layout phase")
         // MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
+        console.log("layout with size",rc.size,rc.surface)
         KEY_VENDOR.start()
         this.elementRoot = this.makeTree()
         this.log.info("constraints space",rc.size,)
