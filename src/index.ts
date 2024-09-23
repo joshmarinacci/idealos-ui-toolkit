@@ -7,6 +7,7 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {makeTabs} from "./apps/demo.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
+import {MinesweeperApp} from "./apps/minesweeper.js";
 
 const size = new Size(1000, 600)
 
@@ -100,6 +101,7 @@ class CanvasScene extends Scene {
     }
     setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas
+        this.markDirty()
     }
     protected makeRc(): RenderContext {
         return {
@@ -107,6 +109,10 @@ class CanvasScene extends Scene {
             scale: window.devicePixelRatio,
             surface: new CanvasRenderingSurface(this.canvas)
         }
+    }
+
+    isDirty() {
+        return this.dirty
     }
 }
 
@@ -121,6 +127,16 @@ MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 
+function shouldRedrawIfDirty() {
+    if(scene.isDirty()) {
+        // console.log("redrawing")
+        scene.layout()
+        scene.redraw()
+    } else {
+        // console.log("skipping redraw")
+    }
+    requestAnimationFrame(shouldRedrawIfDirty)
+}
 
 function toMouseButton(e: MouseEvent):MouseButton {
     let button:MouseButton = 'None'
@@ -171,11 +187,12 @@ loadFont().then(() => {
         pos = pos.subtract(new Point(rect.x, rect.y))
         scene.handleWheelEvent(pos,new Point(e.deltaX, e.deltaY))
     })
-    scene.onShouldJustRedraw(() => scene.redraw())
+    // scene.onShouldJustRedraw(() => shouldRedrawIfDirty())
+    // scene.onShouldRedraw(() => shouldRedrawIfDirty())
     scene.setCanvas(canvas)
     scene.setSize(size)
-    scene.layout()
-    scene.redraw()
+    shouldRedrawIfDirty()
+
 })
 
 

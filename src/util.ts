@@ -76,8 +76,7 @@ export function useRefresh<T>(_key: string, data: Obj<T>) {
     const hand = () => {
         // console.log("the data has changed")
         const scene = MGlobals.get(Scene.name) as Scene
-        scene.layout()
-        scene.redraw()
+        scene.markDirty()
         data.off('changed', hand)
     }
     data.on('changed', hand)

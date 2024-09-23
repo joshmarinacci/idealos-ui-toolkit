@@ -27,9 +27,11 @@ export abstract class Scene {
     protected opts: Required<SceneOpts>;
     log: Logger;
     private prev_point: Point;
+    dirty:boolean
 
     constructor(opts:SceneOpts) {
         this.log = make_logger("SCENE")
+        this.dirty = true
         this.log.setEnabled(false)
         this.opts = {
             debug_enabled: opts.debug_enabled || false,
@@ -49,6 +51,7 @@ export abstract class Scene {
     }
     setSize(size: Size) {
         this.opts.size = size
+        this.markDirty()
     }
 
     async init() {
@@ -57,16 +60,19 @@ export abstract class Scene {
     protected abstract makeRc():RenderContext
 
     layout() {
-        this.log.info("layout")
+        if(!this.dirty) {
+            console.log("layout not dirty. skip")
+            return
+        }
+        // this.log.info("layout")
         if(!this.renderMap) this.renderMap = new Map()
         KEY_VENDOR.reset()
         // this.log("layout phase")
         // MGlobals.get(STATE_CACHE).dump()
         let rc = this.makeRc()
-        console.log("layout with size",rc.size,rc.surface)
         KEY_VENDOR.start()
         this.elementRoot = this.makeTree()
-        this.log.info("constraints space",rc.size,)
+        // this.log.info("constraints space",rc.size,)
         this.renderRoot = this.elementRoot.layout(rc, {space: rc.size, layout: 'grow'})
         // console.log(`final render root ${this.renderRoot.settings.pos} `)
         // console.log(`final zero point ${ZERO_POINT}`)
@@ -76,6 +82,10 @@ export abstract class Scene {
     }
 
     redraw() {
+        if(!this.dirty) {
+            this.log.warn("redraw not dirty. skip")
+            return
+        }
         this.log.info("redraw")
         let rc = this.makeRc()
         rc.surface.save()
@@ -89,6 +99,7 @@ export abstract class Scene {
             this.drawDebugOverlay(rc)
         }
         rc.surface.restore()
+        this.dirty = false
     }
 
     private syncRenderMap(renderRoot: GRenderNode) {
@@ -216,14 +227,7 @@ export abstract class Scene {
                 type: 'wheel',
                 deltaX:delta.x,
                 deltaY:delta.y,
-                redraw: () => {
-                    if(this.should_redraw_callback) {
-                        this.should_redraw_callback()
-                    } else {
-                        this.layout()
-                        this.redraw()
-                    }
-                },
+                redraw: () => this.request_layout_and_redraw(),
                 use: () => {}
             }
             path.dispatch(evt)
@@ -245,19 +249,14 @@ export abstract class Scene {
     }
 
     private request_just_redraw() {
+        this.markDirty()
         if(this.should_just_redraw_callback) this.should_just_redraw_callback()
     }
 
     private request_layout_and_redraw() {
+        this.markDirty()
         if(this.should_redraw_callback) {
             this.should_redraw_callback()
-        } else {
-            console.time("layout")
-            this.layout()
-            console.timeEnd("layout")
-            console.time("redraw")
-            this.redraw()
-            console.timeEnd("redraw")
         }
     }
 
@@ -294,5 +293,11 @@ export abstract class Scene {
 
     setComponentFunction(compFunc: () => GElement) {
         this.makeTree = compFunc
+        this.markDirty()
+    }
+
+    public markDirty() {
+        this.log.info("markDirty")
+        this.dirty = true
     }
 }
