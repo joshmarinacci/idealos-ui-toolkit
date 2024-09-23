@@ -20,11 +20,11 @@ export enum Icons {
     Delete = '\ue872', // 'delete',
     Search = 'search',
     Star = 'star',
-    CheckboxChecked = '\ue834',
-    CheckboxUnchecked = '\ue835',
-    RadioButtonChecked = '\ue837',
-    RadioButtonUnchecked = '\ue836',
-    Document = 'description',
+    CheckboxChecked = '\ue834', //check_box
+    CheckboxUnchecked = '\ue835', //check_box_outline_blank
+    RadioButtonChecked = '\ue837', //radio_button_checked
+    RadioButtonUnchecked = '\ue836', //radio_button_unchecked
+    Document = '\ue873', //description
     Page = 'note',
     Color = 'palette',
     Gradient = 'gradient',
@@ -32,13 +32,13 @@ export enum Icons {
     Number = '123',
     Shape = 'pentagon',
     OpenDocument = 'file_open',
-    Archive ='\ue149',//'Archive',
+    Archive ='\ue149',// archive,
     DeleteForever = 'delete_forever',
     Snooze = 'snooze',
-    Reply = '\ue15e',// 'reply',
-    ReplyAll = '\ue15f',// 'reply_all',
+    Reply = '\ue15e',// reply
+    ReplyAll = '\ue15f',// reply_all
     Forward = 'forward',
-    Inbox = '\ue156',
+    Inbox = '\ue156', //inbox
     Draft = 'draft',
     Send = 'send',
     Group = 'group',
@@ -50,9 +50,9 @@ export enum Icons {
     KeyboardArrowLeft = 'keyboard_arrow_left',
     KeyboardArrowRight = 'keyboard_arrow_right',
     KeyboardArrowUp = 'keyboard_arrow_up',
-    KeyboardArrowDown = 'keyboard_arrow_down',
-    DragHandle = 'drag_handle',
-    Resize = 'resize',
+    KeyboardArrowDown = '\ue313', // keyboard_arrow_down
+    DragHandle = '\ue25d', // drag_handle
+    Resize = '\ue85b', // resize
 }
 
 export class IconElement implements GElement {
