@@ -119,6 +119,7 @@ function makeCellView( grid: MSGridType, cell: CellType, index: Point, _size: nu
             bg = 'white'
         }
     }
+    useRefresh(key,cell)
     return Button({
         key:key,
         text:text,

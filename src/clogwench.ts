@@ -7,7 +7,7 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {calcCanvasFont3} from "./util.js";
 import {EventType, Socket} from "zeromq";
-import {makeTabs} from "./apps/demo.js";
+import {makeBaselineRow, makeTabs} from "./apps/demo.js";
 import {IDEALOS_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 import {setup_common_keybindings} from "./actions.js";
 
@@ -117,6 +117,7 @@ class ClogwenchScene extends Scene {
     resize(size: Size) {
         this.opts.size = size
         this.surface.resize(size)
+        this.dirty = true
     }
 }
 
@@ -224,8 +225,6 @@ async function doit() {
     MGlobals.set(STATE_CACHE, new StateCache())
 
     scene.setComponentFunction(makeTabs)
-    scene.layout()
-    scene.redraw()
 
     if(sock.writable) {
         await sock.send(['open-window', JSON.stringify(size.toJSON()) ])
@@ -239,8 +238,15 @@ async function doit() {
             await sock.send(['repaint', JSON.stringify(size.toJSON()), bitmap.data])
         }
     }
-
-    await sendRepaint()
+    async function repaintIfDirty() {
+        if(scene.dirty) {
+            console.log('is dirty, redrawing', Date.now())
+            scene.layout()
+            scene.redraw()
+            await sendRepaint()
+        }
+    }
+    await repaintIfDirty()
     for await (const frames of sock) {
         // console.log("app received msg", frames)
         // console.log("first frame",frames[0].toString("utf-8"))
@@ -248,13 +254,11 @@ async function doit() {
             let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
             const button = frames[2].toString("utf-8") as MouseButton
             scene.handleMouseDown(pt,button, false)
-            await sendRepaint()
         }
         if (frames[0].toString() === 'mouse-up') {
             let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
             const button = frames[2].toString("utf-8") as MouseButton
             scene.handleMouseUp(pt,button, false)
-            await sendRepaint()
         }
         if (frames[0].toString() === 'mouse-move') {
             let pt = Point.fromJSON(JSON.parse(frames[1].toString("utf-8")))
@@ -262,22 +266,18 @@ async function doit() {
         }
         if(frames[0].toString() === 'key-down') {
             let keycode = JSON.parse(frames[1].toString("utf-8"))
-            console.log("keycode is",keycode)
+            // console.log("keycode is",keycode)
             let mods = JSON.parse(frames[2].toString("utf-8"))
-            console.log("mods is",mods)
+            // console.log("mods is",mods)
             const ikc:LogicalKeyboardCode = IDEALOS_KEYBOARD_CODE[keycode as string]
-            console.log("ikc", ikc)
+            // console.log("ikc", ikc)
             scene.handleKeydownEvent(ikc,mods.ctrl,mods.shift,mods.alt,mods.meta)
-            await sendRepaint()
         }
         if(frames[0].toString() === 'window-resized') {
             let size = Size.fromJSON(JSON.parse(frames[1].toString("utf-8")))
-            // console.log("resized to",size)
             scene.resize(size)
-            scene.layout()
-            scene.redraw()
-            await sendRepaint()
         }
+        await repaintIfDirty()
     }
 }
 

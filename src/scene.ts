@@ -297,7 +297,7 @@ export abstract class Scene {
     }
 
     public markDirty() {
-        this.log.info("markDirty")
+        // this.log.info("markDirty")
         this.dirty = true
     }
 }
