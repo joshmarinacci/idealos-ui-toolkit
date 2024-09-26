@@ -1,13 +1,13 @@
 import pureimage, {Bitmap, Context} from "pureimage"
 import * as zmq from "zeromq"
 import {Scene, SceneOpts} from "./scene.js";
-import {MGlobals, MouseButton, SYMBOL_FONT_ENABLED} from "./base.js";
+import {MGlobals, MouseButton, SYMBOL_FONT_ENABLED, TRANSPARENT} from "./base.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {calcCanvasFont3} from "./util.js";
 import {EventType, Socket} from "zeromq";
-import {makeBaselineRow, makeTabs} from "./apps/demo.js";
+import {makeBaselineRow, makeButton, makeListDemo, makeTabs, makeTextInput} from "./apps/demo.js";
 import {IDEALOS_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 import {setup_common_keybindings} from "./actions.js";
 
@@ -25,14 +25,23 @@ class PureImageSurface implements RenderingSurface {
     private size: Size;
     bitmap: Bitmap;
     private ctx: Context;
+    private data: ArrayBuffer;
+    private use_fast_fill_rect: boolean;
     constructor(size: Size) {
         this.size = size
+        this.use_fast_fill_rect = true
         this.bitmap = pureimage.make(size.w, size.h)
+        this.data = new ArrayBuffer(size.w*size.h*4)
+        // @ts-ignore
+        this.bitmap.data = new Uint8ClampedArray(this.data)
         this.ctx = this.bitmap.getContext('2d')
     }
     resize(size: Size) {
         this.size = size
         this.bitmap = pureimage.make(size.w, size.h)
+        this.data = new ArrayBuffer(size.w*size.h*4)
+        // @ts-ignore
+        this.bitmap.data = new Uint8ClampedArray(this.data)
         this.ctx = this.bitmap.getContext('2d')
         console.log("resized context",size)
     }
@@ -50,8 +59,28 @@ class PureImageSurface implements RenderingSurface {
         this.ctx.restore()
     }
     fillRect(bounds: Bounds, color: string): void {
+        if(color === TRANSPARENT) return
         this.ctx.fillStyle = color
-        this.ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
+        if(this.use_fast_fill_rect
+            && this.ctx._transform.isIdentity()
+        ) {
+            // @ts-ignore
+            const ncolor = this.ctx._fillColor
+            // flip the endianness of the color
+            let cv = new ArrayBuffer(4)
+            let dv = new DataView(cv)
+            dv.setUint32(0, ncolor)
+            let ncolor2 = dv.getUint32(0, true)
+            let arr32 = new Uint32Array(this.data)
+            //alpha, blue, green, red
+            for (let j = bounds.top(); j < bounds.bottom(); j++) {
+                let start = j * this.size.w + bounds.x
+                let end = start + bounds.w
+                arr32.fill(ncolor2, start, end)
+            }
+        } else {
+            this.ctx.fillRect(bounds.x, bounds.y, bounds.w,bounds.h)
+        }
     }
     measureText(text: string, opts: TextOpts): [Size, number] {
         // console.log("measuring text opts",text,opts)

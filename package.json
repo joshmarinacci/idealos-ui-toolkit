@@ -10,6 +10,7 @@
     "start": "mkdir -p build && cp index.html build && esbuild src/index.ts --bundle --watch --outdir=build --servedir=build",
     "sdl-test": "npm run clean && mkdir -p build && esbuild src/*.ts --outdir=build && node build/sdltest.js",
     "clogwench-test": "npm run clean && npm run build --outdir=build && node build/clogwench.js",
+    "clogwench-window": "cd ~/RustroverProjects/clogwench && cargo run-script window",
     "test": "vitest run --dir src",
     "clean": "rm -rf build",
     "tsc": "tsc"

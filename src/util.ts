@@ -1,4 +1,4 @@
-import {Insets, Logger, make_logger, Point, Size} from "josh_js_util";
+import {Bounds, Insets, Logger, make_logger, Point, Size} from "josh_js_util";
 import {ElementSettings, MGlobals, StateHandler} from "./base.js";
 import {Obj, ObjAtom} from "rtds-core";
 import {Scene} from "./scene.js";
@@ -97,4 +97,16 @@ export function withY(pos: Point, y: number) {
 
 export function withX(pos: Point, x: number) {
     return new Point(x, pos.y)
+}
+
+export function intersectBounds(b1: Bounds, b2: Bounds) {
+    let left = Math.max(b1.left(), b2.left());
+    let right = Math.min(b1.right(), b2.right());
+    let top = Math.max(b1.top(), b2.top());
+    let bottom = Math.min(b1.bottom(), b2.bottom());
+    return new Bounds(left, top, right - left, bottom - top)
+}
+
+export function isBoundsValid(bounds: Bounds) {
+    return bounds.w > 0 && bounds.h > 0
 }
