@@ -5,11 +5,10 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {makeTabs} from "./apps/demo.js";
+import {makeTabs, makeTextInput} from "./apps/demo.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
-import {MinesweeperApp} from "./apps/minesweeper.js";
 
-const size = new Size(1000, 600)
+const size = new Size(600, 600)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -121,7 +120,7 @@ const scene = new CanvasScene({
     size:size,
     debug_enabled:true,
 })
-scene.setComponentFunction(makeTabs)
+scene.setComponentFunction(makeTextInput)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
@@ -178,6 +177,7 @@ loadFont().then(() => {
     })
     window.addEventListener('keydown', (e) => {
         const code = DOM_KEYBOARD_CODE_TO_LOGICAL_CODE[e.code]
+        if(!code) console.warn(`no code for ${e.code}`)
         scene.handleKeydownEvent(code, e.ctrlKey, e.shiftKey, e.altKey, e.metaKey)
     })
     window.addEventListener('wheel', (e) => {

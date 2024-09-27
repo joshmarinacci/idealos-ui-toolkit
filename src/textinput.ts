@@ -197,6 +197,7 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let key = args.key
     // console.log("key is",key)
     let char = LOGICAL_KEYBOARD_CODE_TO_CHAR[key]
+    if(!char) console.warn(`missing char for key ${key}`)
     if(args.mods.shift) {
         char = char.toUpperCase()
     }

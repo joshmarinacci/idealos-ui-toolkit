@@ -346,6 +346,27 @@ export const LOGICAL_KEYBOARD_CODE_TO_CHAR:Record<LogicalKeyboardCode, string> =
     'KEY_X':'x',
     'KEY_Y':'y',
     'KEY_Z':'z',
-    'SPACE':' '
+    'SPACE':' ',
+    'PERIOD':'.',
+    'COMMA':',',
+    'SLASH':'/',
+
+    'SEMICOLON':';',
+    'QUOTE':'\'',
+    'DIGIT_1':'1',
+    'DIGIT_2':'2',
+    'DIGIT_3':'3',
+    'DIGIT_4':'4',
+    'DIGIT_5':'5',
+    'DIGIT_6':'6',
+    'DIGIT_7':'7',
+    'DIGIT_8':'8',
+    'DIGIT_9':'9',
+    'DIGIT_0':'0',
+    'MINUS':'-',
+    'BRACKET_LEFT':'[',
+    'BRACKET_RIGHT':']',
+    'BACKQUOTE':'`',
+    'TAB':'\t',
 
 }

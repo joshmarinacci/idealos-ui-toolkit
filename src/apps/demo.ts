@@ -311,7 +311,7 @@ export function makeTextInput() {
     return TextBox({
         multiline:false,
         fixedWidth: 300,
-        fixedHeight: 300,
+        // fixedHeight: 300,
         fontSettings: {
             font:Style.base().font,
             fontSize: 50,
