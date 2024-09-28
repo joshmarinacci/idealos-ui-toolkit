@@ -165,17 +165,14 @@ export abstract class Scene {
         if(path) {
             // swap keyboard focus
             if(path.target().settings.key !== this.keyboard_target) {
-                // this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
-                // path.target().focused = true
-                this.keyboard_target = path.target().settings.kind
-                // console.log("swapping keyboard target to ", this.keyboard_target)
+                this.keyboard_target = path.target().settings.key
                 this.request_just_redraw()
                 this.keyboard_path = path.nodes.map(n => n.settings.key)
             }
 
             // set the current mouse target
             this.current_mouse_target = path.target().settings.key
-            console.log("current mouse target set to",this.current_mouse_target)
+            // console.log("current mouse target set to",this.current_mouse_target)
 
             // swap the debug target
             if(path.target().settings.key !== this.debug_target && shift) {
