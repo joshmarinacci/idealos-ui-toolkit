@@ -220,6 +220,19 @@ export function makeListDemo() {
     })
 }
 
+
+export function makeScrollDemo() {
+    const scroll = ScrollContainer({
+        // fixedWidth: 150,
+        // fixedHeight: 150,
+        child: ListView({
+            fixedHeight:300,
+            data: ["john", "Jacob", 'jingleheimer', 'foo', 'bar', 'baz', 'qux','foo', 'bar', 'baz', 'qux',],
+            key: 'list-view-xx',
+        })
+    })
+    return MWindow({child: scroll, initSize: new Size(300,300)})
+}
 export function makePanelDemo() {
     return new MHBoxElement({
         mainAxisLayout: 'between',
@@ -284,7 +297,10 @@ export function makeTabs(): GElement {
     const panelDemo = makePanelDemo()
     const emailDemo = EmailDemo()
     const todoDemo = TodoListDemo()
-    const minesweeper = MinesweeperApp()
+    const mine_app = MinesweeperApp()
+    const mine_scroll = ScrollContainer({
+        child:mine_app,
+    })
 
     let tabs = TabbedBox({
         titles: [
@@ -301,10 +317,10 @@ export function makeTabs(): GElement {
             panelDemo,
             emailDemo,
             todoDemo,
-            minesweeper,
+            mine_scroll,
         ],
     })
-    return MWindow({child: tabs, initSize: new Size(700,400)})
+    return MWindow({child: tabs, initSize: new Size(300,300)})
 }
 
 export function makeTextInput() {

@@ -5,10 +5,10 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {makeTabs, makeTextInput} from "./apps/demo.js";
+import {makeListDemo, makeScrollDemo, makeTabs, makeTextInput} from "./apps/demo.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
 
-const size = new Size(600, 600)
+const size = new Size(600, 400)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -120,7 +120,7 @@ const scene = new CanvasScene({
     size:size,
     debug_enabled:true,
 })
-scene.setComponentFunction(makeTextInput)
+scene.setComponentFunction(makeTabs)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

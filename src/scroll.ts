@@ -30,123 +30,150 @@ class ScrollContainerElement implements GElement {
         if(this.param.fixedHeight) h = this.param.fixedHeight
         const fullBounds = new Bounds(0, 0, w, h)
         KEY_VENDOR.startElement(this)
+
+
         const contentBounds = fullBounds.shrinkInsets(borderInsets)
         const barInsets = new Insets(0,10,10,0)
         const child_size = contentBounds.size()
         child_size.w -= barInsets.right
         child_size.h -= barInsets.bottom
+
+        const viewport_size = new Size(contentBounds.w-barInsets.right,
+            contentBounds.h-barInsets.bottom)
+
+        // console.log('child size',child_size)
+        // console.log("viewport size",viewport_size)
         let child = this.param.child.layout(rc, {
             space: child_size,
             layout: "grow",
         })
 
         let os = (offset:Point, e:CEvent) => {
-            if(e.type === 'mouse-down' || e.type === 'wheel') {
+            if(e.type === 'mouse-down' || e.type === 'wheel' || e.type === 'mouse-move') {
                 setScrollOffset(offset)
                 e.redraw()
             }
         }
         ;//this.param.onScrollChanged
+        // console.log("actual child",child.settings.size)
         let children = [child]
         // bottom scroll bar
-        {
-            let key =  KEY_VENDOR.getKey()
-            let bar = new GRenderNode({
-                key:key,
-                size: new Size(contentBounds.w-barInsets.right,barInsets.bottom),
-                pos: contentBounds.bottom_left().subtract(new Point(0,barInsets.right)),
-                baseline: 0,
-                borderWidth: ZERO_INSETS,
-                children: [],
-                contentOffset: ZERO_POINT,
-                font: "",
-                kind: "scroll-bar",
-                padding: ZERO_INSETS,
-                text: "",
-                visualStyle: {
-                    borderColor: TRANSPARENT,
-                    background: 'magenta',
-                    textColor: 'magenta'
-                },
-            })
-            children.push(bar)
-        }
+        // {
+        //     let key =  KEY_VENDOR.getKey()
+        //     let bar = new GRenderNode({
+        //         key:key,
+        //         size: new Size(contentBounds.w-barInsets.right,barInsets.bottom),
+        //         pos: contentBounds.bottom_left().subtract(new Point(0,barInsets.right)),
+        //         baseline: 0,
+        //         borderWidth: ZERO_INSETS,
+        //         children: [],
+        //         contentOffset: ZERO_POINT,
+        //         font: "",
+        //         kind: "scroll-bar",
+        //         padding: ZERO_INSETS,
+        //         text: "",
+        //         visualStyle: {
+        //             borderColor: TRANSPARENT,
+        //             background: 'magenta',
+        //             textColor: 'magenta'
+        //         },
+        //     })
+        //     children.push(bar)
+        // }
         //bottom scroll thumb
-        {
-            let key = KEY_VENDOR.getKey()
-            let bar = new GRenderNode({
-                key:key,
-                size: new Size(20,barInsets.bottom),
-                pos: contentBounds.bottom_left().subtract(new Point(-10-scrollOffset.x,barInsets.bottom)),
-                baseline: 0,
-                borderWidth: ZERO_INSETS,
-                children: [],
-                contentOffset: ZERO_POINT,
-                font: "",
-                kind: "thumb",
-                padding: ZERO_INSETS,
-                text: "",
-                visualStyle: {
-                    borderColor: TRANSPARENT,
-                    background: 'cyan',
-                    textColor: 'magenta'
-                },
-                handleEvent:(e) => {
-                    if(e.type === 'mouse-down') {
-                        setDown(true)
-                        e.redraw()
-                        return
-                    }
-                    if(e.type === 'mouse-move' && down) {
-                        let so = scrollOffset.copy()
-                        so.x -= e.delta.x
-                        if(so.x > 0) so.x = 0
-                        if(so.x < -contentBounds.w) {
-                            so.x = -contentBounds.w
-                        }
-                        setScrollOffset(so)
-                        e.use()
-                        e.redraw()
-                    }
-                    if(e.type === 'mouse-up') {
-                        setDown(false)
-                    }
-                }
-            })
-            children.push(bar)
-        }
+        // {
+        //     let key = KEY_VENDOR.getKey()
+        //     let bar = new GRenderNode({
+        //         key:key,
+        //         size: new Size(20,barInsets.bottom),
+        //         pos: contentBounds.bottom_left().subtract(new Point(-10-scrollOffset.x,barInsets.bottom)),
+        //         baseline: 0,
+        //         borderWidth: ZERO_INSETS,
+        //         children: [],
+        //         contentOffset: ZERO_POINT,
+        //         font: "",
+        //         kind: "thumb",
+        //         padding: ZERO_INSETS,
+        //         text: "",
+        //         visualStyle: {
+        //             borderColor: TRANSPARENT,
+        //             background: 'cyan',
+        //             textColor: 'magenta'
+        //         },
+        //         handleEvent:(e) => {
+        //             if(e.type === 'mouse-down') {
+        //                 setDown(true)
+        //                 e.redraw()
+        //                 return
+        //             }
+        //             if(e.type === 'mouse-move' && down) {
+        //                 let so = scrollOffset.copy()
+        //                 so.x -= e.delta.x
+        //                 if(so.x > 0) so.x = 0
+        //                 if(so.x < -contentBounds.w) {
+        //                     so.x = -contentBounds.w
+        //                 }
+        //                 setScrollOffset(so)
+        //                 e.use()
+        //                 e.redraw()
+        //             }
+        //             if(e.type === 'mouse-up') {
+        //                 setDown(false)
+        //             }
+        //         }
+        //     })
+        //     children.push(bar)
+        // }
         // right scroll bar
-        {
-            let key =  KEY_VENDOR.getKey()
-            let bar = new GRenderNode({
-                key:key,
-                size: new Size(barInsets.right,contentBounds.h - barInsets.bottom),
-                pos: contentBounds.top_right().subtract(new Point(barInsets.right,0)),
-                baseline: 0,
-                borderWidth: ZERO_INSETS,
-                children: [],
-                contentOffset: ZERO_POINT,
-                font: "",
-                kind: "scroll-bar",
-                padding: ZERO_INSETS,
-                text: "",
-                visualStyle: {
-                    borderColor: TRANSPARENT,
-                    background: 'magenta',
-                    textColor: 'magenta'
-                }
-            })
-            children.push(bar)
-        }
+        // {
+        //     let key =  KEY_VENDOR.getKey()
+        //     let bar = new GRenderNode({
+        //         key:key,
+        //         size: new Size(barInsets.right,contentBounds.h - barInsets.bottom),
+        //         pos: contentBounds.top_right().subtract(new Point(barInsets.right,0)),
+        //         baseline: 0,
+        //         borderWidth: ZERO_INSETS,
+        //         children: [],
+        //         contentOffset: ZERO_POINT,
+        //         font: "",
+        //         kind: "scroll-bar",
+        //         padding: ZERO_INSETS,
+        //         text: "",
+        //         visualStyle: {
+        //             borderColor: TRANSPARENT,
+        //             background: 'magenta',
+        //             textColor: 'magenta'
+        //         }
+        //     })
+        //     children.push(bar)
+        // }
         // right thumb
+        let ah = child.settings.size.h
+        let vh = viewport_size.h
+        let y_fract = vh/ah
+        // console.log("actual height",ah,"viewport height",vh,"off",scrollOffset.y,"fract",y_fract)
+        let y_enabled = true
+        if(y_fract > 1) {
+            y_enabled = false
+        }
+        let y_thumb_h = vh*y_fract
+        // console.log("ythumbh",y_thumb_h)
+        const y_thumb_size = new Size(barInsets.right,y_thumb_h)
+        const y_thumb_y = -scrollOffset.y * y_fract
+
+        function addDelta(point: Point) {
+            let off = scrollOffset.copy().add(point)
+            if(off.y > 0) off.y = 0
+            if(off.y + ah < vh) off.y = vh - ah
+            return off
+        }
         {
             let key = KEY_VENDOR.getKey()
             let thumb = new GRenderNode({
                 key:key,
-                size: new Size(barInsets.right,20),
-                pos: contentBounds.top_right()
-                    .subtract(new Point(barInsets.right,0))
-                    .add(new Point(0,-scrollOffset.y - 10 )),
+                size: y_thumb_size,//new Size(barInsets.right,20),
+                // pos: contentBounds.top_right().copy(),
+                pos: new Point(contentBounds.w-barInsets.right,y_thumb_y),
                 baseline:0,
                 borderWidth: ZERO_INSETS,
                 children: [],
@@ -157,7 +184,7 @@ class ScrollContainerElement implements GElement {
                 text: "",
                 visualStyle:{
                     borderColor: TRANSPARENT,
-                    background: 'cyan',
+                    background: y_enabled?'cyan':'#ccc',
                     textColor: 'magenta'
                 },
                 handleEvent:(e) => {
@@ -167,15 +194,7 @@ class ScrollContainerElement implements GElement {
                         return
                     }
                     if(e.type === 'mouse-move' && down) {
-                        let so = scrollOffset.copy()
-                        so.y -= e.delta.y
-                        if(so.y > 0) so.y = 0
-                        if(so.y < -contentBounds.h) {
-                            so.y = -contentBounds.h
-                        }
-                        setScrollOffset(so)
-                        e.use()
-                        e.redraw()
+                        os(addDelta(new Point(0,-e.delta.y/y_fract)),e)
                     }
                     if(e.type === 'mouse-up') {
                         setDown(false)
@@ -184,20 +203,23 @@ class ScrollContainerElement implements GElement {
             })
             children.push(thumb)
         }
-        {
-            // debug overlay
-            children.push(Button({text:""+scrollOffset.toString()}).layout(rc,cons))
-        }
-
-        // const iconSettings = {
-        //     fontSize: 14,
-        //     ghost: false,
-        //     padding: ZERO_INSETS,
-        //     borderRadius: ZERO_INSETS,
+        // {
+        //     // debug overlay
+        //     children.push(Button({
+        //         fontSettings: {
+        //             font: Style.button().font,
+        //             fontWeight: Style.button().fontWeight,
+        //             fontSize: 12,
+        //         },
+        //         padding: ZERO_INSETS,
+        //         text:""+scrollOffset.toString()
+        //     }).layout(rc,cons))
         // }
 
         child.settings.pos = scrollOffset.add(contentBounds.position())
         KEY_VENDOR.endElement(this)
+
+
         let node = new GRenderNode({
             kind: 'scroll',
             key:key,
@@ -220,10 +242,11 @@ class ScrollContainerElement implements GElement {
             canScroll:true,
             handleEvent: (e) => {
                 if(e.type === 'wheel') {
-                    os(this.addToOffset(scrollOffset,new Point(-e.deltaX,-e.deltaY), child.settings.size, contentBounds), e)
+                    os(addDelta(new Point(0,-e.deltaY)),e)
                 }
             }
         })
+        // console.log("self bounds", node.settings.size)
         return node
     }
 

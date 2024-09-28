@@ -95,7 +95,7 @@ export const Button = (opts: ButtonParameters) => {
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [new TextElement({
             padding: Insets.from(1),
-            fontSettings: {
+            fontSettings: opts.fontSettings || {
                 font: Style.button().font,
                 fontSize: Style.button().fontSize,
                 fontWeight: Style.button().fontWeight,

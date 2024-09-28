@@ -105,7 +105,8 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         visualStyle: {
             borderColor: Style.panel().borderColor,
             textColor: Style.base().textColor,
-            background: Style.panel().backgroundColor
+            // background: Style.panel().backgroundColor
+            background:'magenta',
         },
         borderWidth: Insets.from(1),
         handleEvent: (e) => {
