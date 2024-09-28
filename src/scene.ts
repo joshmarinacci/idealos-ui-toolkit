@@ -11,6 +11,12 @@ export type SceneOpts = {
     size: Size;
     debug_enabled?:boolean
 }
+
+export type RenderState = {
+    current_focus: string | undefined
+    current_hover: string | undefined
+    popups: boolean
+}
 export abstract class Scene {
     private elementRoot!: GElement;
     renderRoot!: GRenderNode;
@@ -92,7 +98,12 @@ export abstract class Scene {
         rc.surface.scale(rc.scale, rc.scale)
         // rc.ctx.translate(10,10)
         rc.surface.fillRect(Bounds.fromPointSize(ZERO_POINT,rc.size),'#f0f0f0')
-        doDraw(this.renderRoot, rc,false)
+        const rs:RenderState = {
+            current_hover: this.current_hover,
+            popups:false,
+            current_focus: this.keyboard_target
+        }
+        doDraw(this.renderRoot, rc,rs)
         if(this.opts.debug_enabled) {
             drawDebug(this.renderRoot, rc, this.debug_target, false)
             // doDraw(this.renderRoot,rc,true)
@@ -123,8 +134,6 @@ export abstract class Scene {
             // console.log("target",target.settings.kind, target.settings.key)
             // hover code
             if(target.settings.key !== this.current_hover) {
-                this.ifTarget(this.current_hover, (comp) => comp.hover = false)
-                target.hover = true
                 this.current_hover = target.settings.key
                 this.request_just_redraw()
             }
@@ -156,10 +165,10 @@ export abstract class Scene {
         if(path) {
             // swap keyboard focus
             if(path.target().settings.key !== this.keyboard_target) {
-                this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
-                path.target().focused = true
+                // this.ifTarget(this.keyboard_target,(comp) => comp.focused = false)
+                // path.target().focused = true
                 this.keyboard_target = path.target().settings.kind
-                console.log("swapping keyboard target to ", this.keyboard_target)
+                // console.log("swapping keyboard target to ", this.keyboard_target)
                 this.request_just_redraw()
                 this.keyboard_path = path.nodes.map(n => n.settings.key)
             }

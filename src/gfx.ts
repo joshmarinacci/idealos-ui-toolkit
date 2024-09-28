@@ -1,5 +1,6 @@
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {GRenderNode, RenderNodeSettings, TRANSPARENT} from "./base.js";
+import {RenderState} from "./scene.js";
 
 export type TextOpts = {
     valign?: 'top' | 'middle' | 'bottom'
@@ -68,12 +69,12 @@ function calculateBorderRadius(settings: RenderNodeSettings) {
     return insets
 }
 
-function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds) {
+function doDrawBackground(rc: RenderContext, n: GRenderNode, bounds: Bounds, rs: RenderState) {
     let bg = n.settings.visualStyle.background || "magenta"
-    if(n.hover && n.settings.hoverStyle && n.settings.hoverStyle.background) {
+    if(n.settings.key === rs.current_hover && n.settings.hoverStyle && n.settings.hoverStyle.background) {
         bg = n.settings.hoverStyle.background
     }
-    if(n.focused && n.settings.focusedStyle && n.settings.focusedStyle.background) {
+    if(n.settings.key === rs.current_focus && n.settings.focusedStyle && n.settings.focusedStyle.background) {
         bg = n.settings.focusedStyle.background
     }
     let rad = calculateBorderRadius(n.settings)
@@ -123,14 +124,14 @@ function validateNode(n: GRenderNode) {
     }
 }
 
-export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void {
+export function doDraw(n: GRenderNode, rc: RenderContext, rs: RenderState): void {
     if(!n.settings.visualStyle) throw new Error("no visual style found")
     validateNode(n)
     let draw_node = true
-    if(popups && !n.settings.popup) {
+    if(rs.popups && !n.settings.popup) {
         draw_node = false
     }
-    if(!popups && n.settings.popup) {
+    if(!rs.popups && n.settings.popup) {
         draw_node = false
     }
     // console.log('drawing',n.settings.pos)
@@ -142,7 +143,7 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
 
     // fill background inside padding  + border area
     if (draw_node && n.settings.visualStyle.background) {
-        doDrawBackground(rc,n,bounds)
+        doDrawBackground(rc,n,bounds, rs)
     }
 
     // draw / fill border
@@ -165,13 +166,13 @@ export function doDraw(n: GRenderNode, rc: RenderContext, popups:boolean): void 
     }
     n.settings.children.forEach(ch => {
         if(n.settings.popup) {
-            if(popups) {
-                doDraw(ch, rc, false)
+            if(rs.popups) {
+                doDraw(ch, rc, rs)
             } else {
 
             }
         } else {
-            doDraw(ch, rc, popups)
+            doDraw(ch, rc, rs)
         }
     })
 
