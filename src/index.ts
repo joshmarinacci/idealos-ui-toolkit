@@ -5,9 +5,7 @@ import {setup_common_keybindings} from "./actions.ts";
 import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
-import {makeListDemo, makeScrollDemo, makeTabs, makeTextInput} from "./apps/demo.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
-import {DrawingApp} from "./apps/drawing.js";
 import {EmailDemo} from "./apps/email.js";
 
 const size = new Size(800, 400)
@@ -32,45 +30,46 @@ class CanvasRenderingSurface implements RenderingSurface {
     }
 
     strokeBounds(bounds: Bounds, color: string, thickness: number): void {
-        this.ctx.strokeStyle= color
+        this.ctx.strokeStyle = color
         this.ctx.lineWidth = thickness
         this.ctx.strokeRect(bounds.x, bounds.y, bounds.w, bounds.h)
     }
 
     clipRect(bounds: Bounds): void {
         this.ctx.beginPath()
-        this.ctx.rect(bounds.x,bounds.y,bounds.w,bounds.h)
+        this.ctx.rect(bounds.x, bounds.y, bounds.w, bounds.h)
         this.ctx.clip()
     }
 
-    fillText(text: string, pos:Point, opts?:TextOpts): void {
+    fillText(text: string, pos: Point, opts?: TextOpts): void {
         this.ctx.save()
         this.ctx.fillStyle = 'black'
         this.ctx.textRendering = 'optimizeLegibility'
-        if(opts) {
+        if (opts) {
             this.ctx.fillStyle = opts.color || 'black'
-            if(opts.fontSize && opts.fontFamily) {
+            if (opts.fontSize && opts.fontFamily) {
                 this.ctx.font = calcCanvasFont3(opts.fontSize, opts.fontFamily)
             }
-            if(opts.valign === 'top') this.ctx.textBaseline = 'top'
-            if(opts.valign === 'middle') this.ctx.textBaseline = 'middle'
-            if(opts.valign === 'bottom') this.ctx.textBaseline = 'bottom'
-            if(opts.halign === 'left') this.ctx.textAlign = 'left'
-            if(opts.halign === 'center') this.ctx.textAlign = 'center'
-            if(opts.halign === 'right') this.ctx.textAlign = 'right'
+            if (opts.valign === 'top') this.ctx.textBaseline = 'top'
+            if (opts.valign === 'middle') this.ctx.textBaseline = 'middle'
+            if (opts.valign === 'bottom') this.ctx.textBaseline = 'bottom'
+            if (opts.halign === 'left') this.ctx.textAlign = 'left'
+            if (opts.halign === 'center') this.ctx.textAlign = 'center'
+            if (opts.halign === 'right') this.ctx.textAlign = 'right'
         }
-        this.ctx.fillText(text,pos.x,pos.y)
+        this.ctx.fillText(text, pos.x, pos.y)
         this.ctx.restore()
     }
-    measureText(text: string, opts:TextOpts): [Size, number] {
+
+    measureText(text: string, opts: TextOpts): [Size, number] {
         this.ctx.font = calcCanvasFont3(opts.fontSize || 12, opts.fontFamily ||
-        'sans-serif')
+            'sans-serif')
         let metrics = this.ctx.measureText(text)
         let size = new Size(
             Math.floor(metrics.width),
             Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent))
         let baseline = metrics.fontBoundingBoxAscent
-        if(!metrics.fontBoundingBoxAscent) {
+        if (!metrics.fontBoundingBoxAscent) {
             size.h = Math.floor(metrics.emHeightAscent + metrics.emHeightDescent)
             baseline = metrics.emHeightAscent
         }
@@ -80,15 +79,19 @@ class CanvasRenderingSurface implements RenderingSurface {
     save(): void {
         this.ctx.save()
     }
+
     scale(s1: number, s2: number): void {
         this.ctx.scale(s1, s2)
     }
+
     translate(off: Point): void {
         this.ctx.translate(off.x, off.y)
     }
+
     restore(): void {
         this.ctx.restore()
     }
+
     fillRect(bounds: Bounds, color: string): void {
         this.ctx.fillStyle = color
         this.ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
@@ -97,13 +100,16 @@ class CanvasRenderingSurface implements RenderingSurface {
 
 class CanvasScene extends Scene {
     canvas!: HTMLCanvasElement;
-    constructor(opts:SceneOpts) {
+
+    constructor(opts: SceneOpts) {
         super(opts);
     }
+
     setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas
         this.markDirty()
     }
+
     protected makeRc(): RenderContext {
         return {
             size: this.opts.size,
@@ -119,36 +125,35 @@ class CanvasScene extends Scene {
 
 setup_common_keybindings()
 const scene = new CanvasScene({
-    size:size,
-    debug_enabled:true,
+    size: size,
+    debug_enabled: true,
 })
+
 scene.setComponentFunction(EmailDemo)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)
 MGlobals.set(STATE_CACHE, new StateCache())
 
-function shouldRedrawIfDirty() {
-    if(scene.isDirty()) {
-        // console.log("redrawing")
+function repaintLoop() {
+    if (scene.isDirty()) {
         scene.layout()
         scene.redraw()
-    } else {
-        // console.log("skipping redraw")
     }
-    requestAnimationFrame(shouldRedrawIfDirty)
+    requestAnimationFrame(repaintLoop)
 }
 
-function toMouseButton(e: MouseEvent):MouseButton {
-    let button:MouseButton = 'None'
-    if(e.buttons === 1) {
+function toMouseButton(e: MouseEvent): MouseButton {
+    let button: MouseButton = 'None'
+    if (e.buttons === 1) {
         button = 'Primary'
     }
-    if(e.buttons === 2) {
+    if (e.buttons === 2) {
         button = 'Secondary'
     }
     return button
 }
+
 loadFont().then(() => {
     return scene.init()
 }).then(() => {
@@ -165,7 +170,7 @@ loadFont().then(() => {
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleMouseDown(pos,toMouseButton(e),e.shiftKey)
+        scene.handleMouseDown(pos, toMouseButton(e), e.shiftKey)
     })
     canvas.addEventListener('contextmenu', (e) => {
         e.preventDefault();
@@ -175,11 +180,11 @@ loadFont().then(() => {
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleMouseUp(pos,toMouseButton(e),e.shiftKey)
+        scene.handleMouseUp(pos, toMouseButton(e), e.shiftKey)
     })
     window.addEventListener('keydown', (e) => {
         const code = DOM_KEYBOARD_CODE_TO_LOGICAL_CODE[e.code]
-        if(!code) console.warn(`no code for ${e.code}`)
+        if (!code) console.warn(`no code for ${e.code}`)
         scene.handleKeydownEvent(code, e.ctrlKey, e.shiftKey, e.altKey, e.metaKey)
     })
     window.addEventListener('wheel', (e) => {
@@ -187,13 +192,11 @@ loadFont().then(() => {
         let rect = e.target.getBoundingClientRect()
         let pos = new Point(e.clientX, e.clientY);
         pos = pos.subtract(new Point(rect.x, rect.y))
-        scene.handleWheelEvent(pos,new Point(e.deltaX, e.deltaY))
+        scene.handleWheelEvent(pos, new Point(e.deltaX, e.deltaY))
     })
-    // scene.onShouldJustRedraw(() => shouldRedrawIfDirty())
-    // scene.onShouldRedraw(() => shouldRedrawIfDirty())
     scene.setCanvas(canvas)
     scene.setSize(size)
-    shouldRedrawIfDirty()
+    repaintLoop()
 
 })
 

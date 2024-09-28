@@ -531,7 +531,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             })
             map.set(ch,node)
             metrics.non_expander_total_length += node.settings.size.h
-            metrics.total_children_length += node.settings.size.w
+            metrics.total_children_length += node.settings.size.h
             metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
             metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
         })
@@ -543,7 +543,8 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
 
         let children = this.settings.children.map(ch => map.get(ch) as GRenderNode)
-        // contentBounds.h = metrics.total_children_length
+        contentBounds.h = metrics.total_children_length
+        if(this.settings.fixedHeight) contentBounds.h = this.settings.fixedHeight
         fullBounds = contentBounds.growInsets(getTotalInsets(this.settings))
 
         return new GRenderNode({
