@@ -1,5 +1,6 @@
 import {Point} from "josh_js_util";
 import {LOGICAL_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
+import {MKeyboardEvent} from "./base.js";
 
 export const META_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CONTROL_RIGHT','CONTROL_LEFT','SHIFT_LEFT','SHIFT_RIGHT',
     LOGICAL_KEYBOARD_CODE.META_LEFT, LOGICAL_KEYBOARD_CODE.META_RIGHT
@@ -66,18 +67,22 @@ export type KeyActionArgs = {
     selection: TextSelection
     key: LogicalKeyboardCode,
     mods:KeyboardModifiers,
+    delegate?:KeyAction
 }
-type KeyAction = (args: KeyActionArgs) => { text: string, pos: Point, selection:TextSelection }
+export type KeyActionResults = { text:string, pos:Point, selection:TextSelection }
+export type KeyAction = (args: KeyActionArgs) => KeyActionResults
 
-class ActionMap {
-    actions: Map<string, any>;
+export class ActionMap {
+    private actions: Map<string, KeyAction>;
     keystrokes: Map<any, any>;
     controls: Map<string, string>
     shifts: Map<string, string>
     alts: Map<string, string>
     metas: Map<string, string>
+    private parent: ActionMap | undefined;
 
-    constructor() {
+    constructor(parent?:ActionMap) {
+        this.parent = parent
         this.actions = new Map()
         this.keystrokes = new Map()
         this.controls = new Map()
@@ -86,8 +91,8 @@ class ActionMap {
         this.metas = new Map()
     }
 
-    addAction(name: string, cb: KeyAction) {
-        this.actions.set(name, cb)
+    addAction(name: string, action: KeyAction) {
+        this.actions.set(name, action)
     }
 
     match(e: KeyStrokeDef): string | undefined {
@@ -95,7 +100,10 @@ class ActionMap {
         if (e.control) return this.controls.get(e.key)
         if (e.alt) return this.alts.get(e.key)
         if (e.meta) return this.metas.get(e.key)
-        return this.keystrokes.get(e.key)
+        let kk = this.keystrokes.get(e.key)
+        if(kk) return kk
+        if(this.parent) return this.parent.match(e)
+        return undefined
     }
 
     registerKeystroke(def: KeyStrokeDef, action: string) {
@@ -116,6 +124,26 @@ class ActionMap {
             return
         }
         this.keystrokes.set(def.key, action)
+    }
+
+    size() {
+        return this.actions.size
+    }
+
+    getAction(action_name: string):KeyAction | undefined {
+        if(this.actions.has(action_name)) return this.actions.get(action_name)
+        if(this.parent) return this.parent.getAction(action_name)
+        return undefined
+    }
+
+    doAction(name: string, text: string, pos: Point, kbe: MKeyboardEvent, selection: TextSelection, mods: KeyboardModifiers):KeyActionResults {
+        if(this.actions.has(name)) {
+            let act = this.actions.get(name) as KeyAction
+            let parent = this.parent?.getAction(name)
+            return act({text:text,pos:pos,selection:selection, mods:mods,key:kbe.key, delegate:parent})
+        } else {
+            throw new Error("insert-character action not found")
+        }
     }
 }
 

@@ -11,7 +11,7 @@ import {TabbedBox} from "../tabbedBox.js";
 import {MWindow} from "../window.js";
 import {TodoListDemo} from "../todolist.js";
 import {Size} from "josh_js_util";
-import {TextBox} from "../textinput.js";
+import {NumberBox, TextBox} from "../textinput.js";
 import {Style} from "../style.js";
 import {MinesweeperApp} from "./minesweeper.js";
 
@@ -308,15 +308,27 @@ export function makeTabs(): GElement {
 }
 
 export function makeTextInput() {
-    return TextBox({
-        multiline:false,
-        fixedWidth: 300,
-        // fixedHeight: 300,
-        fontSettings: {
-            font:Style.base().font,
-            fontSize: 50,
-            fontWeight: Style.base().fontWeight,
-        }
+    return VBox({
+        children:[
+            TextBox({
+                multiline:false,
+                fixedWidth: 300,
+                fontSettings: {
+                    font:Style.base().font,
+                    fontSize: 50,
+                    fontWeight: Style.base().fontWeight,
+                }
+            }),
+            NumberBox({
+                value:56,
+                fixedWidth: 300,
+                fontSettings: {
+                    font:Style.base().font,
+                    fontSize: 50,
+                    fontWeight: Style.base().fontWeight,
+                }
+            })
+        ]
     })
 }
 export function LayoutTest() {

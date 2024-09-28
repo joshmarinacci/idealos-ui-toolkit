@@ -1,6 +1,6 @@
 import {
     CEvent,
-    ElementSettings,
+    ElementSettings, FontSettings,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -15,10 +15,10 @@ import {Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {RenderContext} from "./gfx.js";
 import {KEY_VENDOR} from "./keys.js";
-import {ACTION_MAP, KeyActionArgs, KeyboardModifiers, META_KEYS, TextSelection} from "./actions.js";
+import {ACTION_MAP, ActionMap, KeyActionArgs, KeyboardModifiers, META_KEYS, TextSelection} from "./actions.js";
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
-import {LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode} from "./keyboard.js";
+import {LOGICAL_KEYBOARD_CODE, LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode} from "./keyboard.js";
 
 
 ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
@@ -236,6 +236,29 @@ ACTION_MAP.addAction('select-all',(args:KeyActionArgs) => {
     }
 })
 
+const NUMBER_ACTION_MAP = new ActionMap(ACTION_MAP)
+
+function isDigit(key: LogicalKeyboardCode) {
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_1) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_2) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_3) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_4) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_5) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_6) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_7) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_8) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_9) return true
+    if (key === LOGICAL_KEYBOARD_CODE.DIGIT_0) return true
+    return false
+}
+
+NUMBER_ACTION_MAP.addAction('insert-character',(args:KeyActionArgs) => {
+    console.log("key is",args.key)
+    if(isDigit(args.key)) return args.delegate(args)
+    if(args.key === LOGICAL_KEYBOARD_CODE.BACKSPACE) return args.delegate(args)
+    return {text:args.text, pos:args.pos,selection: args.selection}
+})
+
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
 export type TextInputElementSettings = {
@@ -244,6 +267,7 @@ export type TextInputElementSettings = {
     multiline?: boolean
     fixedWidth?: number,
     fixedHeight?: number,
+    actionMap?:ActionMap,
 } & ElementSettings
 
 export class TextModel {
@@ -306,7 +330,7 @@ export class TextModel {
     }
 }
 
-function processText(text: string, pos: Point, kbe: MKeyboardEvent, selection: TextSelection): [string, Point, TextSelection] {
+function processText(actionMap:ActionMap, text: string, pos: Point, kbe: MKeyboardEvent, selection: TextSelection): [string, Point, TextSelection] {
     if (META_KEYS.includes(kbe.key)) return [text, pos, selection]
     const mods:KeyboardModifiers = {
         shift: kbe.shift,
@@ -315,19 +339,19 @@ function processText(text: string, pos: Point, kbe: MKeyboardEvent, selection: T
         control: kbe.control
     }
     const key = kbe.key
-    let action_name = ACTION_MAP.match(kbe)
-    // console.log('TEXT_INPUT: action:',action_name, 'pos',cursorPosition, 'sel',selection)
+    let action_name = actionMap.match(kbe)
+    // console.log('TEXT_INPUT: action:',action_name, 'pos',pos, 'sel',selection)
     if (action_name) {
-        let action_impl = ACTION_MAP.actions.get(action_name)
-        // console.log("TEXT_INPUT: ",action_name)
+        let action_impl = actionMap.getAction(action_name)
+        console.log("TEXT_INPUT: ",action_name)
         if (action_impl) {
-            let res = ACTION_MAP.actions.get(action_name)({text, pos, key, selection, mods})
+            let res = action_impl({text, pos, key, selection, mods})
             return [res.text, res.pos, res.selection]
         } else {
             console.warn(`missing action for '${action_name}'`)
         }
     }
-    let res = ACTION_MAP.actions.get('insert-character')({text, pos, key, selection, mods})
+    let res = actionMap.doAction('insert-character',text,pos,kbe,selection,mods)
     return [res.text, res.pos, res.selection]
 }
 
@@ -345,6 +369,7 @@ export class TextInputElement implements GElement {
                 fontSize: Style.base().fontSize,
                 fontWeight: Style.base().fontWeight,
             },
+            actionMap:opts.actionMap || ACTION_MAP
         }
     }
 
@@ -465,7 +490,9 @@ export class TextInputElement implements GElement {
                 if (e.type === 'keyboard-typed') {
                     if (!focused) setFocused(true)
                     let kbe = e as MKeyboardEvent;
-                    let t2 = processText(textString, cursorPosition, kbe, selection)
+                    let t2 = processText(
+                        (this.settings.actionMap || ACTION_MAP),
+                        textString, cursorPosition, kbe, selection)
                     setText(t2[0])
                     setCursorPosition(t2[1])
                     setSelection(t2[2])
@@ -525,4 +552,16 @@ export class TextInputElement implements GElement {
 
 export function TextBox(param: TextInputElementSettings): GElement {
     return new TextInputElement(param)
+}
+export type NumberBoxSettings = {
+    value: number,
+    fixedWidth?:number,
+    fontSettings?: FontSettings
+}
+export function NumberBox(param: NumberBoxSettings):GElement {
+    return new TextInputElement({
+        fixedWidth:param.fixedWidth,
+        fontSettings: param.fontSettings,
+        actionMap:NUMBER_ACTION_MAP,
+    })
 }
