@@ -164,6 +164,8 @@ export class MHBoxElement extends BoxElementBase implements GElement {
                 space: new Size(leftover_per_child, contentBounds.h),
                 layout: this.settings.mainAxisSelfLayout,
             })
+            metrics.max_child_width = Math.max(node.settings.size.w, metrics.max_child_width)
+            metrics.max_child_height = Math.max(node.settings.size.h, metrics.max_child_height)
             map.set(ch, node)
         })
 
