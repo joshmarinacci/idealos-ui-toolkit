@@ -161,12 +161,20 @@ export function makeCompsDemo() {
             HBox({
                 children: [
                     Label({ text:'inputs'}),
-                    TextBox({
-                        text: {
-                            get: () => state.textInputValue,
-                            set: (value) => state.textInputValue = value,
-                        },
-                        fixedWidth: 200,
+                    VBox({
+                        children:[
+                            TextBox({
+                                text: {
+                                    get: () => state.textInputValue,
+                                    set: (value) => state.textInputValue = value,
+                                },
+                                fixedWidth: 100,
+                            }),
+                            NumberBox({
+                                value:55,
+                                fixedWidth: 100,
+                            })
+                        ]
                     }),
                     TextBox({
                         // text:'multi-line text area',

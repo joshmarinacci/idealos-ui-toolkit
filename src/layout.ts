@@ -443,6 +443,10 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             fullBounds.w = metrics.max_child_width + getTotalInsets(this.settings).width()
         }
 
+        if(this.settings.mainAxisSelfLayout === 'grow') {
+            fullBounds.h = metrics.total_children_length + getTotalInsets(this.settings).height()
+        }
+
         this.log.info(`content bounds ${contentBounds}`)
         this.log.info   (`full bounds ${fullBounds}`)
 

@@ -46,10 +46,13 @@ export function IconButton(opts: IconButtonRequired) {
         borderWidth: opts.ghost ? Style.button().borderWidth : opts.borderWidth || Style.button().borderWidth,
         borderRadius: opts.borderRadius || Style.button().borderRadius,
         children: [
-            new IconElement({icon: opts.icon, shadow:true, }),//fontSize:opts.fontSize,}),
+            new IconElement({
+                fontSize: opts.fontSettings?.fontSize,
+                icon: opts.icon, shadow:true,
+            }),
             new TextElement({
                 padding: ZERO_INSETS,
-                fontSettings: {
+                fontSettings: opts.fontSettings || {
                     font: Style.button().font,
                     fontSize: Style.button().fontSize,
                     fontWeight: Style.button().fontWeight,

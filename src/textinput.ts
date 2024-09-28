@@ -20,7 +20,7 @@ import {ACTION_MAP, ActionMap, KeyActionArgs, KeyboardModifiers, META_KEYS, Text
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
 import {LOGICAL_KEYBOARD_CODE, LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode} from "./keyboard.js";
-import {HBox} from "./layout.js";
+import {HBox, VBox} from "./layout.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
 
@@ -566,7 +566,7 @@ export function NumberBox(param: NumberBoxSettings):GElement {
     const key = KEY_VENDOR.getKey()
     let [value, setValue] = useState(key, "num", undefined, () => 0)
     const input = new TextInputElement({
-            fixedWidth:param.fixedWidth,
+            // fixedWidth:param.fixedWidth,
             fontSettings: param.fontSettings,
             actionMap:NUMBER_ACTION_MAP,
             text: {
@@ -579,14 +579,39 @@ export function NumberBox(param: NumberBoxSettings):GElement {
             }
         })
     const increment = (e:CEvent) => {
-        if(e.type === 'mouse-down') setValue(value+1)
+        if(e.type === 'mouse-down') {
+            setValue(value+1)
+            e.redraw()
+        }
     }
     const decrement = (e:CEvent) => {
-        if(e.type === 'mouse-down') setValue(value-1)
+        if(e.type === 'mouse-down') {
+            setValue(value-1)
+            e.redraw()
+        }
     }
-    return HBox({children:[
+    return HBox({
+        fixedWidth: param.fixedWidth,
+        mainAxisSelfLayout:'grow',
+        crossAxisSelfLayout:'shrink',
+        children:[
             input,
-            IconButton({icon:Icons.KeyboardArrowUp, handleEvent:(increment)}),
-            IconButton({icon:Icons.KeyboardArrowDown, handleEvent:(decrement)}),
+            VBox({
+                children:[
+                    IconButton({
+                        padding: Insets.from(1),
+                        fontSettings: {
+                            fontSize: 10,
+                        },
+                        icon:Icons.KeyboardArrowUp, handleEvent:(increment)
+                    }),
+                    IconButton({
+                        padding: Insets.from(1),
+                        fontSettings: {
+                            fontSize: 10,
+                        },
+                        icon:Icons.KeyboardArrowDown, handleEvent:(decrement)
+                    }),
+            ]}),
     ]})
 }

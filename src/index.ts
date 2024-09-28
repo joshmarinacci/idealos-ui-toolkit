@@ -128,7 +128,7 @@ MGlobals.set(STATE_CACHE, new StateCache())
 
 function shouldRedrawIfDirty() {
     if(scene.isDirty()) {
-        console.log("redrawing")
+        // console.log("redrawing")
         scene.layout()
         scene.redraw()
     } else {
