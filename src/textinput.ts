@@ -1,6 +1,7 @@
 import {
     CEvent,
-    ElementSettings, FontSettings,
+    ElementSettings,
+    FontSettings,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -19,6 +20,9 @@ import {ACTION_MAP, ActionMap, KeyActionArgs, KeyboardModifiers, META_KEYS, Text
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
 import {LOGICAL_KEYBOARD_CODE, LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode} from "./keyboard.js";
+import {HBox} from "./layout.js";
+import {IconButton} from "./buttons.js";
+import {Icons} from "./icons.js";
 
 
 ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
@@ -343,7 +347,7 @@ function processText(actionMap:ActionMap, text: string, pos: Point, kbe: MKeyboa
     // console.log('TEXT_INPUT: action:',action_name, 'pos',pos, 'sel',selection)
     if (action_name) {
         let action_impl = actionMap.getAction(action_name)
-        console.log("TEXT_INPUT: ",action_name)
+        // console.log("TEXT_INPUT: ",action_name)
         if (action_impl) {
             let res = action_impl({text, pos, key, selection, mods})
             return [res.text, res.pos, res.selection]
@@ -559,9 +563,30 @@ export type NumberBoxSettings = {
     fontSettings?: FontSettings
 }
 export function NumberBox(param: NumberBoxSettings):GElement {
-    return new TextInputElement({
-        fixedWidth:param.fixedWidth,
-        fontSettings: param.fontSettings,
-        actionMap:NUMBER_ACTION_MAP,
-    })
+    const key = KEY_VENDOR.getKey()
+    let [value, setValue] = useState(key, "num", undefined, () => 0)
+    const input = new TextInputElement({
+            fixedWidth:param.fixedWidth,
+            fontSettings: param.fontSettings,
+            actionMap:NUMBER_ACTION_MAP,
+            text: {
+                get:() => value+"",
+                set:(v) => {
+                    let vv = parseInt(v)
+                    if(isNaN(vv)) vv = 0
+                    setValue(vv)
+                }
+            }
+        })
+    const increment = (e:CEvent) => {
+        if(e.type === 'mouse-down') setValue(value+1)
+    }
+    const decrement = (e:CEvent) => {
+        if(e.type === 'mouse-down') setValue(value-1)
+    }
+    return HBox({children:[
+            input,
+            IconButton({icon:Icons.KeyboardArrowUp, handleEvent:(increment)}),
+            IconButton({icon:Icons.KeyboardArrowDown, handleEvent:(decrement)}),
+    ]})
 }
