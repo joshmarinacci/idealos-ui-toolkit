@@ -28,6 +28,7 @@ export type BoxRequirements = {
     fixedHeight?: number
     visualStyle: VisualStyle
     clip?:boolean
+    debug?:boolean
 } & ElementSettings
 
 export type BoxOptions = {
@@ -40,6 +41,7 @@ export type BoxOptions = {
     children: GElement[],
     visualStyle?: VisualStyle
     clip?:boolean
+    debug?:boolean
 } & ElementSettings;
 
 export type BoxConstraints = {
@@ -57,7 +59,7 @@ class BoxElementBase {
     constructor(settings: BoxRequirements) {
         this.settings = settings
         this.log = make_logger(this.settings.kind)
-        this.log.setEnabled(false)
+        this.log.setEnabled(settings.debug||false)
     }
 
     protected getConstraints():BoxConstraints {
@@ -280,8 +282,6 @@ export class MHBoxElement extends BoxElementBase implements GElement {
         if(main === 'end') x = contentBounds.x + leftover
         if(main === 'between') gap = leftover / (this.settings.children.length - 1)
 
-        this.log.info(`mainAxisLayout is ${this.settings.mainAxisLayout}`)
-        this.log.info("starting x at",x)
         this.settings.children.forEach(ch => {
             let node = map.get(ch) as GRenderNode
             node.settings.pos = withX(node.settings.pos,x)
@@ -502,6 +502,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
     }
 
     private do_shrink_layout(rc: RenderContext, cons: LayoutConstraints) {
+        this.log.info("do_shrink_layout")
         let key = this.settings.key || KEY_VENDOR.getKey()
         let chs = this.settings.children
         let map = new Map<GElement, GRenderNode>()
@@ -536,6 +537,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
         })
         KEY_VENDOR.endElement(this)
 
+        this.log.info("metrics",metrics)
         this.do_main_layout_position(contentBounds, map, metrics)
         this.do_cross_layout_position(contentBounds,  map)
 

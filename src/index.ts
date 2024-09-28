@@ -10,7 +10,7 @@ import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
 import {DrawingApp} from "./apps/drawing.js";
 import {EmailDemo} from "./apps/email.js";
 
-const size = new Size(800, 500)
+const size = new Size(800, 400)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',

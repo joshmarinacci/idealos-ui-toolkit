@@ -105,6 +105,7 @@ const EmailMessRenderer: ListItemRenderer<typeof EmailMessage> = (item, selected
         children: [
             VBox({
                 shadow: true,
+                debug:false,
                 mainAxisSelfLayout: 'shrink',
                 crossAxisSelfLayout:'grow',
                 padding: Insets.from(4),

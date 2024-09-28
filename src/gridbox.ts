@@ -18,6 +18,7 @@ type GridBoxOptions = {
     children: GElement[],
     columns: GridColumn[],
     rows: GridRow[],
+    debug?:boolean
 }
 
 class GridBoxElement implements GElement {
@@ -27,6 +28,7 @@ class GridBoxElement implements GElement {
     constructor(opts: GridBoxOptions) {
         this.settings = opts
         this.log = make_logger("GRID_BOX")
+        this.log.setEnabled(opts.debug||false)
     }
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
