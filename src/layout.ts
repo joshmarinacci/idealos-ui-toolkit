@@ -27,6 +27,7 @@ export type BoxRequirements = {
     fixedWidth?: number
     fixedHeight?: number
     visualStyle: VisualStyle
+    clip?:boolean
 } & ElementSettings
 
 export type BoxOptions = {
@@ -38,6 +39,7 @@ export type BoxOptions = {
     crossAxisLayout?: AxisLayout,
     children: GElement[],
     visualStyle?: VisualStyle
+    clip?:boolean
 } & ElementSettings;
 
 export type BoxConstraints = {

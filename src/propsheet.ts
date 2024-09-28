@@ -154,7 +154,7 @@ export function PropSheet(rect: ObjMap<unknown> | undefined) {
         })
     }
     return VBox({
-        fixedWidth: 300,
+        fixedWidth: 200,
         mainAxisLayout: 'start',
         borderWidth: Insets.from(1),
         padding: Insets.from(3),

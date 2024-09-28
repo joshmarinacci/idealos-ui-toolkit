@@ -156,7 +156,7 @@ function DocTree() {
     //     nodeRenderer:RenderShapeNode
     // })
     return VBox({
-        fixedWidth: 200,
+        fixedWidth: 100,
         borderWidth: Insets.from(1),
         visualStyle: {
             borderColor: "black",

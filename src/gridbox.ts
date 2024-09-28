@@ -65,7 +65,7 @@ class GridBoxElement implements GElement {
                     layout: "grow",
                 })
                 node.settings.pos = rect.position().copy()
-                node.settings.size = rect.size().copy()
+                // node.settings.size = rect.size().copy()
                 // console.log("node", node.settings.kind, node.settings.pos, node.settings.size)
                 boxes.push(node)
             }

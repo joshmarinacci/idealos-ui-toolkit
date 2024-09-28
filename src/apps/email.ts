@@ -210,9 +210,9 @@ export function EmailDemo() {
                     IconButton({icon: Icons.DeleteForever, ghost: true}),
                     IconButton({icon: Icons.Delete, ghost: true}),
                     // HSep(),
-                    // IconButton({icon: Icons.Snooze, ghost: true}),
+                    IconButton({icon: Icons.Snooze, ghost: true}),
                     IconButton({icon: Icons.Reply, ghost: true}),
-                    // IconButton({icon: Icons.ReplyAll, ghost: true}),
+                    IconButton({icon: Icons.ReplyAll, ghost: true}),
                     IconButton({icon: Icons.Forward, ghost: true}),
                     // HSep()
                     // IconButton({icon: Icons.LeftPanelCloseIcon, ghost: true}),
@@ -220,6 +220,7 @@ export function EmailDemo() {
             }),
             ScrollContainer({
                 child: ListView({
+                    mainAxisSelfLayout:'grow',
                     data: AppState.get('email_folders'),
                     selected: atomAsStateHandler(AppState.get('selectedFolder')),
                     renderItem: EmailFolderRenderer,

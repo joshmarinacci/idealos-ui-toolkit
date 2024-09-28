@@ -7,8 +7,10 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {makeListDemo, makeScrollDemo, makeTabs, makeTextInput} from "./apps/demo.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
+import {DrawingApp} from "./apps/drawing.js";
+import {EmailDemo} from "./apps/email.js";
 
-const size = new Size(600, 400)
+const size = new Size(800, 500)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -120,7 +122,7 @@ const scene = new CanvasScene({
     size:size,
     debug_enabled:true,
 })
-scene.setComponentFunction(makeTabs)
+scene.setComponentFunction(EmailDemo)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

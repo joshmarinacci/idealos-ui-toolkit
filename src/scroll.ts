@@ -1,7 +1,6 @@
 import {CEvent, GElement, GRenderNode, LayoutConstraints, TRANSPARENT, useState, ZERO_INSETS, ZERO_POINT} from "./base.js";
 import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {RenderContext} from "./gfx.js";
-import {Button} from "./buttons.js";
 import {KEY_VENDOR} from "./keys.js";
 import {Style} from "./style.js";
 
@@ -54,100 +53,7 @@ class ScrollContainerElement implements GElement {
                 e.redraw()
             }
         }
-        ;//this.param.onScrollChanged
-        // console.log("actual child",child.settings.size)
         let children = [child]
-        // bottom scroll bar
-        // {
-        //     let key =  KEY_VENDOR.getKey()
-        //     let bar = new GRenderNode({
-        //         key:key,
-        //         size: new Size(contentBounds.w-barInsets.right,barInsets.bottom),
-        //         pos: contentBounds.bottom_left().subtract(new Point(0,barInsets.right)),
-        //         baseline: 0,
-        //         borderWidth: ZERO_INSETS,
-        //         children: [],
-        //         contentOffset: ZERO_POINT,
-        //         font: "",
-        //         kind: "scroll-bar",
-        //         padding: ZERO_INSETS,
-        //         text: "",
-        //         visualStyle: {
-        //             borderColor: TRANSPARENT,
-        //             background: 'magenta',
-        //             textColor: 'magenta'
-        //         },
-        //     })
-        //     children.push(bar)
-        // }
-        //bottom scroll thumb
-        // {
-        //     let key = KEY_VENDOR.getKey()
-        //     let bar = new GRenderNode({
-        //         key:key,
-        //         size: new Size(20,barInsets.bottom),
-        //         pos: contentBounds.bottom_left().subtract(new Point(-10-scrollOffset.x,barInsets.bottom)),
-        //         baseline: 0,
-        //         borderWidth: ZERO_INSETS,
-        //         children: [],
-        //         contentOffset: ZERO_POINT,
-        //         font: "",
-        //         kind: "thumb",
-        //         padding: ZERO_INSETS,
-        //         text: "",
-        //         visualStyle: {
-        //             borderColor: TRANSPARENT,
-        //             background: 'cyan',
-        //             textColor: 'magenta'
-        //         },
-        //         handleEvent:(e) => {
-        //             if(e.type === 'mouse-down') {
-        //                 setDown(true)
-        //                 e.redraw()
-        //                 return
-        //             }
-        //             if(e.type === 'mouse-move' && down) {
-        //                 let so = scrollOffset.copy()
-        //                 so.x -= e.delta.x
-        //                 if(so.x > 0) so.x = 0
-        //                 if(so.x < -contentBounds.w) {
-        //                     so.x = -contentBounds.w
-        //                 }
-        //                 setScrollOffset(so)
-        //                 e.use()
-        //                 e.redraw()
-        //             }
-        //             if(e.type === 'mouse-up') {
-        //                 setDown(false)
-        //             }
-        //         }
-        //     })
-        //     children.push(bar)
-        // }
-        // right scroll bar
-        // {
-        //     let key =  KEY_VENDOR.getKey()
-        //     let bar = new GRenderNode({
-        //         key:key,
-        //         size: new Size(barInsets.right,contentBounds.h - barInsets.bottom),
-        //         pos: contentBounds.top_right().subtract(new Point(barInsets.right,0)),
-        //         baseline: 0,
-        //         borderWidth: ZERO_INSETS,
-        //         children: [],
-        //         contentOffset: ZERO_POINT,
-        //         font: "",
-        //         kind: "scroll-bar",
-        //         padding: ZERO_INSETS,
-        //         text: "",
-        //         visualStyle: {
-        //             borderColor: TRANSPARENT,
-        //             background: 'magenta',
-        //             textColor: 'magenta'
-        //         }
-        //     })
-        //     children.push(bar)
-        // }
-        // right thumb
         let ah = child.settings.size.h
         let vh = viewport_size.h
         let y_fract = vh/ah
@@ -171,8 +77,7 @@ class ScrollContainerElement implements GElement {
             let key = KEY_VENDOR.getKey()
             let thumb = new GRenderNode({
                 key:key,
-                size: y_thumb_size,//new Size(barInsets.right,20),
-                // pos: contentBounds.top_right().copy(),
+                size: y_thumb_size,
                 pos: new Point(contentBounds.w-barInsets.right,y_thumb_y),
                 baseline:0,
                 borderWidth: ZERO_INSETS,

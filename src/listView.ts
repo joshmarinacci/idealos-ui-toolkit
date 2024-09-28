@@ -102,6 +102,7 @@ export function ListView<T>(opts: ListViewParameters<T>): GElement {
         fixedHeight: opts.fixedHeight,
         kind: 'list-view',
         key: key,
+        clip:true,
         visualStyle: {
             borderColor: Style.panel().borderColor,
             textColor: Style.base().textColor,
