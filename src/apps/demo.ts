@@ -16,6 +16,8 @@ import {Style} from "../style.js";
 import {makeMinesweeperApp} from "./minesweeper.js";
 import {makeWeatherApp} from "./weather.js";
 import {makeClockApp} from "./clock.js";
+import {ContactsApp} from "./contacts.js";
+import {TextEditor} from "./texteditor.js";
 
 
 const state = {
@@ -313,27 +315,33 @@ export function makeTabs(): GElement {
     const mine_scroll = ScrollContainer({
         child:mine_app,
     })
+    const contacts = ContactsApp()
+    const textEditor = TextEditor()
 
     let tabs = TabbedBox({
         titles: [
             'Components',
-            'List View',
-            'Panels',
+            // 'List View',
+            // 'Panels',
             'Email',
             'Todo List',
             'Minesweeper',
             'Clock',
             'Weather',
+            'Contacts',
+            'Editor',
         ],
         children: [
             compsDemo,
-            listviewDemo,
-            panelDemo,
+            // listviewDemo,
+            // panelDemo,
             emailDemo,
             todoDemo,
             mine_scroll,
             clock_app,
-            weatherApp
+            weatherApp,
+            contacts,
+            textEditor,
         ],
     })
     return MWindow({child: tabs, initSize: new Size(700,300)})
