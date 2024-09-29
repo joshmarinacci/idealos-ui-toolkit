@@ -80,7 +80,7 @@ class ScrollContainerElement implements GElement {
                 size: y_thumb_size,
                 pos: new Point(contentBounds.w-barInsets.right,y_thumb_y),
                 baseline:0,
-                borderWidth: ZERO_INSETS,
+                borderWidth: Insets.from(1),
                 children: [],
                 contentOffset: ZERO_POINT,
                 font: "",
@@ -88,8 +88,8 @@ class ScrollContainerElement implements GElement {
                 padding: ZERO_INSETS,
                 text: "",
                 visualStyle:{
-                    borderColor: TRANSPARENT,
-                    background: y_enabled?'cyan':'#ccc',
+                    borderColor: Style.selectedButton().borderColor,
+                    background: y_enabled?Style.selectedButton().backgroundColor:'#ccc',
                     textColor: 'magenta'
                 },
                 handleEvent:(e) => {
