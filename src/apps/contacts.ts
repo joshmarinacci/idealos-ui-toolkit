@@ -93,21 +93,20 @@ function ContactPanel(opts: { contact: typeof Contact }) {
                     Label({text: `${con.get('first').get()} ${con.get('last').get()}`}),
                 ]
             }),
-            Label({text:`age: ${con.get('age').get()}`}),
+            HBox({children:[
+                    Label({text:'age'}),
+                    Label({text:con.get('age').get()+""}),
+            ]}),
             VBox({
                 children: con.get('phone').map(p => {
-                    console.log("phone",p)
-                        return Label({
-                            text:'type: '
-                                + p.get('type').get()
-                                + ' '
-                                + p.get('number').get()
-                        })
+                    return HBox({children:[
+                            Label({text:p.get('type').get()}),
+                            Label({text:p.get('number').get()}),
+                        ]})
                     })
             })
         ]
     })
-
 }
 
 export function ContactsApp() {
@@ -115,6 +114,7 @@ export function ContactsApp() {
     const add = () => {
         const contact = Contact.cloneWith({first: 'first', last: 'last'})
         console.log("made a contact", contact)
+        AppState.get('contacts').push(contact)
         // setSelected(contact)
     }
     return VBox({
