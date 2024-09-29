@@ -4,11 +4,12 @@ import {ListItemRenderer, ListView, ListViewItem} from "../listView.js";
 import {Button, DropdownButton, IconButton, ToggleGroup} from "../buttons.js";
 import {Label, WrappingLabel} from "../text.js";
 import {Icon, Icons} from "../icons.js";
-import {ObjAtom, Schema} from "rtds-core"
-import {CEvent, StateHandler} from "../base.js";
+import {Schema} from "rtds-core"
+import {CEvent} from "../base.js";
 import {GridBox} from "../gridbox.js"
 
 import {Insets} from "josh_js_util";
+import {atomAsStateHandler} from "../util.js";
 
 
 const S = new Schema()
@@ -158,14 +159,6 @@ function EmailBody(selectedMessage: typeof EmailMessage) {
         child: WrappingLabel({
         text: selectedMessage.get('body').get(),
     })})
-}
-
-function atomAsStateHandler<T>(atom: ObjAtom<T>) {
-    const hand: StateHandler<T> = {
-        get: () => atom.get(),
-        set: (v: T) => atom.set(v)
-    }
-    return hand
 }
 
 export function makeEmailApp() {

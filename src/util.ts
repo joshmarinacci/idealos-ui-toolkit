@@ -110,3 +110,11 @@ export function intersectBounds(b1: Bounds, b2: Bounds) {
 export function isBoundsValid(bounds: Bounds) {
     return bounds.w > 0 && bounds.h > 0
 }
+
+export function atomAsStateHandler<T>(atom: ObjAtom<T>) {
+    const hand: StateHandler<T> = {
+        get: () => atom.get(),
+        set: (v: T) => atom.set(v)
+    }
+    return hand
+}
