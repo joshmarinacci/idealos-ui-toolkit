@@ -12,7 +12,7 @@ export function makeClockApp() {
         setTime(Date.now())
         const scene = MGlobals.get(Scene.name)
         scene.markDirty()
-    }, 100)
+    }, 100*100)
     return new TextElement({
         text: `${new Intl.DateTimeFormat("en-US", {
             timeStyle: 'medium',

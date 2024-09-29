@@ -1,4 +1,4 @@
-import {Point} from 'josh_js_util'
+import {Insets, Point} from 'josh_js_util'
 import {AGrid2D, ObjAtom, Schema} from 'rtds-core'
 import {Button} from "../buttons.js";
 import {Grid2DView} from "../grid2d.js";
@@ -110,23 +110,35 @@ function makeCellView( grid: MSGridType, cell: CellType, index: Point, _size: nu
         text = `${calcAdjacent(grid,index)}`
     }
     let bg = '#ccc'
-    if(cell.get('flag').get()) bg = 'blue'
+    let bg_hover = '#fff'
+    if(cell.get('flag').get()) {
+        bg = 'blue'
+        bg_hover = '#88f'
+    }
     if(cell.get('revealed').get()) {
         if(cell.get('bomb').get()) {
             bg = 'red'
+            bg_hover = '#f88'
             text = "X"
         } else {
             bg = 'white'
+            bg_hover = '#eee'
         }
     }
     useRefresh(key,cell)
     return Button({
         key:key,
         text:text,
+        borderWidth: Insets.from(3),
         visualStyle: {
             background: bg,
             borderColor: "blue",
             textColor: "blue",
+        },
+        hoverStyle: {
+            background: bg_hover,
+            borderColor:'red',
+            textColor: 'blue',
         },
         handleEvent:(e) => {
             if(e.type === 'mouse-down') {

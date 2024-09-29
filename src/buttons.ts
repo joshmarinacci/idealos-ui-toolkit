@@ -89,7 +89,7 @@ export const Button = (opts: ButtonParameters) => {
             borderColor: opts.visualStyle?.borderColor || Style.button().borderColor,
             textColor: Style.button().textColor,
         },
-        hoverStyle: {
+        hoverStyle: opts.hoverStyle || {
             background:opts.selected?Style.selectedButton().hoverBackgroundColor:Style.button().hoverBackgroundColor,
             borderColor: Style.button().borderColor,
             textColor: Style.button().textColor,
