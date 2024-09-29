@@ -125,10 +125,8 @@ ACTION_MAP.addAction('selection-prev-line',(args:KeyActionArgs) => {
     if(pos.y > 0) {
         pos.y -= 1
     }
-    console.log("now pos is",pos)
     if(sel.isActive()) {
         sel = new TextSelection(model.posToIndex(pos),sel.end,true)
-        console.log("new sel",sel)
         return {
             text:model.toText(),
             pos:pos,
@@ -136,7 +134,6 @@ ACTION_MAP.addAction('selection-prev-line',(args:KeyActionArgs) => {
         }
     } else {
         sel = new TextSelection(model.posToIndex(pos), model.posToIndex(args.pos),true)
-        console.log("new sel",sel)
         return {
             text:model.toText(),
             pos:pos,
@@ -379,10 +376,10 @@ export class TextModel {
     }
 
     deleteCharsAt(selection: TextSelection) {
-        // let line = this.lines[selection.start.y]
         let before = this.text.substring(0, selection.start)
         let after = this.text.substring(selection.end)
         this.text = before + after
+        // console.log("deleting",selection,`becomes -${before}-${after}-`)
         this._resplit()
     }
 
