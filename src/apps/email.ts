@@ -168,7 +168,7 @@ function atomAsStateHandler<T>(atom: ObjAtom<T>) {
     return hand
 }
 
-export function EmailDemo() {
+export function makeEmailApp() {
     return GridBox({
         mainAxisSelfLayout:'grow',
         crossAxisSelfLayout:'grow',

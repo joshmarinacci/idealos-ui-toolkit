@@ -57,7 +57,7 @@ const state = {
     selected: S.number()
 }
 
-export function TodoListDemo() {
+export function makeTodolistDemo() {
     const key = KEY_VENDOR.getKey()
     useRefresh(key,data)
     const addItem = (e: CEvent) => {

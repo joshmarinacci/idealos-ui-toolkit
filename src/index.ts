@@ -6,7 +6,7 @@ import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
-import {EmailDemo} from "./apps/email.js";
+import {makeTabs} from "./apps/demo.js";
 
 const size = new Size(800, 400)
 
@@ -129,7 +129,7 @@ const scene = new CanvasScene({
     debug_enabled: true,
 })
 
-scene.setComponentFunction(EmailDemo)
+scene.setComponentFunction(makeTabs)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

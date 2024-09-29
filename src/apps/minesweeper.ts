@@ -159,7 +159,7 @@ function ReactiveLabel(opts:{ text:ObjAtom<string>}) {
         text:opts.text.get().toString()
     })
 }
-export function MinesweeperApp() {
+export function makeMinesweeperApp() {
     const key = KEY_VENDOR.getKey()
     useRefresh(key,state)
     return VBox({

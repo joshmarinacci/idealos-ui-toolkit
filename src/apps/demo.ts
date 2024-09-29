@@ -1,19 +1,22 @@
 import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "../layout.js";
-import {Label, WrappingLabel} from "../text.js";
+import {Label, TextElement, WrappingLabel} from "../text.js";
 import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "../buttons.js";
 import {IconElement, Icons} from "../icons.js";
 import {HSeparator, Square} from "../comps2.js";
 import {ListView, ListViewItem} from "../listView.js";
 import {ScrollContainer} from "../scroll.js";
-import {GElement, ZERO_INSETS} from "../base.js";
-import {EmailDemo} from "./email.js";
+import {GElement, MGlobals, useState, ZERO_INSETS} from "../base.js";
+import {makeEmailApp} from "./email.js";
 import {TabbedBox} from "../tabbedBox.js";
 import {MWindow} from "../window.js";
-import {TodoListDemo} from "../todolist.js";
-import {Size} from "josh_js_util";
+import {makeTodolistDemo} from "../todolist.js";
+import {Insets, Size} from "josh_js_util";
 import {NumberBox, TextBox} from "../textinput.js";
 import {Style} from "../style.js";
-import {MinesweeperApp} from "./minesweeper.js";
+import {makeMinesweeperApp} from "./minesweeper.js";
+import {KEY_VENDOR} from "../keys.js";
+import {Scene} from "../scene.js";
+import {makeWeatherApp} from "./weather.js";
 
 
 const state = {
@@ -299,13 +302,40 @@ export function testList() {
     })
 }
 
+function makeClockApp() {
+    const key = KEY_VENDOR.getKey()
+    let [time, setTime] = useState<number>(key,"time",undefined,()=>Date.now())
+    setInterval(() => {
+        setTime(Date.now())
+        const scene = MGlobals.get(Scene.name)
+        scene.markDirty()
+    },100)
+    return new TextElement({
+        text:`${new Intl.DateTimeFormat("en-US",{
+            timeStyle:'medium',
+        }).format(time)}`,
+        visualStyle: {
+            textColor:'black'
+        },
+        fontSettings: {
+            font: Style.base().font,
+            fontSize: 80,
+            fontWeight: Style.base().fontWeight,
+        },
+        shadow:false,
+        padding: Insets.from(10),
+    })
+}
+
 export function makeTabs(): GElement {
     const compsDemo = makeCompsDemo()
     const listviewDemo = makeListDemo()
     const panelDemo = makePanelDemo()
-    const emailDemo = EmailDemo()
-    const todoDemo = TodoListDemo()
-    const mine_app = MinesweeperApp()
+    const emailDemo = makeEmailApp()
+    const todoDemo = makeTodolistDemo()
+    const mine_app = makeMinesweeperApp()
+    const clock_app = makeClockApp()
+    const weatherApp = makeWeatherApp()
     const mine_scroll = ScrollContainer({
         child:mine_app,
     })
@@ -317,7 +347,9 @@ export function makeTabs(): GElement {
             'Panels',
             'Email',
             'Todo List',
-            'Minesweeper'
+            'Minesweeper',
+            'Clock',
+            'Weather',
         ],
         children: [
             compsDemo,
@@ -326,9 +358,11 @@ export function makeTabs(): GElement {
             emailDemo,
             todoDemo,
             mine_scroll,
+            clock_app,
+            weatherApp
         ],
     })
-    return MWindow({child: tabs, initSize: new Size(300,300)})
+    return MWindow({child: tabs, initSize: new Size(700,300)})
 }
 
 export function makeTextInput() {
