@@ -5,7 +5,7 @@ import {Bounds, Logger, make_logger, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {Button} from "./buttons.js";
 import {HBox, VBox} from "./layout.js";
-import {AxisLayout, AxisSelfLayout, MGlobals, RenderNodeSettings, ZERO_INSETS} from "./base.js";
+import {AxisLayout, AxisSelfLayout, GRenderNode, MGlobals, RenderNodeSettings, ZERO_INSETS} from "./base.js";
 import {TextBox} from "./textinput.js";
 import {STATE_CACHE, StateCache} from "./state.js";
 class HeadlessRenderingSurface implements RenderingSurface {
@@ -111,6 +111,12 @@ function filterProps(settings: RenderNodeSettings, strings: (keyof RenderNodeSet
             return `${key}: ${settings[key]}`
         }
     }).join("\n")
+}
+
+function dumpKeys(root: GRenderNode, strings: (keyof RenderNodeSettings)[]) {
+    console.log(filterProps(root.settings,strings))
+    root.settings.children.forEach(ch => dumpKeys(ch,strings))
+
 }
 
 describe("layout", () => {
@@ -255,6 +261,7 @@ describe("layout", () => {
         // vbox start
         scene.setComponentFunction(makeBox('grow',"start"))
         scene.layout()
+        // dumpKeys(scene.renderRoot,['key','pos','size'])
         // a two letter button with zero padding & borders is 22x12
         expect(scene.renderRoot.settings.size).toEqual(new Size(22,100))
         expect(scene.renderRoot.settings.children[0].settings.size).toEqual(new Size(22,12))

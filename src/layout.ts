@@ -367,6 +367,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
 
     layout(rc: RenderContext, cons: LayoutConstraints): GRenderNode {
         this.log.info("space = ", cons.layout, cons.space)
+        this.log.info("self  main:", this.settings.mainAxisSelfLayout,'cross:', this.settings.crossAxisSelfLayout)
         if (this.settings.mainAxisSelfLayout === 'grow') {
             return this.do_grow_layout(rc, cons)
         }
@@ -377,6 +378,7 @@ export class MVBoxElement extends BoxElementBase implements GElement {
     }
 
     private do_grow_layout(rc: RenderContext, cons: LayoutConstraints) {
+        this.log.info("do_grow_layout")
         let key = this.settings.key || KEY_VENDOR.getKey()
         let fullBounds = new Bounds(0, 0, 0, 0)
         fullBounds.h = cons.space.h
@@ -445,9 +447,9 @@ export class MVBoxElement extends BoxElementBase implements GElement {
             fullBounds.w = metrics.max_child_width + getTotalInsets(this.settings).width()
         }
 
-        if(this.settings.mainAxisSelfLayout === 'grow') {
-            fullBounds.h = metrics.total_children_length + getTotalInsets(this.settings).height()
-        }
+        // if(this.settings.mainAxisSelfLayout === 'grow') {
+            // fullBounds.h = metrics.total_children_length + getTotalInsets(this.settings).height()
+        // }
 
         this.log.info(`content bounds ${contentBounds}`)
         this.log.info   (`full bounds ${fullBounds}`)

@@ -1,22 +1,21 @@
 import {HBox, HSpacer, MHBoxElement, MVBoxElement, VBox} from "../layout.js";
-import {Label, TextElement, WrappingLabel} from "../text.js";
+import {Label, WrappingLabel} from "../text.js";
 import {Button, CheckBox, IconButton, RadioButton, Tag, ToggleButton, ToggleGroup} from "../buttons.js";
 import {IconElement, Icons} from "../icons.js";
 import {HSeparator, Square} from "../comps2.js";
 import {ListView, ListViewItem} from "../listView.js";
 import {ScrollContainer} from "../scroll.js";
-import {GElement, MGlobals, useState, ZERO_INSETS} from "../base.js";
+import {GElement, ZERO_INSETS} from "../base.js";
 import {makeEmailApp} from "./email.js";
 import {TabbedBox} from "../tabbedBox.js";
 import {MWindow} from "../window.js";
 import {makeTodolistDemo} from "../todolist.js";
-import {Insets, Size} from "josh_js_util";
+import {Size} from "josh_js_util";
 import {NumberBox, TextBox} from "../textinput.js";
 import {Style} from "../style.js";
 import {makeMinesweeperApp} from "./minesweeper.js";
-import {KEY_VENDOR} from "../keys.js";
-import {Scene} from "../scene.js";
 import {makeWeatherApp} from "./weather.js";
+import {makeClockApp} from "./clock.js";
 
 
 const state = {
@@ -299,31 +298,6 @@ export function makePanelDemo() {
 export function testList() {
     return ListView({
         data: ["john", "Jacob", 'jingleheimer'],
-    })
-}
-
-function makeClockApp() {
-    const key = KEY_VENDOR.getKey()
-    let [time, setTime] = useState<number>(key,"time",undefined,()=>Date.now())
-    setInterval(() => {
-        setTime(Date.now())
-        const scene = MGlobals.get(Scene.name)
-        scene.markDirty()
-    },100)
-    return new TextElement({
-        text:`${new Intl.DateTimeFormat("en-US",{
-            timeStyle:'medium',
-        }).format(time)}`,
-        visualStyle: {
-            textColor:'black'
-        },
-        fontSettings: {
-            font: Style.base().font,
-            fontSize: 80,
-            fontWeight: Style.base().fontWeight,
-        },
-        shadow:false,
-        padding: Insets.from(10),
     })
 }
 
