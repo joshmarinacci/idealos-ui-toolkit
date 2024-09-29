@@ -8,7 +8,7 @@ import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
 import {TextEditor} from "./apps/texteditor.js";
 
-const size = new Size(800, 400)
+const size = new Size(400, 400)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -186,6 +186,7 @@ loadFont().then(() => {
         const code = DOM_KEYBOARD_CODE_TO_LOGICAL_CODE[e.code]
         if (!code) console.warn(`no code for ${e.code}`)
         scene.handleKeydownEvent(code, e.ctrlKey, e.shiftKey, e.altKey, e.metaKey)
+        // e.preventDefault()
     })
     window.addEventListener('wheel', (e) => {
         // @ts-ignore

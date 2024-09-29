@@ -54,6 +54,7 @@ export class TextElement implements GElement {
                 kind:"text-line-element",
                 text:line,
                 font: Style.base().font,
+                fontSize: this.settings.fontSettings?.fontSize,
                 size: new Size(m.w,lineHeight),
                 pos: pos,
                 contentOffset: new Point(0,0),

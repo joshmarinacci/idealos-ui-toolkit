@@ -16,10 +16,10 @@ import {Insets, Point, Size} from "josh_js_util";
 import {Style} from "./style.js";
 import {RenderContext} from "./gfx.js";
 import {KEY_VENDOR} from "./keys.js";
-import {ACTION_MAP, ActionMap, KeyActionArgs, KeyboardModifiers, META_KEYS, TextSelection} from "./actions.js";
+import {ACTION_MAP, ActionMap, KeyActionArgs, KeyboardModifiers, TextSelection} from "./actions.js";
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
-import {LOGICAL_KEYBOARD_CODE, LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode} from "./keyboard.js";
+import {LOGICAL_KEYBOARD_CODE, LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode, META_KEYS} from "./keyboard.js";
 import {HBox, VBox} from "./layout.js";
 import {IconButton} from "./buttons.js";
 import {Icons} from "./icons.js";
@@ -201,7 +201,10 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let key = args.key
     // console.log("key is",key)
     let char = LOGICAL_KEYBOARD_CODE_TO_CHAR[key]
-    if(!char) console.warn(`missing char for key ${key}`)
+    if(!char) {
+        console.warn(`missing char for key ${key}`)
+        return args
+    }
     if(args.mods.shift) {
         char = char.toUpperCase()
     }
@@ -440,18 +443,12 @@ export class TextInputElement implements GElement {
         const selection_rect = this.makeSelection()
         if(selection.isActive()) {
             selection_rect.settings.pos = new Point(total_insets.left, total_insets.top)
-            // console.log("measuring",line.length, line)
             let before_text = line.substring(0,selection.start.x)
             let selected_text = line.substring(selection.start.x, selection.end.x)
-            // console.log('before text',before_text)
-            // console.log("selected text", selected_text)
             let [before_metrics] = this.calcMetrics(rc, before_text )
-            // console.log("before metrics",before_metrics)
             let [selected_metrics] = this.calcMetrics(rc, selected_text )
-            // console.log("selected metrics", selected_metrics)
             selection_rect.settings.pos = selection_rect.settings.pos.add(new Point(before_metrics.w,0))
             selection_rect.settings.size = new Size(selected_metrics.w, selected_metrics.h)
-            // console.log(selection_rect)
         } else {
             selection_rect.settings.visualStyle.background = TRANSPARENT
         }
