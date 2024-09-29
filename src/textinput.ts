@@ -60,7 +60,6 @@ ACTION_MAP.addAction("cursor-line-end",(args:KeyActionArgs) => {
         selection:args.selection.clear()
     }
 })
-
 ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
     let model = new TextModel(args.text)
     let pos = args.pos.add(new Point(1,0))
@@ -79,19 +78,18 @@ ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
     }
 })
 ACTION_MAP.addAction('selection-forward-char', (args:KeyActionArgs) => {
-    console.log("doing selection forward char")
     let model = new TextModel(args.text)
     let sel = args.selection
     if(sel.isActive()) {
         sel = sel.extendRight(1)
         return {
             text:model.toText(),
-            pos:sel.getEnd(),
+            pos:model.indexToPos(sel.getEnd()),
             selection:sel
         }
 
     } else {
-        sel = sel.makeAt(args.pos)
+        sel = sel.makeAt(model.posToIndex(args.pos))
         let pos = args.pos.add(new Point(1, 0))
         return {
             text:model.toText(),
@@ -101,20 +99,67 @@ ACTION_MAP.addAction('selection-forward-char', (args:KeyActionArgs) => {
     }
 })
 ACTION_MAP.addAction('selection-backward-char', (args:KeyActionArgs) => {
-    console.log("doing selection backward char")
     let model = new TextModel(args.text)
     let sel = args.selection
     if(sel.isActive()) {
         sel = sel.extendLeft(1)
         return {
             text:model.toText(),
-            pos:sel.getStart(),
+            pos:model.indexToPos(sel.getStart()),
             selection:sel
         }
-
     } else {
         let pos = args.pos.subtract(new Point(1, 0))
-        sel = sel.makeAt(pos)
+        sel = sel.makeAt(model.posToIndex(pos))
+        return {
+            text:model.toText(),
+            pos:pos,
+            selection:sel
+        }
+    }
+})
+ACTION_MAP.addAction('selection-prev-line',(args:KeyActionArgs) => {
+    let model = new TextModel(args.text)
+    let sel = args.selection
+    let pos = args.pos.copy()
+    if(pos.y > 0) {
+        pos.y -= 1
+    }
+    console.log("now pos is",pos)
+    if(sel.isActive()) {
+        sel = new TextSelection(model.posToIndex(pos),sel.end,true)
+        console.log("new sel",sel)
+        return {
+            text:model.toText(),
+            pos:pos,
+            selection:sel
+        }
+    } else {
+        sel = new TextSelection(model.posToIndex(pos), model.posToIndex(args.pos),true)
+        console.log("new sel",sel)
+        return {
+            text:model.toText(),
+            pos:pos,
+            selection:sel
+        }
+    }
+})
+ACTION_MAP.addAction('selection-next-line',(args:KeyActionArgs) => {
+    let model = new TextModel(args.text)
+    let sel = args.selection
+    let pos = args.pos.copy()
+    if(pos.y < model.lineCount()-1) {
+        pos.y += 1
+    }
+    if(sel.isActive()) {
+        sel = new TextSelection(sel.start,model.posToIndex(pos),true)
+        return {
+            text:model.toText(),
+            pos:pos,
+            selection:sel
+        }
+    } else {
+        sel = new TextSelection(model.posToIndex(args.pos), model.posToIndex(pos),true)
         return {
             text:model.toText(),
             pos:pos,
@@ -131,7 +176,7 @@ ACTION_MAP.addAction('cursor-previous-line',(args:KeyActionArgs) => {
     return {
         text:model.toText(),
         pos:pos,
-        selection:args.selection,
+        selection:args.selection.clear()
     }
 })
 ACTION_MAP.addAction('cursor-next-line',(args:KeyActionArgs) => {
@@ -142,7 +187,7 @@ ACTION_MAP.addAction('cursor-next-line',(args:KeyActionArgs) => {
     }
     return {
         text:model.toText(),
-        selection:args.selection,
+        selection:args.selection.clear(),
         pos:pos
     }
 })
@@ -152,7 +197,7 @@ ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
     let sel = args.selection
     if(sel.isActive()) {
         model.deleteCharsAt(args.selection)
-        pos = args.selection.start.copy()
+        pos = model.indexToPos(args.selection.start)
         sel = TextSelection.makeInactive()
     } else {
         if (pos.x > 0) {
@@ -177,8 +222,8 @@ ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
     let pos = args.pos.copy()
     let sel = args.selection
     if(sel.isActive()) {
-        model.deleteCharsAt(args.selection)
-        pos = args.selection.start.copy()
+        model.deleteCharsAt(sel)
+        pos = model.indexToPos(sel.start)
         sel = TextSelection.makeInactive()
     } else {
         let p2 = pos.add(new Point(1, 0))
@@ -212,7 +257,7 @@ ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
     let sel = args.selection
     if(sel.isActive()) {
         model.deleteCharsAt(sel)
-        pos = sel.getStart()
+        pos = model.indexToPos(sel.getStart())
         sel = TextSelection.makeInactive()
     }
     model.insertCharAt(pos,char)
@@ -239,7 +284,7 @@ ACTION_MAP.addAction('select-all',(args:KeyActionArgs) => {
     return {
         text:model.toText(),
         pos:args.pos,
-        selection:TextSelection.makeWith(start,end)
+        selection:TextSelection.makeWith(0,model.lastIndex())
     }
 })
 
@@ -260,7 +305,7 @@ function isDigit(key: LogicalKeyboardCode) {
 }
 
 NUMBER_ACTION_MAP.addAction('insert-character',(args:KeyActionArgs) => {
-    console.log("key is",args.key)
+    // console.log("key is",args.key)
     if(isDigit(args.key)) return args.delegate(args)
     if(args.key === LOGICAL_KEYBOARD_CODE.BACKSPACE) return args.delegate(args)
     return {text:args.text, pos:args.pos,selection: args.selection}
@@ -278,10 +323,15 @@ export type TextInputElementSettings = {
 } & ElementSettings
 
 export class TextModel {
-    private readonly lines: string[];
+    private lines: string[];
+    private text: string;
 
     constructor(text: string) {
         this.lines = text.split('\n')
+        this.text = text
+    }
+    private _resplit() {
+        this.lines = this.text.split('\n')
     }
 
     splitLineAt(pos: Point) {
@@ -329,11 +379,44 @@ export class TextModel {
     }
 
     deleteCharsAt(selection: TextSelection) {
-        let line = this.lines[selection.start.y]
-        let before = line.substring(0, selection.start.x)
-        let after = line.substring(selection.end.x)
-        line = before + after
-        this.lines[selection.start.y] = line
+        // let line = this.lines[selection.start.y]
+        let before = this.text.substring(0, selection.start)
+        let after = this.text.substring(selection.end)
+        this.text = before + after
+        this._resplit()
+    }
+
+    posToIndex(pos: Point):number {
+        let n = 0
+        for(let j=0; j<pos.y; j++) {
+            let line = this.lines[j]
+            n += line.length
+        }
+        n += pos.x
+        return n
+    }
+
+    indexToPos(ch: number) {
+        let x = 0
+        let y = 0
+        for(let j=0; j<this.lines.length; j++) {
+            let line = this.lines[j]
+            if(ch > line.length) {
+                ch -= line.length
+                y += 1
+            } else {
+                x = ch
+            }
+        }
+        return new Point(x,y)
+    }
+
+    lastIndex() {
+        return this.text.length
+    }
+
+    lineAt(y: number) {
+        return this.lines[y]
     }
 }
 
@@ -393,6 +476,7 @@ export class TextInputElement implements GElement {
         let [cursorPosition, setCursorPosition] = useState(key, "cursor", undefined, () => new Point(0, 0))
         let [focused, setFocused] = useState(key, "focused", undefined, () => false)
         let [selection, setSelection] = useState(key, "selection", undefined, () => TextSelection.makeInactive())
+
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
             fontSettings: {
@@ -422,7 +506,7 @@ export class TextInputElement implements GElement {
 
         cursor_node.settings.pos = new Point(
             total_insets.left + metrics_before.w,
-            total_insets.top + cursorPosition.y * baseline
+            total_insets.top + cursorPosition.y * metrics_before.h
         )
         cursor_node.settings.size.h = metrics_before.h
         const size = new Size(_cons.space.w, 100)
@@ -440,20 +524,81 @@ export class TextInputElement implements GElement {
             // console.log("selection is", selection.start, selection.end)
         }
 
-        const selection_rect = this.makeSelection()
+        const children = [text_node]
+
         if(selection.isActive()) {
-            selection_rect.settings.pos = new Point(total_insets.left, total_insets.top)
-            let before_text = line.substring(0,selection.start.x)
-            let selected_text = line.substring(selection.start.x, selection.end.x)
-            let [before_metrics] = this.calcMetrics(rc, before_text )
-            let [selected_metrics] = this.calcMetrics(rc, selected_text )
-            selection_rect.settings.pos = selection_rect.settings.pos.add(new Point(before_metrics.w,0))
-            selection_rect.settings.size = new Size(selected_metrics.w, selected_metrics.h)
-        } else {
-            selection_rect.settings.visualStyle.background = TRANSPARENT
+            console.log("rendering selection",selection)
+            let model = new TextModel(textString)
+            let s_sta = model.indexToPos(selection.getStart())
+            let s_end = model.indexToPos(selection.getEnd())
+            // console.log("start",s_sta,'end',s_end)
+            if(s_sta.y === s_end.y) {
+                // console.log("single line selection")
+                const line = model.lineAt(s_sta.y)
+                const srect = this.makeSelectionRect()
+                srect.settings.pos = new Point(total_insets.left, total_insets.top)
+                let before_text = line.substring(0,s_sta.x)
+                let selected_text = line.substring(s_sta.x,s_end.x)
+                // console.log(`before text -${before_text}-`)
+                // console.log(`after text -${selected_text}-`)
+                let [before_metrics] = this.calcMetrics(rc, before_text )
+                let [selected_metrics] = this.calcMetrics(rc, selected_text )
+                srect.settings.pos = srect.settings.pos.add(new Point(
+                    before_metrics.w,
+                    selected_metrics.h*s_sta.y))
+                srect.settings.size = new Size(selected_metrics.w, selected_metrics.h)
+                // console.log("srect",srect.settings.pos)
+                // console.log("srect",srect.settings.size)
+                children.unshift(srect)
+            } else {
+                // start_sel
+                {
+                    const rect = this.makeSelectionRect()
+                    let before_text = model.lineAt(s_sta.y).substring(0, s_sta.x)
+                    let after_text = model.lineAt(s_sta.y).substring(s_sta.x)
+                    let [before_metrics] = this.calcMetrics(rc, before_text)
+                    rect.settings.pos = new Point(
+                        total_insets.left + before_metrics.w,
+                        total_insets.top + before_metrics.h*s_sta.y
+                    )
+                    let [selected_metrics] = this.calcMetrics(rc, after_text)
+                    rect.settings.size = new Size(selected_metrics.w, selected_metrics.h)
+                    children.unshift(rect)
+                }
+                // middle lines
+                {
+                    if((s_end.y - s_sta.y) > 1) {
+                        // console.log('middle lines')
+                        for(let j=s_sta.y+1; j<s_end.y; j++) {
+                            // console.log("middle line",j)
+                            const line = model.lineAt(j)
+                            const [line_metrics] = this.calcMetrics(rc,line)
+                            const rect = this.makeSelectionRect()
+                            rect.settings.pos = new Point(
+                                total_insets.left,
+                                total_insets.top + line_metrics.h*j
+                            )
+                            rect.settings.size = line_metrics
+                            // console.log("line is",line)
+                            children.unshift(rect)
+                        }
+                    }
+                }
+                // end_sel
+                {
+                    const rect = this.makeSelectionRect()
+                    let before_text = model.lineAt(s_end.y).substring(0, s_end.x)
+                    let after_text = model.lineAt(s_end.y).substring(s_end.x)
+                    let [before_metrics] = this.calcMetrics(rc, before_text)
+                    rect.settings.pos = new Point(total_insets.left,
+                        total_insets.top + before_metrics.h*s_end.y
+                    )
+                    rect.settings.size = new Size(before_metrics.w,before_metrics.h)
+                    children.unshift(rect)
+                }
+            }
         }
 
-        const children = [selection_rect, text_node]
         if(focused) {
             children.push(cursor_node)
         }
@@ -528,7 +673,7 @@ export class TextInputElement implements GElement {
         })
     }
 
-    private makeSelection() {
+    private makeSelectionRect() {
         const key = KEY_VENDOR.getKey()
         return new GRenderNode({
             key: key,

@@ -4,19 +4,19 @@ import {MKeyboardEvent} from "./base.js";
 
 type KeyStrokeDef = { key: LogicalKeyboardCode, control?: boolean, shift?:boolean, meta?:boolean, alt?:boolean }
 export class TextSelection {
-    start: Point;
-    end: Point;
+    start: number;
+    end: number;
     private active: boolean;
-    constructor(start:Point,end:Point,active:boolean) {
+    constructor(start:number,end:number,active:boolean) {
         this.start = start
-        if(this.start.x < 0) {
-            this.start.x = 0
+        if(this.start < 0) {
+            this.start = 0
         }
         this.end = end
         this.active = active
     }
 
-    static makeWith(start: Point, end: Point):TextSelection {
+    static makeWith(start: number, end: number):TextSelection {
         return new TextSelection(start,end,true)
     }
 
@@ -25,22 +25,22 @@ export class TextSelection {
     }
 
     static makeInactive() {
-        return new TextSelection(new Point(0,0), new Point(0,0),false)
+        return new TextSelection(0,0,false)
     }
 
     extendRight(count: number) {
-        return new TextSelection(this.start,this.end.add(new Point(count,0)),this.active)
+        return new TextSelection(this.start,this.end + count,this.active)
     }
     extendLeft(count: number) {
-        return new TextSelection(this.start.subtract(new Point(count,0)),this.end,this.active)
+        return new TextSelection(this.start - count,this.end,this.active)
     }
 
     getEnd() {
         return this.end
     }
 
-    makeAt(pos: Point) {
-        return new TextSelection( pos,pos.add(new Point(1,0)),true)
+    makeAt(start:number) {
+        return new TextSelection( start, start+1,true)
     }
 
     clear() {
@@ -160,6 +160,8 @@ export function setup_common_keybindings() {
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_RIGHT}, 'cursor-forward')
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_LEFT, shift:true}, 'selection-backward-char')
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_RIGHT, shift:true}, 'selection-forward-char')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_UP, shift:true}, 'selection-prev-line')
+    ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_DOWN, shift:true}, 'selection-next-line')
 
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_UP}, 'cursor-previous-line')
     ACTION_MAP.registerKeystroke({key: LOGICAL_KEYBOARD_CODE.ARROW_DOWN}, 'cursor-next-line')
