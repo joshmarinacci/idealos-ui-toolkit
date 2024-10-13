@@ -68,6 +68,8 @@ export type CEvent = MMouseEvent | MKeyboardEvent | MWheelEvent
 
 export type EventHandler = (event: CEvent) => void
 
+export type RenderCallback = (ctx:RenderContext) => void
+
 export type RenderNodeSettings = {
     kind:string,
     key:string,
@@ -92,6 +94,7 @@ export type RenderNodeSettings = {
     clip?:boolean
     canScroll?:boolean
     popup?:boolean
+    renderCallback?: RenderCallback
 }
 export class GRenderNode {
     settings: RenderNodeSettings

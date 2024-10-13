@@ -1,13 +1,14 @@
 import {ObjMap, Schema} from "rtds-core";
-import {Insets, Point, Size} from "josh_js_util";
+import {Bounds, Insets, Point, Size} from "josh_js_util";
 import {ListItemRenderer, ListView, ListViewItem} from "../listView.js";
-import {GElement} from "../base.js";
+import {GElement, GRenderNode, LayoutConstraints, RenderCallback, ZERO_INSETS, ZERO_POINT} from "../base.js";
 import {Label} from "../text.js";
 import {Button} from "../buttons.js";
 import {AtomAsState, useRefresh} from "../util.js";
 import {HBox, VBox} from "../layout.js";
 import {KEY_VENDOR} from "../keys.js";
 import {PropSheet} from "../propsheet.js";
+import {RenderContext} from "../gfx.js";
 
 const S = new Schema()
 
@@ -171,18 +172,66 @@ function DocTree() {
     })
 }
 
-function CanvasArea() {
-    return HBox({
-        fixedWidth: 400,
+
+type CanvasElementSettings = {
+    fixedWidth: number
+    fixedHeight: number
+    borderWidth:Insets
+    background:string
+    borderColor:string
+    render: RenderCallback
+}
+class CanvasElement implements GElement {
+    settings: CanvasElementSettings
+    constructor(settings:CanvasElementSettings) {
+        this.settings = settings
+    }
+    layout(_rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        const key = KEY_VENDOR.getKey()
+        return new GRenderNode({
+            font: "",
+            key:key,
+            kind:'canvas',
+            size: new Size(this.settings.fixedWidth, this.settings.fixedHeight),
+            pos: ZERO_POINT.copy(),
+            children:[],
+            borderWidth: this.settings.borderWidth,
+            visualStyle: {
+                background:this.settings.background,
+                borderColor: this.settings.borderColor,
+            },
+            padding: ZERO_INSETS.copy(),
+            baseline: 0,
+            contentOffset: ZERO_POINT.copy(),
+            renderCallback:this.settings.render
+        })
+    }
+}
+
+
+function doRender(ctx:RenderContext, doc:DocType) {
+    let shapes = doc.get('shapes')
+    shapes.forEach((shape) => {
+        console.log(shape.typeName())
+        if(shape.typeName() === 'Rect') {
+            let rect = shape as typeof Rect
+            let size = rect.get('size').get()
+            let pos = rect.get('position').get()
+            let fill = rect.get('fill')
+            // console.log("fill is",fill.get('r').get(),fill.get('g').get(),fill.get('b').get())
+            ctx.surface.fillRect(Bounds.fromPointSize(pos,size),'red')
+        }
+    })
+}
+
+function CanvasArea(doc: DocType) {
+    return new CanvasElement({
+        fixedWidth: 200,
         fixedHeight: 200,
         borderWidth: Insets.from(5),
-        visualStyle: {
-            background: '#f0f0f0',
-            borderColor: 'green'
-        },
-        children: [
-            Label({text: "canvas area"})
-        ]
+        background: '#f0f0f0',
+        borderColor: 'green',
+        render:(rc) => doRender(rc,doc),
     })
 }
 
@@ -201,7 +250,7 @@ export function DrawingApp() {
                 // crossAxisLayout:'center',
                 children: [
                     DocTree(),
-                    CanvasArea(),
+                    CanvasArea(doc),
                     PropSheet(rect as ObjMap<any>),
                 ]
             })

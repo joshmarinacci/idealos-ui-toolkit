@@ -6,9 +6,9 @@ import {calcCanvasFont3, makeCanvas} from "./util.js";
 import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
-import {TextEditor} from "./apps/texteditor.js";
+import {DrawingApp} from "./apps/drawing.js";
 
-const size = new Size(400, 400)
+const size = new Size(600, 400)
 
 async function loadFont() {
     // const font = new FontFace('material-icons',
@@ -129,7 +129,7 @@ const scene = new CanvasScene({
     debug_enabled: true,
 })
 
-scene.setComponentFunction(TextEditor)
+scene.setComponentFunction(DrawingApp)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

@@ -124,6 +124,11 @@ function validateNode(n: GRenderNode) {
     }
 }
 
+function doRenderCallback(rc: RenderContext, n: GRenderNode) {
+    if(!n.settings.renderCallback) return
+    n.settings.renderCallback(rc)
+}
+
 export function doDraw(n: GRenderNode, rc: RenderContext, rs: RenderState): void {
     if(!n.settings.visualStyle) throw new Error("no visual style found")
     validateNode(n)
@@ -159,6 +164,10 @@ export function doDraw(n: GRenderNode, rc: RenderContext, rs: RenderState): void
     // draw text
     if (draw_node && n.settings.text && n.settings.text.trim().length > 0) {
         doDrawText(rc,n)
+    }
+
+    if(n.settings.renderCallback) {
+        doRenderCallback(rc,n)
     }
 
     if(n.settings.clip) {
