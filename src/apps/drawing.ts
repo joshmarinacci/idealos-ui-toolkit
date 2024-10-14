@@ -69,7 +69,7 @@ const RenderShapeNode: ListItemRenderer<RectType> = (item, selected, index, onSe
             Label({text: item.get('name').get(), shadow: true}),
         ],
         selected: selected == index,
-        mainAxisLayout: 'end',
+        mainAxisLayout: 'start',
         handleEvent: (e) => {
             if (e.type === 'mouse-down') {
                 onSelectedChanged(index, e)
@@ -157,7 +157,7 @@ function DocTree() {
     //     nodeRenderer:RenderShapeNode
     // })
     return VBox({
-        fixedWidth: 100,
+        fixedWidth: 150,
         borderWidth: Insets.from(1),
         visualStyle: {
             borderColor: "black",
@@ -209,6 +209,10 @@ class CanvasElement implements GElement {
 }
 
 
+function fillToColor(fill: typeof Color) {
+    return `rgb(${fill.get('r').get()*255}, ${fill.get('g').get()*255}, ${fill.get('b').get()*255})`
+}
+
 function doRender(ctx:RenderContext, doc:DocType) {
     let shapes = doc.get('shapes')
     shapes.forEach((shape) => {
@@ -217,9 +221,19 @@ function doRender(ctx:RenderContext, doc:DocType) {
             let rect = shape as typeof Rect
             let size = rect.get('size').get()
             let pos = rect.get('position').get()
-            let fill = rect.get('fill')
+            let fill:typeof Color = rect.get('fill')
             // console.log("fill is",fill.get('r').get(),fill.get('g').get(),fill.get('b').get())
-            ctx.surface.fillRect(Bounds.fromPointSize(pos,size),'red')
+            let color = fillToColor(fill)
+            console.log("color is",color)
+            ctx.surface.fillRect(Bounds.fromPointSize(pos,size),color)
+        }
+        if(shape.typeName() === 'Circle') {
+            let circ = shape as typeof Circle
+            let pos = circ.get('position')
+            let rad = circ.get('radius')
+            let fill:typeof Color = rect.get('fill')
+            // let color = fillToColor(fill)
+            // ctx.surface.fillArc(pos,rad,color)
         }
     })
 }
@@ -247,7 +261,6 @@ export function DrawingApp() {
             Toolbar(),
             HBox({
                 crossAxisSelfLayout:'grow',
-                // crossAxisLayout:'center',
                 children: [
                     DocTree(),
                     CanvasArea(doc),

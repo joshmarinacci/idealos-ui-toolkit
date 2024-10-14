@@ -139,6 +139,10 @@ function EditorRow(chs: GElement[]) {
     })
 }
 
+function GetEditorForMap(obj1: ObjMap<unknown>) {
+    return PropSheet(obj1)
+}
+
 export function PropSheet(rect: ObjMap<unknown> | undefined) {
     let children: GElement[] = []
     if (rect) {
@@ -150,11 +154,17 @@ export function PropSheet(rect: ObjMap<unknown> | undefined) {
                     GetEditorForAtom(obj as ObjAtom<unknown>)
                 ])
             }
+            if (obj.objType() === 'map') {
+                return EditorRow([
+                    Label({text: prop, fixedWidth: 100}),
+                    GetEditorForMap(obj as ObjMap<unknown>)
+                ])
+            }
             return EditorRow([Label({text: 'unsupported property'})])
         })
     }
     return VBox({
-        fixedWidth: 200,
+        fixedWidth: 300,
         mainAxisLayout: 'start',
         borderWidth: Insets.from(1),
         padding: Insets.from(3),

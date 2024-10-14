@@ -307,6 +307,26 @@ NUMBER_ACTION_MAP.addAction('insert-character',(args:KeyActionArgs) => {
     if(args.key === LOGICAL_KEYBOARD_CODE.BACKSPACE) return args.delegate(args)
     return {text:args.text, pos:args.pos,selection: args.selection}
 })
+NUMBER_ACTION_MAP.addAction('cursor-previous-line', (args:KeyActionArgs) => {
+    let val = parseInt(args.text)
+    val = val + 1
+    let text = val + ""
+    return {
+        text:text,
+        pos:args.pos,
+        selection: args.selection,
+    }
+})
+NUMBER_ACTION_MAP.addAction('cursor-next-line', (args:KeyActionArgs) => {
+    let val = parseInt(args.text)
+    val = val + 1
+    let text = val + ""
+    return {
+        text:text,
+        pos:args.pos,
+        selection: args.selection,
+    }
+})
 
 
 type OnChangeCallback<T> = (value: T, e: CEvent) => void
