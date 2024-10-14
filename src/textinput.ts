@@ -717,35 +717,62 @@ export function TextBox(param: TextInputElementSettings): GElement {
     return new TextInputElement(param)
 }
 export type NumberBoxSettings = {
-    value: number,
+    value: StateHandler<number>
     fixedWidth?:number,
     fontSettings?: FontSettings
+    hints? : Record<string, any>
+    format?: "integer" | "float"
+    min?: number
+    max?: number
+    step?: number
 }
 export function NumberBox(param: NumberBoxSettings):GElement {
     const key = KEY_VENDOR.getKey()
-    let [value, setValue] = useState(key, "num", undefined, () => 0)
+    let [value, setValue] = useState(key, "num", param.value, () => 0)
+    let min = param.min || 0
+    let max = param.max || 100
+    let step = param.step || 1
+    let format = param.format || "integer"
+    if(param.hints) {
+        if(param.hints.step) step = param.hints.step
+        if(param.hints.format) format = param.hints.format
+        if(param.hints.min) min = param.hints.min
+        if(param.hints.max) max = param.hints.max
+    }
+    const setConstrainedValue = (v:number) => {
+        let vv:number = v
+        if(isNaN(vv)) vv = 0
+        if(vv < min) vv = min
+        if(vv > max) vv = max
+        setValue(vv)
+    }
     const input = new TextInputElement({
-            // fixedWidth:param.fixedWidth,
+            fixedWidth:param.fixedWidth,
             fontSettings: param.fontSettings,
             actionMap:NUMBER_ACTION_MAP,
             text: {
-                get:() => value+"",
+                get:() => {
+                    if(format === 'integer') return Math.floor(value) + ""
+                    if(format === 'float') return value.toFixed(2)
+                    return value + ""
+                },
                 set:(v) => {
-                    let vv = parseInt(v)
-                    if(isNaN(vv)) vv = 0
-                    setValue(vv)
+                    let vv:number = 0
+                    if(format === 'integer') vv = parseInt(v)
+                    if(format === 'float') vv = parseFloat(v)
+                    setConstrainedValue(vv)
                 }
             }
         })
     const increment = (e:CEvent) => {
         if(e.type === 'mouse-down') {
-            setValue(value+1)
+            setConstrainedValue(value+step)
             e.redraw()
         }
     }
     const decrement = (e:CEvent) => {
         if(e.type === 'mouse-down') {
-            setValue(value-1)
+            setConstrainedValue(value-step)
             e.redraw()
         }
     }

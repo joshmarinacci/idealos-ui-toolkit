@@ -2,11 +2,10 @@ import {ObjAtom, ObjMap} from "rtds-core";
 import {Insets, Point, Size} from "josh_js_util";
 import {HBox, VBox} from "./layout.js";
 import {Label} from "./text.js";
-import {TextBox} from "./textinput.js";
+import {NumberBox, TextBox} from "./textinput.js";
 import {GElement, TRANSPARENT} from "./base.js";
 import {AtomAsState} from "./util.js";
 import {CheckBox} from "./buttons.js";
-import {Style} from "./style.js";
 
 export function PointEditor(atom: ObjAtom<Point>) {
     const updatePointX = {
@@ -105,11 +104,12 @@ export function GetEditorForAtom(obj: ObjAtom<unknown>): GElement {
         }
         case "number": {
             let atom = obj as ObjAtom<number>
-            return TextBox({
-                text: {
-                    get: () => atom.get() + "",
-                    set: (v) => atom.set(parseInt(v))
-                }
+            return NumberBox({
+                value: {
+                    get: () => atom.get(),
+                    set:(v:number) => atom.set(v)
+                },
+                hints:atom.getOptions().hints,
             })
         }
         case "boolean": {
@@ -140,31 +140,39 @@ function EditorRow(chs: GElement[]) {
 }
 
 function GetEditorForMap(obj1: ObjMap<unknown>) {
-    return PropSheet(obj1)
+    return PropSheet({
+        fixedWidth: 200,
+        target:obj1
+    })
 }
 
-export function PropSheet(rect: ObjMap<unknown> | undefined) {
+export type PropSheetSettings = {
+    fixedWidth: number
+    target: ObjMap<unknown> | undefined
+}
+export function PropSheet(settings:PropSheetSettings) {
     let children: GElement[] = []
-    if (rect) {
-        children = rect.getPropNames().map(prop => {
-            let obj = rect.get(prop) as ObjAtom<any>
-            if (obj.objType() === 'atom') {
+    if (settings.target) {
+        let theObj = settings.target as ObjMap<unknown>
+        children = settings.target.getPropNames().map(propName => {
+            let propPobj = theObj.get(propName) as ObjAtom<any>
+            if (propPobj.objType() === 'atom') {
                 return EditorRow([
-                    Label({text: prop, fixedWidth: 100}),
-                    GetEditorForAtom(obj as ObjAtom<unknown>)
+                    Label({text: propName, fixedWidth: 100}),
+                    GetEditorForAtom(propPobj as ObjAtom<unknown>)
                 ])
             }
-            if (obj.objType() === 'map') {
+            if (propPobj.objType() === 'map') {
                 return EditorRow([
-                    Label({text: prop, fixedWidth: 100}),
-                    GetEditorForMap(obj as ObjMap<unknown>)
+                    Label({text: propName, fixedWidth: 100}),
+                    GetEditorForMap(propPobj as unknown as ObjMap<unknown>)
                 ])
             }
             return EditorRow([Label({text: 'unsupported property'})])
         })
     }
     return VBox({
-        fixedWidth: 300,
+        fixedWidth: settings.fixedWidth,
         mainAxisLayout: 'start',
         borderWidth: Insets.from(1),
         padding: Insets.from(3),

@@ -10,7 +10,7 @@ import {makeEmailApp} from "./email.js";
 import {TabbedBox} from "../tabbedBox.js";
 import {MWindow} from "../window.js";
 import {makeTodolistDemo} from "../todolist.js";
-import {Size} from "josh_js_util";
+import {Point, Size} from "josh_js_util";
 import {NumberBox, TextBox} from "../textinput.js";
 import {Style} from "../style.js";
 import {makeMinesweeperApp} from "./minesweeper.js";
@@ -18,6 +18,8 @@ import {makeWeatherApp} from "./weather.js";
 import {makeClockApp} from "./clock.js";
 import {ContactsApp} from "./contacts.js";
 import {TextEditor} from "./texteditor.js";
+import {PropSheet} from "../propsheet.js";
+import {ObjMap, Schema} from "rtds-core";
 
 
 const state = {
@@ -402,4 +404,41 @@ export function LayoutTest() {
     child.log.setEnabled(true)
     return MWindow({child: child, initSize: new Size(700,400)})
 
+}
+
+const S = new Schema()
+const Position = S.jsobj(new Point(50, 50), {
+    typeName: 'Position',
+    fromJson: (j) => Point.fromJSON(j),
+})
+const SizeAtom = S.jsobj(new Size(25, 25), {
+    typeName: 'Size',
+    fromJson: (j) => Size.fromJSON(j),
+})
+const Color = S.map({
+    r: S.number(0, {
+        hints: {
+            "min":0,
+            "max":1.0,
+            "format":"float",
+            step:0.1,
+        }
+    }),
+    g: S.number(0),
+    b: S.number(0),
+})
+
+const Rect = S.map({
+    position: Position,
+    size: SizeAtom,
+    name: S.string('unnamed rect'),
+    fill: Color,
+}, {typeName: 'Rect'})
+
+const rect = Rect.clone()
+export function PropSheetTest() {
+    return PropSheet({
+        fixedWidth: 300,
+        target:rect as ObjMap<any>
+    })
 }
