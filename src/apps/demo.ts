@@ -11,7 +11,7 @@ import {TabbedBox} from "../tabbedBox.js";
 import {MWindow} from "../window.js";
 import {makeTodolistDemo} from "../todolist.js";
 import {Point, Size} from "josh_js_util";
-import {NumberBox, TextBox} from "../textinput.js";
+import {NumberBox, ActionBox, TextBox} from "../textinput.js";
 import {Style} from "../style.js";
 import {makeMinesweeperApp} from "./minesweeper.js";
 import {makeWeatherApp} from "./weather.js";
@@ -349,26 +349,25 @@ export function makeTabs(): GElement {
     return MWindow({child: tabs, initSize: new Size(700,300)})
 }
 
-export function makeTextInput() {
+export function TextInputTest() {
     return VBox({
         children:[
             TextBox({
                 multiline:false,
                 fixedWidth: 300,
-                fontSettings: {
-                    font:Style.base().font,
-                    fontSize: 50,
-                    fontWeight: Style.base().fontWeight,
+                fontSize: 50,
+            }),
+            ActionBox({
+                fixedWidth: 300,
+                fontSize:50,
+                action: (text:string) => {
+                    console.log("did an action with text",text)
                 }
             }),
             NumberBox({
-                value:56,
+                // value:56,
                 fixedWidth: 300,
-                fontSettings: {
-                    font:Style.base().font,
-                    fontSize: 50,
-                    fontWeight: Style.base().fontWeight,
-                }
+                fontSize:50,
             })
         ]
     })

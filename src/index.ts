@@ -7,7 +7,7 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {DOM_KEYBOARD_CODE_TO_LOGICAL_CODE} from "./keyboard.js";
 import {DrawingApp} from "./apps/drawing.js";
-import {makeTextInput, PropSheetTest} from "./apps/demo.js";
+import {TextInputTest, PropSheetTest} from "./apps/demo.js";
 
 const size = new Size(600, 400)
 
@@ -130,7 +130,7 @@ const scene = new CanvasScene({
     debug_enabled: true,
 })
 
-scene.setComponentFunction(PropSheetTest)
+scene.setComponentFunction(TextInputTest)
 
 MGlobals.set(Scene.name, scene)
 MGlobals.set(SYMBOL_FONT_ENABLED, true)

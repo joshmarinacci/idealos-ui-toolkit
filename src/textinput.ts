@@ -1,7 +1,6 @@
 import {
     CEvent,
     ElementSettings,
-    FontSettings,
     GElement,
     GRenderNode,
     LayoutConstraints,
@@ -20,51 +19,48 @@ import {ACTION_MAP, ActionMap, KeyActionArgs, KeyboardModifiers, TextSelection} 
 import {getTotalInsets} from "./util.js";
 import {TextElement} from "./text.js";
 import {LOGICAL_KEYBOARD_CODE, LOGICAL_KEYBOARD_CODE_TO_CHAR, LogicalKeyboardCode, META_KEYS} from "./keyboard.js";
-import {HBox, VBox} from "./layout.js";
-import {IconButton} from "./buttons.js";
-import {Icons} from "./icons.js";
 
 
-ACTION_MAP.addAction('cursor-backward',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('cursor-backward', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
-    let pos = args.pos.subtract(new Point(1,0))
-    if(pos.x < 0) {
-        if(pos.y > 0) {
-            pos = new Point(model.lineLengthAt(pos),pos.y-1)
+    let pos = args.pos.subtract(new Point(1, 0))
+    if (pos.x < 0) {
+        if (pos.y > 0) {
+            pos = new Point(model.lineLengthAt(pos), pos.y - 1)
         } else {
             pos = ZERO_POINT.copy()
         }
     }
     return {
-        text:args.text,
-        pos:pos,
-        selection:args.selection.clear()
+        text: args.text,
+        pos: pos,
+        selection: args.selection.clear()
     }
 })
-ACTION_MAP.addAction("cursor-line-start",(args:KeyActionArgs) => {
+ACTION_MAP.addAction("cursor-line-start", (args: KeyActionArgs) => {
     // let model = new TextModel(args.text)
-    let pos = new Point(0,args.pos.y)
+    let pos = new Point(0, args.pos.y)
     return {
-        text:args.text,
-        pos:pos,
-        selection:args.selection.clear()
+        text: args.text,
+        pos: pos,
+        selection: args.selection.clear()
     }
 })
-ACTION_MAP.addAction("cursor-line-end",(args:KeyActionArgs) => {
+ACTION_MAP.addAction("cursor-line-end", (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let len = model.lineLengthAt(args.pos)
-    let pos = new Point(len,args.pos.y)
+    let pos = new Point(len, args.pos.y)
     return {
-        text:args.text,
-        pos:pos,
-        selection:args.selection.clear()
+        text: args.text,
+        pos: pos,
+        selection: args.selection.clear()
     }
 })
-ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('cursor-forward', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
-    let pos = args.pos.add(new Point(1,0))
-    if(pos.x >= model.lineLengthAt(pos)) {
-        if(pos.y < model.lineCount()-1) {
+    let pos = args.pos.add(new Point(1, 0))
+    if (pos.x >= model.lineLengthAt(pos)) {
+        if (pos.y < model.lineCount() - 1) {
             pos.x = 0
             pos.y += 1
         } else {
@@ -72,127 +68,127 @@ ACTION_MAP.addAction('cursor-forward',(args:KeyActionArgs) => {
         }
     }
     return {
-        text:model.toText(),
-        pos:pos,
-        selection:args.selection.clear(),
+        text: model.toText(),
+        pos: pos,
+        selection: args.selection.clear(),
     }
 })
-ACTION_MAP.addAction('selection-forward-char', (args:KeyActionArgs) => {
+ACTION_MAP.addAction('selection-forward-char', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let sel = args.selection
-    if(sel.isActive()) {
+    if (sel.isActive()) {
         sel = sel.extendRight(1)
         return {
-            text:model.toText(),
-            pos:model.indexToPos(sel.getEnd()),
-            selection:sel
+            text: model.toText(),
+            pos: model.indexToPos(sel.getEnd()),
+            selection: sel
         }
 
     } else {
         sel = sel.makeAt(model.posToIndex(args.pos))
         let pos = args.pos.add(new Point(1, 0))
         return {
-            text:model.toText(),
-            pos:pos,
-            selection:sel
+            text: model.toText(),
+            pos: pos,
+            selection: sel
         }
     }
 })
-ACTION_MAP.addAction('selection-backward-char', (args:KeyActionArgs) => {
+ACTION_MAP.addAction('selection-backward-char', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let sel = args.selection
-    if(sel.isActive()) {
+    if (sel.isActive()) {
         sel = sel.extendLeft(1)
         return {
-            text:model.toText(),
-            pos:model.indexToPos(sel.getStart()),
-            selection:sel
+            text: model.toText(),
+            pos: model.indexToPos(sel.getStart()),
+            selection: sel
         }
     } else {
         let pos = args.pos.subtract(new Point(1, 0))
         sel = sel.makeAt(model.posToIndex(pos))
         return {
-            text:model.toText(),
-            pos:pos,
-            selection:sel
+            text: model.toText(),
+            pos: pos,
+            selection: sel
         }
     }
 })
-ACTION_MAP.addAction('selection-prev-line',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('selection-prev-line', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let sel = args.selection
     let pos = args.pos.copy()
-    if(pos.y > 0) {
+    if (pos.y > 0) {
         pos.y -= 1
     }
-    if(sel.isActive()) {
-        sel = new TextSelection(model.posToIndex(pos),sel.end,true)
+    if (sel.isActive()) {
+        sel = new TextSelection(model.posToIndex(pos), sel.end, true)
         return {
-            text:model.toText(),
-            pos:pos,
-            selection:sel
+            text: model.toText(),
+            pos: pos,
+            selection: sel
         }
     } else {
-        sel = new TextSelection(model.posToIndex(pos), model.posToIndex(args.pos),true)
+        sel = new TextSelection(model.posToIndex(pos), model.posToIndex(args.pos), true)
         return {
-            text:model.toText(),
-            pos:pos,
-            selection:sel
+            text: model.toText(),
+            pos: pos,
+            selection: sel
         }
     }
 })
-ACTION_MAP.addAction('selection-next-line',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('selection-next-line', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let sel = args.selection
     let pos = args.pos.copy()
-    if(pos.y < model.lineCount()-1) {
+    if (pos.y < model.lineCount() - 1) {
         pos.y += 1
     }
-    if(sel.isActive()) {
-        sel = new TextSelection(sel.start,model.posToIndex(pos),true)
+    if (sel.isActive()) {
+        sel = new TextSelection(sel.start, model.posToIndex(pos), true)
         return {
-            text:model.toText(),
-            pos:pos,
-            selection:sel
+            text: model.toText(),
+            pos: pos,
+            selection: sel
         }
     } else {
-        sel = new TextSelection(model.posToIndex(args.pos), model.posToIndex(pos),true)
+        sel = new TextSelection(model.posToIndex(args.pos), model.posToIndex(pos), true)
         return {
-            text:model.toText(),
-            pos:pos,
-            selection:sel
+            text: model.toText(),
+            pos: pos,
+            selection: sel
         }
     }
 })
-ACTION_MAP.addAction('cursor-previous-line',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('cursor-previous-line', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
-    if(pos.y > 0) {
+    if (pos.y > 0) {
         pos.y -= 1
     }
     return {
-        text:model.toText(),
-        pos:pos,
-        selection:args.selection.clear()
+        text: model.toText(),
+        pos: pos,
+        selection: args.selection.clear()
     }
 })
-ACTION_MAP.addAction('cursor-next-line',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('cursor-next-line', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
-    if(pos.y < model.lineCount()-1) {
+    if (pos.y < model.lineCount() - 1) {
         pos.y += 1
     }
     return {
-        text:model.toText(),
-        selection:args.selection.clear(),
-        pos:pos
+        text: model.toText(),
+        selection: args.selection.clear(),
+        pos: pos
     }
 })
-ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('delete-backward', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
     let sel = args.selection
-    if(sel.isActive()) {
+    if (sel.isActive()) {
         model.deleteCharsAt(args.selection)
         pos = model.indexToPos(args.selection.start)
         sel = TextSelection.makeInactive()
@@ -208,17 +204,17 @@ ACTION_MAP.addAction('delete-backward',(args:KeyActionArgs) => {
         }
     }
     return {
-        text:model.toText(),
-        selection:sel,
-        pos:pos
+        text: model.toText(),
+        selection: sel,
+        pos: pos
     }
 
 })
-ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('delete-forward', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
     let sel = args.selection
-    if(sel.isActive()) {
+    if (sel.isActive()) {
         model.deleteCharsAt(sel)
         pos = model.indexToPos(sel.start)
         sel = TextSelection.makeInactive()
@@ -232,56 +228,56 @@ ACTION_MAP.addAction('delete-forward',(args:KeyActionArgs) => {
         }
     }
     return {
-        text:model.toText(),
-        selection:sel,
-        pos:pos
+        text: model.toText(),
+        selection: sel,
+        pos: pos
     }
 })
-ACTION_MAP.addAction('insert-character',(args:KeyActionArgs)=> {
+ACTION_MAP.addAction('insert-character', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
     let pos = args.pos.copy()
     let key = args.key
     // console.log("key is",key)
     let char = LOGICAL_KEYBOARD_CODE_TO_CHAR[key]
-    if(!char) {
+    if (!char) {
         console.warn(`missing char for key ${key}`)
         return args
     }
-    if(args.mods.shift) {
+    if (args.mods.shift) {
         char = char.toUpperCase()
     }
     // console.log("char is",char)
     let sel = args.selection
-    if(sel.isActive()) {
+    if (sel.isActive()) {
         model.deleteCharsAt(sel)
         pos = model.indexToPos(sel.getStart())
         sel = TextSelection.makeInactive()
     }
-    model.insertCharAt(pos,char)
+    model.insertCharAt(pos, char)
     return {
-        text:model.toText(),
-        selection:sel,
-        pos:new Point(pos.x+1,pos.y)
+        text: model.toText(),
+        selection: sel,
+        pos: new Point(pos.x + 1, pos.y)
     }
 })
 ACTION_MAP.addAction('insert-newline', (args) => {
     let model = new TextModel(args.text)
     model.splitLineAt(args.pos)
-    let pos = new Point(0,args.pos.y+1)
+    let pos = new Point(0, args.pos.y + 1)
     return {
-        text:model.toText(),
-        pos:pos,
-        selection:args.selection,
+        text: model.toText(),
+        pos: pos,
+        selection: args.selection,
     }
 })
-ACTION_MAP.addAction('select-all',(args:KeyActionArgs) => {
+ACTION_MAP.addAction('select-all', (args: KeyActionArgs) => {
     let model = new TextModel(args.text)
-    let start = new Point(0,0)
-    let end = new Point(model.lineLengthAt(new Point(0,model.lineCount()-1)),model.lineCount()-1)
+    let start = new Point(0, 0)
+    let end = new Point(model.lineLengthAt(new Point(0, model.lineCount() - 1)), model.lineCount() - 1)
     return {
-        text:model.toText(),
-        pos:args.pos,
-        selection:TextSelection.makeWith(0,model.lastIndex())
+        text: model.toText(),
+        pos: args.pos,
+        selection: TextSelection.makeWith(0, model.lastIndex())
     }
 })
 
@@ -301,29 +297,29 @@ function isDigit(key: LogicalKeyboardCode) {
     return false
 }
 
-NUMBER_ACTION_MAP.addAction('insert-character',(args:KeyActionArgs) => {
+NUMBER_ACTION_MAP.addAction('insert-character', (args: KeyActionArgs) => {
     // console.log("key is",args.key)
-    if(isDigit(args.key)) return args.delegate(args)
-    if(args.key === LOGICAL_KEYBOARD_CODE.BACKSPACE) return args.delegate(args)
-    return {text:args.text, pos:args.pos,selection: args.selection}
+    if (isDigit(args.key)) return args.delegate(args)
+    if (args.key === LOGICAL_KEYBOARD_CODE.BACKSPACE) return args.delegate(args)
+    return {text: args.text, pos: args.pos, selection: args.selection}
 })
-NUMBER_ACTION_MAP.addAction('cursor-previous-line', (args:KeyActionArgs) => {
+NUMBER_ACTION_MAP.addAction('cursor-previous-line', (args: KeyActionArgs) => {
     let val = parseInt(args.text)
     val = val + 1
     let text = val + ""
     return {
-        text:text,
-        pos:args.pos,
+        text: text,
+        pos: args.pos,
         selection: args.selection,
     }
 })
-NUMBER_ACTION_MAP.addAction('cursor-next-line', (args:KeyActionArgs) => {
+NUMBER_ACTION_MAP.addAction('cursor-next-line', (args: KeyActionArgs) => {
     let val = parseInt(args.text)
     val = val + 1
     let text = val + ""
     return {
-        text:text,
-        pos:args.pos,
+        text: text,
+        pos: args.pos,
         selection: args.selection,
     }
 })
@@ -336,7 +332,8 @@ export type TextInputElementSettings = {
     multiline?: boolean
     fixedWidth?: number,
     fixedHeight?: number,
-    actionMap?:ActionMap,
+    actionMap?: ActionMap,
+    fontSize?: number
 } & ElementSettings
 
 export class TextModel {
@@ -347,6 +344,7 @@ export class TextModel {
         this.lines = text.split('\n')
         this.text = text
     }
+
     private _resplit() {
         this.lines = this.text.split('\n')
     }
@@ -403,9 +401,9 @@ export class TextModel {
         this._resplit()
     }
 
-    posToIndex(pos: Point):number {
+    posToIndex(pos: Point): number {
         let n = 0
-        for(let j=0; j<pos.y; j++) {
+        for (let j = 0; j < pos.y; j++) {
             let line = this.lines[j]
             n += line.length
         }
@@ -416,16 +414,16 @@ export class TextModel {
     indexToPos(ch: number) {
         let x = 0
         let y = 0
-        for(let j=0; j<this.lines.length; j++) {
+        for (let j = 0; j < this.lines.length; j++) {
             let line = this.lines[j]
-            if(ch > line.length) {
+            if (ch > line.length) {
                 ch -= line.length
                 y += 1
             } else {
                 x = ch
             }
         }
-        return new Point(x,y)
+        return new Point(x, y)
     }
 
     lastIndex() {
@@ -437,9 +435,9 @@ export class TextModel {
     }
 }
 
-function processText(actionMap:ActionMap, text: string, pos: Point, kbe: MKeyboardEvent, selection: TextSelection): [string, Point, TextSelection] {
+function processText(actionMap: ActionMap, text: string, pos: Point, kbe: MKeyboardEvent, selection: TextSelection): [string, Point, TextSelection] {
     if (META_KEYS.includes(kbe.key)) return [text, pos, selection]
-    const mods:KeyboardModifiers = {
+    const mods: KeyboardModifiers = {
         shift: kbe.shift,
         alt: kbe.alt,
         meta: kbe.meta,
@@ -458,12 +456,12 @@ function processText(actionMap:ActionMap, text: string, pos: Point, kbe: MKeyboa
             console.warn(`missing action for '${action_name}'`)
         }
     }
-    let res = actionMap.doAction('insert-character',text,pos,kbe,selection,mods)
+    let res = actionMap.doAction('insert-character', text, pos, kbe, selection, mods)
     return [res.text, res.pos, res.selection]
 }
 
 export class TextInputElement implements GElement {
-    private readonly settings: TextInputElementSettings
+    protected readonly settings: TextInputElementSettings
 
     constructor(opts: TextInputElementSettings) {
         this.settings = {
@@ -476,7 +474,7 @@ export class TextInputElement implements GElement {
                 fontSize: Style.base().fontSize,
                 fontWeight: Style.base().fontWeight,
             },
-            actionMap:opts.actionMap || ACTION_MAP
+            actionMap: opts.actionMap || ACTION_MAP
         }
     }
 
@@ -497,8 +495,8 @@ export class TextInputElement implements GElement {
         let text = new TextElement({
             borderWidth: ZERO_INSETS,
             fontSettings: {
-                font: this.settings.fontSettings?.font,
-                fontSize: this.settings.fontSettings?.fontSize,
+                font: this.settings.fontSettings?.font || Style.base().font,
+                fontSize: this.settings.fontSize || Style.base().fontSize,
                 fontWeight: Style.base().fontWeight,
             },
             padding: ZERO_INSETS,
@@ -535,7 +533,7 @@ export class TextInputElement implements GElement {
         } else {
             size.h = total_insets.top + text_node.settings.size.h + total_insets.bottom
         }
-        if(!selection) {
+        if (!selection) {
             console.warn("selection is empty")
         } else {
             // console.log("selection is", selection.start, selection.end)
@@ -543,26 +541,25 @@ export class TextInputElement implements GElement {
 
         const children = [text_node]
 
-        if(selection.isActive()) {
-            console.log("rendering selection",selection)
+        if (selection.isActive()) {
             let model = new TextModel(textString)
             let s_sta = model.indexToPos(selection.getStart())
             let s_end = model.indexToPos(selection.getEnd())
             // console.log("start",s_sta,'end',s_end)
-            if(s_sta.y === s_end.y) {
+            if (s_sta.y === s_end.y) {
                 // console.log("single line selection")
                 const line = model.lineAt(s_sta.y)
                 const srect = this.makeSelectionRect()
                 srect.settings.pos = new Point(total_insets.left, total_insets.top)
-                let before_text = line.substring(0,s_sta.x)
-                let selected_text = line.substring(s_sta.x,s_end.x)
+                let before_text = line.substring(0, s_sta.x)
+                let selected_text = line.substring(s_sta.x, s_end.x)
                 // console.log(`before text -${before_text}-`)
                 // console.log(`after text -${selected_text}-`)
-                let [before_metrics] = this.calcMetrics(rc, before_text )
-                let [selected_metrics] = this.calcMetrics(rc, selected_text )
+                let [before_metrics] = this.calcMetrics(rc, before_text)
+                let [selected_metrics] = this.calcMetrics(rc, selected_text)
                 srect.settings.pos = srect.settings.pos.add(new Point(
                     before_metrics.w,
-                    selected_metrics.h*s_sta.y))
+                    selected_metrics.h * s_sta.y))
                 srect.settings.size = new Size(selected_metrics.w, selected_metrics.h)
                 // console.log("srect",srect.settings.pos)
                 // console.log("srect",srect.settings.size)
@@ -576,7 +573,7 @@ export class TextInputElement implements GElement {
                     let [before_metrics] = this.calcMetrics(rc, before_text)
                     rect.settings.pos = new Point(
                         total_insets.left + before_metrics.w,
-                        total_insets.top + before_metrics.h*s_sta.y
+                        total_insets.top + before_metrics.h * s_sta.y
                     )
                     let [selected_metrics] = this.calcMetrics(rc, after_text)
                     rect.settings.size = new Size(selected_metrics.w, selected_metrics.h)
@@ -584,16 +581,16 @@ export class TextInputElement implements GElement {
                 }
                 // middle lines
                 {
-                    if((s_end.y - s_sta.y) > 1) {
+                    if ((s_end.y - s_sta.y) > 1) {
                         // console.log('middle lines')
-                        for(let j=s_sta.y+1; j<s_end.y; j++) {
+                        for (let j = s_sta.y + 1; j < s_end.y; j++) {
                             // console.log("middle line",j)
                             const line = model.lineAt(j)
-                            const [line_metrics] = this.calcMetrics(rc,line)
+                            const [line_metrics] = this.calcMetrics(rc, line)
                             const rect = this.makeSelectionRect()
                             rect.settings.pos = new Point(
                                 total_insets.left,
-                                total_insets.top + line_metrics.h*j
+                                total_insets.top + line_metrics.h * j
                             )
                             rect.settings.size = line_metrics
                             // console.log("line is",line)
@@ -608,15 +605,15 @@ export class TextInputElement implements GElement {
                     let after_text = model.lineAt(s_end.y).substring(s_end.x)
                     let [before_metrics] = this.calcMetrics(rc, before_text)
                     rect.settings.pos = new Point(total_insets.left,
-                        total_insets.top + before_metrics.h*s_end.y
+                        total_insets.top + before_metrics.h * s_end.y
                     )
-                    rect.settings.size = new Size(before_metrics.w,before_metrics.h)
+                    rect.settings.size = new Size(before_metrics.w, before_metrics.h)
                     children.unshift(rect)
                 }
             }
         }
 
-        if(focused) {
+        if (focused) {
             children.push(cursor_node)
         }
 
@@ -644,25 +641,7 @@ export class TextInputElement implements GElement {
             pos: new Point(0, 0),
             size: size,
             clip: false,
-            handleEvent: (e) => {
-                if (e.type === 'mouse-down') {
-                    if (!focused) setFocused(true)
-                    e.use()
-                    e.redraw()
-                }
-                if (e.type === 'keyboard-typed') {
-                    if (!focused) setFocused(true)
-                    let kbe = e as MKeyboardEvent;
-                    let t2 = processText(
-                        (this.settings.actionMap || ACTION_MAP),
-                        textString, cursorPosition, kbe, selection)
-                    setText(t2[0])
-                    setCursorPosition(t2[1])
-                    setSelection(t2[2])
-                    e.use()
-                    e.redraw()
-                }
-            }
+            handleEvent: (e) => this.handleEvent(e, key),
         })
     }
 
@@ -711,93 +690,155 @@ export class TextInputElement implements GElement {
             baseline: 0,
         })
     }
+
+    protected handleEvent(e: CEvent, key: string) {
+        // console.log("handling the event", e.type, 'for element', key)
+        let [textString, setText] = useState(key, "text", this.settings.text, () => "")
+        let [cursorPosition, setCursorPosition] = useState(key, "cursor", undefined, () => new Point(0, 0))
+        let [focused, setFocused] = useState(key, "focused", undefined, () => false)
+        let [selection, setSelection] = useState(key, "selection", undefined, () => TextSelection.makeInactive())
+
+        if (e.type === 'mouse-down') {
+            if (!focused) setFocused(true)
+            e.use()
+            e.redraw()
+            return
+        }
+        if (e.type === 'keyboard-typed') {
+            if (!focused) setFocused(true)
+            let kbe = e as MKeyboardEvent;
+            let t2 = processText(
+                (this.settings.actionMap || ACTION_MAP),
+                textString, cursorPosition, kbe, selection)
+            setText(t2[0])
+            setCursorPosition(t2[1])
+            setSelection(t2[2])
+            e.use()
+            e.redraw()
+        }
+    }
 }
 
 export function TextBox(param: TextInputElementSettings): GElement {
     return new TextInputElement(param)
 }
+
 export type NumberBoxSettings = {
-    value: StateHandler<number>
-    fixedWidth?:number,
-    fontSettings?: FontSettings
-    hints? : Record<string, any>
+    value?: StateHandler<number>
+    fixedWidth?: number,
+    hints?: Record<string, any>
     format?: "integer" | "float"
     min?: number
     max?: number
     step?: number
-}
-export function NumberBox(param: NumberBoxSettings):GElement {
-    const key = KEY_VENDOR.getKey()
-    let [value, setValue] = useState(key, "num", param.value, () => 0)
-    let min = param.min || 0
-    let max = param.max || 100
-    let step = param.step || 1
-    let format = param.format || "integer"
-    if(param.hints) {
-        if(param.hints.step) step = param.hints.step
-        if(param.hints.format) format = param.hints.format
-        if(param.hints.min) min = param.hints.min
-        if(param.hints.max) max = param.hints.max
+} & TextInputElementSettings
+
+class NumberInputElement extends TextInputElement {
+    private num_settings: NumberBoxSettings;
+    private key: string;
+    constructor(param: NumberBoxSettings) {
+        super(param);
+        this.num_settings = param
     }
-    const setConstrainedValue = (v:number) => {
-        let vv:number = v
-        if(isNaN(vv)) vv = 0
-        if(vv < min) vv = min
-        if(vv > max) vv = max
-        setValue(vv)
-    }
-    const input = new TextInputElement({
-            fixedWidth:param.fixedWidth,
-            fontSettings: param.fontSettings,
-            actionMap:NUMBER_ACTION_MAP,
-            text: {
-                get:() => {
-                    if(format === 'integer') return Math.floor(value) + ""
-                    if(format === 'float') return value.toFixed(2)
-                    return value + ""
-                },
-                set:(v) => {
-                    let vv:number = 0
-                    if(format === 'integer') vv = parseInt(v)
-                    if(format === 'float') vv = parseFloat(v)
-                    setConstrainedValue(vv)
-                }
+    layout(rc: RenderContext, _cons: LayoutConstraints): GRenderNode {
+        let param = this.num_settings
+        let min = param.min || 0
+        let max = param.max || 100
+        let step = param.step || 1
+        const key = KEY_VENDOR.getKey()
+        this.key = key
+        let [value, setValue] = useState(key, "num", param.value, () => 0)
+        let format = param.format || "integer"
+        const setConstrainedValue = (v: number) => {
+            let vv: number = v
+            if (isNaN(vv)) vv = 0
+            if (vv < min) vv = min
+            if (vv > max) vv = max
+            setValue(vv)
+        }
+        const numberToTextModel: StateHandler<string> = {
+            get: () => {
+                if (format === 'integer') return Math.floor(value) + ""
+                if (format === 'float') return value.toFixed(2)
+                return value + ""
+            },
+            set: (v) => {
+                let vv: number = 0
+                if (format === 'integer') vv = parseInt(v)
+                if (format === 'float') vv = parseFloat(v)
+                setConstrainedValue(vv)
             }
-        })
-    const increment = (e:CEvent) => {
-        if(e.type === 'mouse-down') {
-            setConstrainedValue(value+step)
-            e.redraw()
         }
+        this.settings.text = numberToTextModel
+        return super.layout(rc, _cons);
     }
-    const decrement = (e:CEvent) => {
-        if(e.type === 'mouse-down') {
-            setConstrainedValue(value-step)
-            e.redraw()
+
+    protected handleEvent(e: CEvent, key: string) {
+        if(e.type === 'keyboard-typed') {
+            let kbe = e as MKeyboardEvent;
+            if(kbe.key === LOGICAL_KEYBOARD_CODE.ARROW_UP) {
+                this.increment(e)
+                return
+            }
+            if(kbe.key === LOGICAL_KEYBOARD_CODE.ARROW_DOWN) {
+                this.decrement(e)
+                return
+            }
         }
+        super.handleEvent(e, key);
     }
-    return HBox({
-        fixedWidth: param.fixedWidth,
-        mainAxisSelfLayout:'grow',
-        crossAxisSelfLayout:'shrink',
-        children:[
-            input,
-            VBox({
-                children:[
-                    IconButton({
-                        padding: Insets.from(1),
-                        fontSettings: {
-                            fontSize: 10,
-                        },
-                        icon:Icons.KeyboardArrowUp, handleEvent:(increment)
-                    }),
-                    IconButton({
-                        padding: Insets.from(1),
-                        fontSettings: {
-                            fontSize: 10,
-                        },
-                        icon:Icons.KeyboardArrowDown, handleEvent:(decrement)
-                    }),
-            ]}),
-    ]})
+
+    increment(e:CEvent) {
+        let key = this.key
+        let [value, setValue] = useState(key, "num", this.num_settings.value, () => 0)
+        setValue(value+1)
+        let [_textString, setText] = useState(key, "text", this.settings.text, () => "")
+        setText((value+1)+"")
+        e.use()
+        e.redraw()
+    }
+
+    decrement(e:CEvent) {
+        let key = this.key
+        let [value, setValue] = useState(key, "num", this.num_settings.value, () => 0)
+        setValue(value-1)
+        let [_textString, setText] = useState(key, "text", this.settings.text, () => "")
+        setText((value-1)+"")
+        e.use()
+        e.redraw()
+    }
+}
+
+export function NumberBox(param: NumberBoxSettings): GElement {
+    if (param.hints) {
+        if (param.hints.step) param.step = param.hints.step
+        if (param.hints.format) param.format = param.hints.format
+        if (param.hints.min) param.min = param.hints.min
+        if (param.hints.max) param.max = param.hints.max
+    }
+    return new NumberInputElement(param)
+}
+export type ActionBoxSettings = {
+    action: (value: string) => void
+} & TextInputElementSettings
+
+class ActionInputElement extends TextInputElement {
+    private action_settings: ActionBoxSettings;
+    constructor(param:ActionBoxSettings) {
+        super(param);
+        this.action_settings = param
+    }
+    protected handleEvent(e: CEvent, key: string) {
+        if(e.type === 'keyboard-typed') {
+            let kbe = e as MKeyboardEvent;
+            if(kbe.key === LOGICAL_KEYBOARD_CODE.ENTER) {
+                let [text, setText] = useState(key, "text", this.settings.text, () => "")
+                this.action_settings.action(text)
+            }
+        }
+        super.handleEvent(e, key);
+    }
+}
+export function ActionBox(param: ActionBoxSettings): GElement {
+    return new ActionInputElement(param)
 }

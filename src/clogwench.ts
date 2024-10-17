@@ -7,7 +7,7 @@ import {Bounds, Point, Size} from "josh_js_util";
 import {RenderContext, RenderingSurface, TextOpts} from "./gfx.js";
 import {calcCanvasFont3} from "./util.js";
 import {EventType, Socket} from "zeromq";
-import {makeBaselineRow, makeButton, makeListDemo, makeTabs, makeTextInput} from "./apps/demo.js";
+import {makeTabs} from "./apps/demo.js";
 import {IDEALOS_KEYBOARD_CODE, LogicalKeyboardCode} from "./keyboard.js";
 import {setup_common_keybindings} from "./actions.js";
 
